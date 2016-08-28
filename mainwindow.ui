@@ -20,11 +20,11 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true"/>
+   <string notr="true">font: 10pt &quot;Arial&quot;;</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(24,24,24);
+    <string notr="true">background-color: #212121;
 </string>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -115,7 +115,8 @@
           <string>Search</string>
          </property>
          <property name="styleSheet">
-          <string notr="true"/>
+          <string notr="true">background-color: #404f4f;
+border-color: #e3e3e3;</string>
          </property>
         </widget>
        </item>
@@ -150,7 +151,8 @@
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true"/>
+          <string notr="true">background-color: #404f4f;
+border-color: #e3e3e3;</string>
          </property>
         </widget>
        </item>
@@ -163,10 +165,10 @@
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">border: 1px solid #676767;
+          <string notr="true">border: 1px solid #e3e3e3;
 border-radius: 3px 3px 3px 3px;
-padding: 3px;
-background-color: qlineargradient(spread:pad, x1:0.015, y1:1, x2:0, y2:0, stop:0 rgba(0, 0, 0, 255), stop:0.751244 rgba(42, 42, 42, 255), stop:1 rgba(0, 0, 0, 255));</string>
+padding: 2px 5px;
+background-color: #404f4f;</string>
          </property>
          <property name="text">
           <string>Replace</string>
@@ -182,10 +184,10 @@ background-color: qlineargradient(spread:pad, x1:0.015, y1:1, x2:0, y2:0, stop:0
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">border: 1px solid #676767;
+          <string notr="true">border: 1px solid #e3e3e3;
 border-radius: 3px 3px 3px 3px;
-padding: 3px;
-background-color: qlineargradient(spread:pad, x1:0.015, y1:1, x2:0, y2:0, stop:0 rgba(0, 0, 0, 255), stop:0.751244 rgba(42, 42, 42, 255), stop:1 rgba(0, 0, 0, 255));</string>
+padding: 2px 5px;
+background-color: #404f4f;</string>
          </property>
          <property name="text">
           <string>Replace all</string>
@@ -204,10 +206,10 @@ background-color: qlineargradient(spread:pad, x1:0.015, y1:1, x2:0, y2:0, stop:0
           <string>Find next</string>
          </property>
          <property name="styleSheet">
-          <string notr="true">border: 1px solid #676767;
+          <string notr="true">border: 1px solid #e3e3e3;
 border-radius: 3px 3px 3px 3px;
-padding: 3px;
-background-color: qlineargradient(spread:pad, x1:0.015, y1:1, x2:0, y2:0, stop:0 rgba(0, 0, 0, 255), stop:0.751244 rgba(42, 42, 42, 255), stop:1 rgba(0, 0, 0, 255));</string>
+padding: 2px 5px;
+background-color: #404f4f;</string>
          </property>
          <property name="text">
           <string>Find</string>
@@ -226,10 +228,10 @@ background-color: qlineargradient(spread:pad, x1:0.015, y1:1, x2:0, y2:0, stop:0
           <string>Find Previous</string>
          </property>
          <property name="styleSheet">
-          <string notr="true">border: 1px solid #676767;
+          <string notr="true">border: 1px solid #e3e3e3;
 border-radius: 3px 3px 3px 3px;
-padding: 3px;
-background-color: qlineargradient(spread:pad, x1:0.015, y1:1, x2:0, y2:0, stop:0 rgba(0, 0, 0, 255), stop:0.751244 rgba(42, 42, 42, 255), stop:1 rgba(0, 0, 0, 255));</string>
+padding: 2px 5px;
+background-color: #404f4f;</string>
          </property>
          <property name="text">
           <string>Find Prev</string>
@@ -278,9 +280,8 @@ background-color: qlineargradient(spread:pad, x1:0.015, y1:1, x2:0, y2:0, stop:0
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">font: 9pt &quot;Droid Sans&quot;;
-color: white;
-background-color: rgb(24,24,24);
+         <string notr="true">color: white;
+background-color: #212121;
 </string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
@@ -479,8 +480,11 @@ background:qlineargradient(spread:pad, x1:0.015, y1:1, x2:0, y2:0, stop:0 rgba(3
         </property>
         <property name="font">
          <font>
-          <family>Droid Sans Mono</family>
+          <family>Liberation Mono</family>
           <pointsize>10</pointsize>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
          </font>
         </property>
         <property name="layoutDirection">
@@ -492,7 +496,8 @@ margin-top: 28px;
 padding-left: 5px;
 color: rgb(173, 173, 173);
 border: 1px solid #303030;
-border-radius: 3px 3px 3px 3px;</string>
+border-radius: 3px 3px 3px 3px;
+font: 10pt &quot;Liberation Mono&quot;;</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -501,12 +506,12 @@ border-radius: 3px 3px 3px 3px;</string>
          <enum>QListView::SinglePass</enum>
         </property>
         <property name="spacing">
-         <number>-1</number>
+         <number>0</number>
         </property>
         <property name="gridSize">
          <size>
           <width>0</width>
-          <height>17</height>
+          <height>16</height>
          </size>
         </property>
         <property name="uniformItemSizes">
@@ -515,11 +520,6 @@ border-radius: 3px 3px 3px 3px;</string>
         <property name="selectionRectVisible">
          <bool>true</bool>
         </property>
-        <item>
-         <property name="text">
-          <string>1</string>
-         </property>
-        </item>
        </widget>
       </item>
       <item>
@@ -549,6 +549,9 @@ border-radius: 3px 3px 3px 3px;</string>
       </item>
       <item>
        <widget class="QPlainTextEdit" name="fileOverview">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="maximumSize">
          <size>
           <width>110</width>
@@ -557,15 +560,19 @@ border-radius: 3px 3px 3px 3px;</string>
         </property>
         <property name="font">
          <font>
-          <family>DejaVu Sans Mono</family>
+          <family>Liberation Mono</family>
           <pointsize>1</pointsize>
-          <kerning>true</kerning>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">color: rgb(255, 255, 255);
+         <string notr="true">font-family: &quot;Liberation Mono&quot;;
+font-size: 1pt;
+color: rgb(255, 255, 255);
 margin-top: 28px;
-background-color: rgb(27,29,31);
+background-color: #212121;
 border: 0px;</string>
         </property>
         <property name="verticalScrollBarPolicy">
@@ -606,7 +613,7 @@ border: 0px;</string>
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: qlineargradient(spread:pad, x1:0.015, y1:1, x2:0, y2:0, stop:0 rgba(51, 51, 51, 255), stop:0.532338 rgba(69, 69, 69, 255), stop:1 rgba(51, 51, 51, 255));
+       <string notr="true">background-color: #404f4f;
 color:white;
 font-size: 10;</string>
       </property>
@@ -630,9 +637,10 @@ font-size: 10;</string>
         <widget class="QLabel" name="label">
          <property name="font">
           <font>
-           <family>Droid Sans</family>
-           <pointsize>9</pointsize>
+           <family>Arial</family>
+           <pointsize>10</pointsize>
            <weight>50</weight>
+           <italic>false</italic>
            <bold>false</bold>
           </font>
          </property>
@@ -660,10 +668,11 @@ font-size: 10;</string>
          </property>
          <property name="font">
           <font>
-           <family>Droid Sans</family>
-           <pointsize>9</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
+           <family>Arial</family>
+           <pointsize>10</pointsize>
+           <weight>50</weight>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="styleSheet">
@@ -700,22 +709,13 @@ background-color: rgba(255, 255, 255, 0);</string>
    </property>
    <property name="font">
     <font>
-     <family>DejaVu Sans</family>
+     <family>Arial</family>
+     <pointsize>10</pointsize>
+     <weight>50</weight>
+     <italic>false</italic>
+     <bold>false</bold>
     </font>
    </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionNew"/>
-    <addaction name="separator"/>
-    <addaction name="actionOpen"/>
-    <addaction name="actionOpen_containg_folder"/>
-    <addaction name="actionSave"/>
-    <addaction name="actionSave_as"/>
-    <addaction name="separator"/>
-    <addaction name="actionExit"/>
-   </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
      <string>Edit</string>
@@ -777,6 +777,19 @@ background-color: rgba(255, 255, 255, 0);</string>
     <addaction name="actionRun_in_xterm"/>
     <addaction name="actionRun"/>
     <addaction name="actionChmodx"/>
+   </widget>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionNew"/>
+    <addaction name="separator"/>
+    <addaction name="actionOpen"/>
+    <addaction name="actionOpen_containg_folder"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionSave_as"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>

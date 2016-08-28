@@ -75,22 +75,22 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //  CSS
     this->setWindowTitle("Geist");
-    MainWindow::setStyleSheet("QMenu {background-color: rgb(48, 47, 54); color:white; selection-background-color: #232629;border: 1px solid #303030;border-radius: 3px 3px 3px 3px;}"
-                              "QMenuBar::item {background:rgb(25, 25, 25);} QMenuBar::item:selected {background: #232629;}"
+    MainWindow::setStyleSheet("QMenu {background-color: rgb(48, 47, 54); color:white; selection-background-color: #404f4f;border: 1px solid #303030;border-radius: 3px 3px 3px 3px;}"
+                              "QMenuBar::item {background:#212121;} QMenuBar::item:selected {background: #232629;}"
                               "QMessageBox {color:white;}"
-                              "QLineEdit {border: 1px solid #676767;}"
-                              "QScrollBar::sub-page:vertical {background: #1f1f1f;} QScrollBar::add-page:vertical {background: #1f1f1f;}"
-                              "QScrollBar::sub-page:horizonal {background: #1f1f1f;} QScrollBar::add-page:horizontal {background: #1f1f1f;}"
-                              "QScrollBar:vertical{background: white;width:10px;margin: 0px 0px 0px 0px;} QScrollBar::handle:vertical {background:#1f1f1f;border: 1px solid #333333;border-radius: 5px 5px 5px 5px; min-height: 30px;}"
-                              "QScrollBar:horizontal{background: white;height:10px;margin: 0px 0px 0px 0px;} QScrollBar::handle:horizontal {background:#1f1f1f;border: 1px solid #333333;border-radius: 5px 5px 5px 5px; min-height: 30px;}");
+                              "QLineEdit {border: 1px solid #676767; border-radius: 5px 5px 5px 5px;}"
+                              "QScrollBar::sub-page:vertical {background: #333333;} QScrollBar::add-page:vertical {background: #333333;}"
+                              "QScrollBar::sub-page:horizonal {background: #333333;} QScrollBar::add-page:horizontal {background: #333333;}"
+                              "QScrollBar:vertical{background: white;width:12px;margin: 0px 0px 0px 0px;} QScrollBar::handle:vertical {background:#1d1f21;border: 2px solid #333333;border-radius: 5px 5px 5px 5px; min-height: 30px;}"
+                              "QScrollBar:horizontal{background: white;height:12px;margin: 0px 0px 0px 0px;} QScrollBar::handle:horizontal {background:#1d1f21;border: 2px solid #333333;border-radius: 5px 5px 5px 5px; min-height: 30px;}");
 
 
-    ui->tabWidget->setStyleSheet("QPlainTextEdit { background-color: #1d1f21; color:white; border: 0px; selection-background-color: #363b40; font-family: \"droid\", sans, mono; font-size:10pt;} "
-                                 "QScrollBar:vertical{background: #252429;} QScrollBar:horizontal{background: #252429;}"
-                                 "QTabBar::tab:selected{color: white; background: #1d1f21; border-color: #2F4F4F;}"
-                                 "QTabBar::tab {height: 22px; width: 155px; color: #676767; font-size:8pt; border: 1px solid black; border-bottom:0px; border-top-left-radius: 10px 25px;border-top-right-radius: 10px 25px;margin-left: 1px;padding: 1px 3px; background-color: #141617;}");
+    ui->tabWidget->setStyleSheet("QPlainTextEdit { background-color: #1d1f21; color:white; border: 0px; selection-background-color: #404f4f; font-family: \"Liberation Mono\"; font-size:10pt;} "
+                                 "QScrollBar:vertical{background: #333333;} QScrollBar:horizontal{background: #333333;}"
+                                 "QTabBar::tab:selected{color: white; background: #1d1f21; border-bottom: 2px solid #2F4F4F;}"
+                                 "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; margin: 0 -2px;padding: 1px 5px; background-color: #212121;}");
 
-    ui->menuBar->setStyleSheet("color:white; background-color:rgb(25, 25, 25); QMenuBar::item {background:black;}");
+    ui->menuBar->setStyleSheet("color:white; background-color:#212121; QMenuBar::item {background:black;}");
     ui->centralWidget->layout()->setContentsMargins(0,0,0,0);
 
     //  Set Icons for toolbar
@@ -130,6 +130,10 @@ MainWindow::MainWindow(QWidget *parent) :
     p->setFocus();
     highlighter = new Highlighter(ui->fileOverview->document());
     highlightCurrentLine();
+
+    ui->listWidget->addItem("1");
+    QListWidgetItem *item = ui->listWidget->item(numBlocks-1);
+    item->setSizeHint(QSize(item->sizeHint().height(), 14));
 
 }
 
@@ -851,6 +855,8 @@ void MainWindow::updateLineNums(int newBlockCount){
             ostringstream oss;
             oss << numBlocks;
             ui->listWidget->addItem( QString::fromStdString(oss.str()) );
+            QListWidgetItem *item = ui->listWidget->item(numBlocks-1);
+            item->setSizeHint(QSize(item->sizeHint().height(), 14));
         }
 
     }else{
@@ -864,7 +870,7 @@ void MainWindow::updateLineNums(int newBlockCount){
     }
 
     ostringstream oss;
-    oss << " Total Lines: " << newBlockCount << "\t";
+    oss << " Lines: " << newBlockCount << "\t";
     ui->label->setText(QString::fromStdString(oss.str()));
 }
 void MainWindow::onBlockCountChanged(int newBlockCount)

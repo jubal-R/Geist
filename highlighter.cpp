@@ -49,7 +49,7 @@ Highlighter::Highlighter(QTextDocument *parent)
 
     //Functions
     functionFormat.setFontItalic(true);
-    functionFormat.setForeground(QColor(255, 247, 99));
+    functionFormat.setForeground(QColor(77,171,171));
     rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
     rule.format = functionFormat;
     highlightingRules.append(rule);
@@ -104,8 +104,8 @@ Highlighter::Highlighter(QTextDocument *parent)
     highlightingRules.append(rule);
 
     //Nums :D
-    classFormat.setFontWeight(QFont::Bold);
-    classFormat.setForeground(QColor(209, 84, 84));
+//    classFormat.setFontWeight(QFont::Bold);
+    classFormat.setForeground(QColor(247, 235, 96));
     rule.pattern = QRegExp("\\b[0-9\\.]+\\b");
     rule.format = classFormat;
     highlightingRules.append(rule);
