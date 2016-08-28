@@ -341,7 +341,10 @@ void MainWindow::on_actionSave_as_triggered()
        }
 }
 
-//  Run program
+/*  Run program (in gnome terminal)
+*   If html opens in default browser instead
+*   Supported languages: html, perl, python, ruby, sh
+*/
 void MainWindow::run(bool sudo){
     ostringstream oss;
 
@@ -352,46 +355,28 @@ void MainWindow::run(bool sudo){
     QStringList fileExtension = QString::fromStdString(filename).split(".");
     int len = fileExtension.length();
 
-    if (fileExtension[len - 1] == "cpp"){
-            oss << filename.substr(0,filename.length()-4);
-
-    }else if (fileExtension[len - 1] == "asm"){
-        oss << filename.substr(0,filename.length()-4);
-
-    }else if (fileExtension[len - 1] == "c"){
-        oss << filename.substr(0,filename.length()-2);
-
-    }else if (fileExtension[len - 1] == "java"){
-            string path = filename.substr(0,filename.find_last_of("/")+1);
-            string f = filename.substr(filename.find_last_of("/")+1, filename.length() - path.length() -5);
-            oss << "java -cp " << path << " " << f;
-
-    }else if (fileExtension[len - 1] == "php"){
-        oss << "php " << filename;
-
-    }else if (fileExtension[len - 1] == "py"){
+    if (fileExtension[len - 1] == "py"){
         oss << filename;
+        runner.runGnomeTerminal(oss.str());
 
     }else if (fileExtension[len - 1] == "rb"){
         oss << "ruby " << filename;
-
+        runner.runGnomeTerminal(oss.str());
     }else if (fileExtension[len - 1] == "pl"){
         oss << "perl " << filename;
-
+        runner.runGnomeTerminal(oss.str());
     }else if (fileExtension[len - 1] == "sh"){
         oss << filename;
+        runner.runGnomeTerminal(oss.str());
 
     }else if (fileExtension[len - 1] == "html"){
         oss << "xdg-open " << filename;
         ui->textBrowser->setPlainText(QString::fromStdString(runner.run(oss.str())));
 
-    }else if (fileExtension[len - 1] == "js"){
-
     }else{
-        oss << "";
+
     }
-    //  run in xterm
-    runner.runxterm(oss.str());
+
 }
 void MainWindow::on_runButton_clicked()
 {
