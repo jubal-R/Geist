@@ -197,8 +197,13 @@ void MainWindow::on_tabWidget_currentChanged(int index)
 void MainWindow::on_tabWidget_tabCloseRequested(int index)
 {
     if (*openTabs > 1){
+
+    }else{
+        newTab();
+    }
         int newIndex = 0;
 
+        // Set the new current tab
         if (index > 0){
             newIndex = index - 1;
             ui->tabWidget->setCurrentWidget(ui->tabWidget->widget(index - 1));
@@ -207,25 +212,29 @@ void MainWindow::on_tabWidget_tabCloseRequested(int index)
             ui->tabWidget->setCurrentWidget(ui->tabWidget->widget(index + 1));
         }
 
+        // Delete the tabs highlighter
         delete highlighters[index];
         highlighters[index] = 0;
 
+        // Update other highlighters to their tab's new positions
         for (int i = index; i < *openTabs; i++){
             highlighters[i] = highlighters[i+1];
         }
 
+        // Delete the tab
         delete ui->tabWidget->widget(index);
         *openTabs -= 1;
 
+        // Update file names list to correspond to new tab positions
         for (int i = index; i < ui->tabWidget->count(); i++){
             filenames[i] = filenames[i+1];
         }
 
+        // Clear last file name in list
         filenames[*openTabs] = "";
+        // Update filename to correspond to new current tab
         filename = filenames[newIndex];
-    }else{
 
-    }
 }
 
 //  Create new tab
