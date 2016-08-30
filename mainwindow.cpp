@@ -264,22 +264,7 @@ void MainWindow::on_actionOpen_triggered()
 //  Save file
 void MainWindow::save(){
     if (filename == "" || *outputModeP != 0){
-        filename = QFileDialog::getSaveFileName(this, tr("Open File"), currentDirectory, tr("All (*)"));
-
-        if(filename != ""){
-
-            if(filename.length() > 20){
-                ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename.right(20));
-            }else{
-                ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename);
-            }
-            ui->tabWidget->setTabToolTip(ui->tabWidget->currentIndex(), filename);
-
-            if(files.write(filename.toStdString(), p->toPlainText().toStdString())){
-                ui->textBrowser->setText("Saved");
-            }
-        }
-
+        on_actionSave_as_triggered();
     }else{
         if(files.write(filename.toStdString(), p->toPlainText().toStdString())){
             ui->textBrowser->setText("Saved");
@@ -296,9 +281,23 @@ void MainWindow::on_actionSave_as_triggered()
     filename = QFileDialog::getSaveFileName(this, tr("Open File"), currentDirectory, tr("All (*)"));
 
     if (filename != ""){
+        files.write(filename.toStdString(), p->toPlainText().toStdString());
+
+        // Add info to filelist
+        QString currentFile = ui->tabWidget->tabToolTip(ui->tabWidget->currentIndex());
+        if(currentFile == ""){
+            // Add file info to filelist
+            node * fileNode = new node;
+            fileNode->filepath = filename.toStdString();
+            fileNode->highlighter = new Highlighter(p->document());
+            filelist.insertNode(fileNode);
+        }else{
+            filelist.setFilepath(currentFile.toStdString(), filename.toStdString());
+        }
+
         ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename.right(20));
         ui->tabWidget->setTabToolTip(ui->tabWidget->currentIndex(), filename);
-        files.write(filename.toStdString(), p->toPlainText().toStdString());
+
         ui->textBrowser->setText("Saved");
        }
 }

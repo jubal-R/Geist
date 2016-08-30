@@ -6,6 +6,7 @@
 struct node {
     node * next;
     std::string filepath;
+    std::string filetype;
     Highlighter * highlighter;
 };
 
@@ -15,6 +16,7 @@ public:
     FileList();
     void insertNode(node * newNode);
     void removeNode(std::string file);
+    void setFilepath(std::string oldfilepath, std::string newfilepath);
     std::string getData(int index);
 private:
     node * head;

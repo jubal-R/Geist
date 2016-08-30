@@ -7,6 +7,7 @@ FileList::FileList(){
     head->next = NULL;
     head->highlighter = NULL;
     head->filepath = "";
+    head->filetype = "";
     len = 0;
 }
 
@@ -54,6 +55,22 @@ void FileList::removeNode(std::string file){
         }
         len--;
     }
+}
+
+void FileList::setFilepath(std::string oldfp, std::string newfp){
+    if(head->next != NULL && oldfp != "" && newfp != ""){
+        node * n = head;
+
+        while(oldfp != n->filepath && n->next != NULL){
+            n = n->next;
+        }
+
+        if(oldfp == n->filepath){
+            n->filepath = newfp;
+        }
+
+    }
+
 }
 
 std::string FileList::getData(int index){
