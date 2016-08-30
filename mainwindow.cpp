@@ -4,6 +4,7 @@ By Jubal - Geist - All purpose text editor
 */
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "filelist.h"
 #include "files.h"
 #include "conversion.h"
 #include "snippets.h"
@@ -30,16 +31,14 @@ using namespace std;
 
 QPlainTextEdit *p;
 
-std::string filenames[20] = {}; //  Currently open files, up to 20
-
 Conversion conversion;
+FileList filelist;
 Files files;
 Snippets snippets;
-Highlighter *highlighters[20];
 Runner runner;
 Templates templates;
 
-QString currentQuery;
+QString currentSearchTerm;
 QStringList foundPositions;
 QStringList settings;
 QString currentDirectory = QString::fromStdString(files.getHomeDir());    //  Directory of last opened file. Users home folder by default.
@@ -55,20 +54,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     // Init vars
-    cTab = 0;
-    Tabs = 0;
     numBlocks = 1;
     newNumBlocks = 0;
     outputMode = 0;
-    is64bit = 0;
     foundPosElement = 0;
-    queryLen = 0;
+    searchTermLen = 0;
 
-    currentTab = &cTab;    //  Index of currently focused tab
-    openTabs = &Tabs;  //  Number of curently open tabs
     outputModeP = &outputMode; //  0 = ascii, 1 = hex, 2 = strings
 
-    filename = "";
+    filename = "";  // Name of file in current tab
 
     // UI Setup
     ui->setupUi(this);
@@ -93,23 +87,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->menuBar->setStyleSheet("color:white; background-color:#212121; QMenuBar::item {background:black;}");
     ui->centralWidget->layout()->setContentsMargins(0,0,0,0);
 
-    //  Set Icons for toolbar
-    QIcon iconNew;
-    iconNew.addFile(QString::fromUtf8("images/document-new.png"), QSize(), QIcon::Normal, QIcon::Off);
-    ui->newTabButton->setIcon(iconNew); ui->newTabButton->setIconSize(QSize(16, 16));
-    QIcon iconOpen;
-    iconOpen.addFile(QString::fromUtf8("images/document-open.png"), QSize(), QIcon::Normal, QIcon::Off);
-    ui->openButton->setIcon(iconOpen); ui->openButton->setIconSize(QSize(16, 16));
-    QIcon iconSave;
-    iconSave.addFile(QString::fromUtf8("images/document-save.png"), QSize(), QIcon::Normal, QIcon::Off);
-    ui->saveButton->setIcon(iconSave); ui->saveButton->setIconSize(QSize(16, 16));
-    QIcon iconFind;
-    iconFind.addFile(QString::fromUtf8("images/edit-find.png"), QSize(), QIcon::Normal, QIcon::Off);
-    ui->searchButton->setIcon(iconFind); ui->searchButton->setIconSize(QSize(16, 16));
-    QIcon iconRun;
-    iconRun.addFile(QString::fromUtf8("images/utilities-terminal.png"), QSize(), QIcon::Normal, QIcon::Off);
-    ui->runButton->setIcon(iconRun); ui->runButton->setIconSize(QSize(16, 16));
-
 
     //  Setup window based on user's settings
     string set = files.read("settings.txt");
@@ -117,7 +94,6 @@ MainWindow::MainWindow(QWidget *parent) :
     if (settings.size() > 3){
         MainWindow::resize(settings.at(0).toInt(), settings.at(1).toInt());
         ui->fileOverview->setMaximumWidth(settings.at(2).toInt());
-        ui->toolbar->setMaximumWidth(settings.at(3).toInt());
     }
 
     //  Disbale manual scrolling for line numbers
@@ -128,7 +104,7 @@ MainWindow::MainWindow(QWidget *parent) :
     newTab();
     connect(p, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
     p->setFocus();
-    highlighter = new Highlighter(ui->fileOverview->document());
+    highlighter = new Highlighter(ui->fileOverview->document());    // Set highlighter for file overview
     highlightCurrentLine();
 
     ui->listWidget->addItem("1");
@@ -139,11 +115,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    //  Save settings
-    if (settings.at(0).toInt() != MainWindow::width() || settings.at(1).toInt() != MainWindow::height() || settings.at(2).toInt() != ui->fileOverview->maximumWidth()
-            || settings.at(3).toInt() != ui->toolbar->width()){
+    /*  Save settings
+    *   Window size, overview toggle values
+    */
+    if (settings.at(0).toInt() != MainWindow::width() || settings.at(1).toInt() != MainWindow::height() || settings.at(2).toInt() != ui->fileOverview->maximumWidth()){
         ostringstream oss;
-        oss << MainWindow::width() << "\n" << MainWindow::height() << "\n" << ui->fileOverview->width() << "\n" << ui->toolbar->width();
+        oss << MainWindow::width() << "\n" << MainWindow::height() << "\n" << ui->fileOverview->width();
         files.write("settings.txt", oss.str());
     }
 
@@ -154,7 +131,7 @@ MainWindow::~MainWindow()
 
 //  Highlight Current Line
 void MainWindow::highlightCurrentLine(){
-    QList<QTextEdit::ExtraSelection> extraSelections;
+   QList<QTextEdit::ExtraSelection> extraSelections;
 
    QTextEdit::ExtraSelection selections;
    QColor lineColor = QColor(37, 40, 43);
@@ -178,8 +155,7 @@ void MainWindow::on_tabWidget_currentChanged(int index)
         disconnect(p, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
     }
 
-    *currentTab = index;
-    p = qobject_cast<QPlainTextEdit *>(ui->tabWidget->widget(*currentTab));
+    p = qobject_cast<QPlainTextEdit *>(ui->tabWidget->widget(index));
     newNumBlocks = p->document()->blockCount();
     QObject::connect(p->verticalScrollBar(), SIGNAL(valueChanged(int)), ui->listWidget->verticalScrollBar(), SLOT(setValue(int)));
     QObject::connect(p->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(scrollOverview(int)));
@@ -188,7 +164,7 @@ void MainWindow::on_tabWidget_currentChanged(int index)
     connect(p, SIGNAL(blockCountChanged(int)), this, SLOT(onBlockCountChanged(int)));
     connect(p, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
     ui->fileOverview->setPlainText(p->toPlainText());
-    filename = filenames[index];
+    filename = ui->tabWidget->tabToolTip(ui->tabWidget->currentIndex());
     foundPositions.clear();
     foundPosElement = 0;
 }
@@ -196,56 +172,37 @@ void MainWindow::on_tabWidget_currentChanged(int index)
 //  Close tab
 void MainWindow::on_tabWidget_tabCloseRequested(int index)
 {
-    if (*openTabs > 1){
+    if (ui->tabWidget->count() > 1){
 
     }else{
         newTab();
     }
-        int newIndex = 0;
 
         // Set the new current tab
         if (index > 0){
-            newIndex = index - 1;
             ui->tabWidget->setCurrentWidget(ui->tabWidget->widget(index - 1));
         }else{
-            newIndex = index;
             ui->tabWidget->setCurrentWidget(ui->tabWidget->widget(index + 1));
         }
 
-        // Delete the tabs highlighter
-        delete highlighters[index];
-        highlighters[index] = 0;
-
-        // Update other highlighters to their tab's new positions
-        for (int i = index; i < *openTabs; i++){
-            highlighters[i] = highlighters[i+1];
-        }
+        // Delete filelist data
+        filelist.removeNode(ui->tabWidget->tabToolTip(index).toStdString());
 
         // Delete the tab
         delete ui->tabWidget->widget(index);
-        *openTabs -= 1;
 
-        // Update file names list to correspond to new tab positions
-        for (int i = index; i < ui->tabWidget->count(); i++){
-            filenames[i] = filenames[i+1];
-        }
-
-        // Clear last file name in list
-        filenames[*openTabs] = "";
         // Update filename to correspond to new current tab
-        filename = filenames[newIndex];
+        filename = ui->tabWidget->tabToolTip(ui->tabWidget->currentIndex());
 
 }
 
 //  Create new tab
 void MainWindow::newTab(){
-    if (*openTabs < 20){
+    if (ui->tabWidget->count() < 50){
         ui->tabWidget->addTab(new QPlainTextEdit, "New File");
-        *openTabs += 1;
         ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);
+        ui->tabWidget->setTabToolTip(ui->tabWidget->currentIndex(), "");
         filename = "";
-        filenames[ui->tabWidget->currentIndex()] = "";
-        highlighters[*currentTab] = new Highlighter(p->document());
 
         QFont font;
         font.setFamily("DejaVu Sans Mono");
@@ -259,44 +216,45 @@ void MainWindow::newTab(){
         p->setWordWrapMode(QTextOption::NoWrap);
     }
 }
-void MainWindow::on_newTabButton_clicked()
-{
-    MainWindow::newTab();
-    p->setFocus();
-}
 void MainWindow::on_actionNew_triggered()
 {
     MainWindow::newTab();
 }
 
-//  Open file
+/*  Open file
+*   Opens in new tab unless current tab is empty
+*   If file does not exist it will be created on save
+*/
 void MainWindow::open(){
     string file = QFileDialog::getOpenFileName(this, tr("Open File"), currentDirectory, tr("All (*)")).toStdString();
 
     if (file != ""){
 
-        if(filename != ""){
+        if(filename != "" || p->toPlainText() != ""){
             newTab();
         }
 
-        filename = file;
-        filenames[ui->tabWidget->currentIndex()] = filename;
-        p->setPlainText(QString::fromStdString(files.read(filename)));
+        filename = QString::fromStdString(file);
+        p->setPlainText(QString::fromStdString(files.read(filename.toStdString())));
 
         if (filename.length() > 22){
-            ui->tabWidget->setTabText(*currentTab, QString::fromStdString(filename.substr(filename.length()-22,filename.length())));
+            ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename.right(22));
         }else{
-            ui->tabWidget->setTabText(*currentTab, QString::fromStdString(filename));
+            ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename);
         }
+        // Store file path in tool tip
+        ui->tabWidget->setTabToolTip(ui->tabWidget->currentIndex(), filename);
+
+        // Add file info to filelist
+        node * fileNode = new node;
+        fileNode->filepath = file;
+        fileNode->highlighter = new Highlighter(p->document());
+        filelist.insertNode(fileNode);
 
         ui->textBrowser->setText("");
         *outputModeP = 0;
         currentDirectory = QString::fromStdString(getDirectory());
     }
-}
-void MainWindow::on_openButton_clicked(){
-    MainWindow::open();
-    p->setFocus();
 }
 void MainWindow::on_actionOpen_triggered()
 {
@@ -306,33 +264,28 @@ void MainWindow::on_actionOpen_triggered()
 //  Save file
 void MainWindow::save(){
     if (filename == "" || *outputModeP != 0){
-        filename = QFileDialog::getSaveFileName(this, tr("Open File"), currentDirectory, tr("All (*)")).toStdString();
+        filename = QFileDialog::getSaveFileName(this, tr("Open File"), currentDirectory, tr("All (*)"));
 
         if(filename != ""){
 
             if(filename.length() > 20){
-                ui->tabWidget->setTabText(*currentTab, QString::fromStdString(filename.substr(filename.length()-20,filename.length())));
+                ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename.right(20));
             }else{
-                ui->tabWidget->setTabText(*currentTab, QString::fromStdString(filename));
+                ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename);
             }
+            ui->tabWidget->setTabToolTip(ui->tabWidget->currentIndex(), filename);
 
-            filenames[ui->tabWidget->currentIndex()] = filename;
-            if(files.write(filename, p->toPlainText().toStdString())){
+            if(files.write(filename.toStdString(), p->toPlainText().toStdString())){
                 ui->textBrowser->setText("Saved");
             }
         }
 
     }else{
-        if(files.write(filename, p->toPlainText().toStdString())){
+        if(files.write(filename.toStdString(), p->toPlainText().toStdString())){
             ui->textBrowser->setText("Saved");
         }
 
     }
-}
-void MainWindow::on_saveButton_clicked()
-{
-    MainWindow::save();
-    p->setFocus();
 }
 void MainWindow::on_actionSave_triggered()
 {
@@ -340,12 +293,12 @@ void MainWindow::on_actionSave_triggered()
 }
 void MainWindow::on_actionSave_as_triggered()
 {
-    filename = QFileDialog::getSaveFileName(this, tr("Open File"), currentDirectory, tr("All (*)")).toStdString();
+    filename = QFileDialog::getSaveFileName(this, tr("Open File"), currentDirectory, tr("All (*)"));
 
     if (filename != ""){
-        ui->tabWidget->setTabText(*currentTab, QString::fromStdString(filename.substr(filename.length()-20,filename.length())));
-        filenames[ui->tabWidget->currentIndex()] = filename;
-        files.write(filename, p->toPlainText().toStdString());
+        ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename.right(20));
+        ui->tabWidget->setTabToolTip(ui->tabWidget->currentIndex(), filename);
+        files.write(filename.toStdString(), p->toPlainText().toStdString());
         ui->textBrowser->setText("Saved");
        }
 }
@@ -361,36 +314,31 @@ void MainWindow::run(bool sudo){
         oss << "sudo ";
     }
 
-    QStringList fileExtension = QString::fromStdString(filename).split(".");
+    QStringList fileExtension = filename.split(".");
     int len = fileExtension.length();
 
     if (fileExtension[len - 1] == "py"){
-        oss << filename;
+        oss << filename.toStdString();
         runner.runGnomeTerminal(oss.str());
 
     }else if (fileExtension[len - 1] == "rb"){
-        oss << "ruby " << filename;
+        oss << "ruby " << filename.toStdString();
         runner.runGnomeTerminal(oss.str());
     }else if (fileExtension[len - 1] == "pl"){
-        oss << "perl " << filename;
+        oss << "perl " << filename.toStdString();
         runner.runGnomeTerminal(oss.str());
     }else if (fileExtension[len - 1] == "sh"){
-        oss << filename;
+        oss << filename.toStdString();
         runner.runGnomeTerminal(oss.str());
 
     }else if (fileExtension[len - 1] == "html"){
-        oss << "xdg-open " << filename;
+        oss << "xdg-open " << filename.toStdString();
         ui->textBrowser->setPlainText(QString::fromStdString(runner.run(oss.str())));
 
     }else{
 
     }
 
-}
-void MainWindow::on_runButton_clicked()
-{
-    MainWindow::run(false);
-    p->setFocus();
 }
 void MainWindow::on_actionRun_in_xterm_triggered()
 {
@@ -429,10 +377,6 @@ void MainWindow::on_actionFind_triggered()
         p->setFocus();
     }
 }
-void MainWindow::on_searchButton_clicked()
-{
-    on_actionFind_triggered();
-}
 
 // Go To (Line number)
 void MainWindow::on_actionGoTo_triggered()
@@ -448,40 +392,40 @@ void MainWindow::on_actionGoTo_triggered()
     }
 }
 
-/*  Returns all positions of first char in query where matches are found
+/*  Returns all positions of first char in search term where matches are found
  *  as a string with positions seperated by spaces */
-string MainWindow::find(string query, string content){
+string MainWindow::find(string searchTerm, string content){
     ostringstream oss;
     string line = "";
     string *l = &line;
     bool found = false;
     bool *f = &found;
-    int qLen = query.length();
+    int qLen = searchTerm.length();
     char altFirst[1];   // Alternate case(uppercase/lowercase) version of first character
 
     //  Set altFirst
-    if(query[0] > 90){
-        altFirst[0] = query[0] - 32;
+    if(searchTerm[0] > 90){
+        altFirst[0] = searchTerm[0] - 32;
     }else{
-        altFirst[0] = query[0] + 32;
+        altFirst[0] = searchTerm[0] + 32;
     }
 
     for(unsigned int i = 0; i < content.length(); i++){
         *l += content[i];
 
-        if(content[i] == query[0] || content[i] == altFirst[0] ){
+        if(content[i] == searchTerm[0] || content[i] == altFirst[0] ){
             int lineNum = 1;
             char altCase[1];
 
             while(lineNum < qLen){
 
-                if(query[lineNum] > 90){
-                    altCase[0] = query[lineNum]-32;
+                if(searchTerm[lineNum] > 90){
+                    altCase[0] = searchTerm[lineNum]-32;
                 }else{
-                    altCase[0] = query[lineNum]+32;
+                    altCase[0] = searchTerm[lineNum]+32;
                 }
 
-                if(content[i+lineNum] == query[lineNum] || content[i+lineNum] == altCase[0]){
+                if(content[i+lineNum] == searchTerm[lineNum] || content[i+lineNum] == altCase[0]){
                     if(lineNum == qLen-1){
                         *f = true;
                         oss << i << " ";
@@ -499,22 +443,22 @@ string MainWindow::find(string query, string content){
     return oss.str();
 }
 
-// Find all instances of query and cycles through them
+// Find all instances of search term and cycles through them
 void MainWindow::on_findLineEdit_returnPressed()
 {
-    if (ui->findLineEdit->text() == currentQuery){
+    if (ui->findLineEdit->text() == currentSearchTerm){
             findNext();
 
     }else{
-        QString query = ui->findLineEdit->text();
-        currentQuery = query;
-        queryLen = query.length();
+        QString searchTerm = ui->findLineEdit->text();
+        currentSearchTerm = searchTerm;
+        searchTermLen = searchTerm.length();
 
-        if (queryLen > 0){
-            QString found = QString::fromStdString(find(query.toStdString(), p->toPlainText().toStdString()));
+        if (searchTermLen > 0){
+            QString found = QString::fromStdString(find(searchTerm.toStdString(), p->toPlainText().toStdString()));
             foundPositions = found.split(" ");
             foundPosElement = 0;
-            selectText(foundPositions[foundPosElement].toInt(), queryLen);
+            selectText(foundPositions[foundPosElement].toInt(), searchTermLen);
         }
     }
 }
@@ -550,9 +494,9 @@ void MainWindow::selectWord(){
     p->setTextCursor(cur);
 }
 
-//  Find next instance of query
+//  Find next instance of search term
 void MainWindow::findNext(){
-    if (ui->findLineEdit->text() == currentQuery){
+    if (ui->findLineEdit->text() == currentSearchTerm){
 
         if (foundPositions.length() > 1){
 
@@ -562,7 +506,7 @@ void MainWindow::findNext(){
                 foundPosElement = 0;
             }
 
-            selectText(foundPositions[foundPosElement].toInt(), queryLen);
+            selectText(foundPositions[foundPosElement].toInt(), searchTermLen);
         }
 
     }else{
@@ -570,7 +514,7 @@ void MainWindow::findNext(){
     }
 }
 
-// Find previous instance of query
+// Find previous instance of search term
 void MainWindow::findPrev(){
 
     if (foundPositions.length() > 1){
@@ -581,7 +525,7 @@ void MainWindow::findPrev(){
             foundPosElement = foundPositions.length() - 2;
         }
 
-        selectText(foundPositions[foundPosElement].toInt(), queryLen);
+        selectText(foundPositions[foundPosElement].toInt(), searchTermLen);
     }
 }
 
@@ -639,15 +583,15 @@ void MainWindow::on_replaceButton_clicked()
     }
 
     p->setTextCursor(cur);
-    QString query = ui->findLineEdit->text();
-    currentQuery = query;
-    queryLen = query.length();
+    QString searchTerm = ui->findLineEdit->text();
+    currentSearchTerm = searchTerm;
+    searchTermLen = searchTerm.length();
 
-    if (queryLen > 0){
-        QString found = QString::fromStdString(find(query.toStdString(), p->toPlainText().toStdString()));
+    if (searchTermLen > 0){
+        QString found = QString::fromStdString(find(searchTerm.toStdString(), p->toPlainText().toStdString()));
         foundPositions = found.split(" ");
         foundPosElement = 0;
-        selectText(foundPositions[foundPosElement].toInt(), queryLen);
+        selectText(foundPositions[foundPosElement].toInt(), searchTermLen);
     }
 }
 void MainWindow::on_replaceLineEdit_returnPressed()
@@ -658,16 +602,16 @@ void MainWindow::on_replaceLineEdit_returnPressed()
 //  Replace all found instances of text to be replaced
 void MainWindow::on_replaceAllButton_clicked()
 {
-    QString query = ui->findLineEdit->text();
-    currentQuery = query;
+    QString searchTerm = ui->findLineEdit->text();
+    currentSearchTerm = searchTerm;
     do{
-        queryLen = query.length();
+        searchTermLen = searchTerm.length();
 
-        if (queryLen > 0){
-            QString found = QString::fromStdString(find(query.toStdString(), p->toPlainText().toStdString()));
+        if (searchTermLen > 0){
+            QString found = QString::fromStdString(find(searchTerm.toStdString(), p->toPlainText().toStdString()));
             foundPositions = found.split(" ");
             foundPosElement = 0;
-            selectText(foundPositions[foundPosElement].toInt(), queryLen);
+            selectText(foundPositions[foundPosElement].toInt(), searchTermLen);
         }
 
         QTextCursor cur = p->textCursor();
@@ -774,7 +718,7 @@ void MainWindow::on_actionAscii_triggered()
 void MainWindow::on_actionChmodx_triggered()
 {
     ostringstream oss;
-    oss << "chmod +x " << filename;
+    oss << "chmod +x " << filename.toStdString();
     string output = runner.run(oss.str());
 
     if (output == ""){
@@ -894,7 +838,7 @@ void MainWindow::onTextChanged(){
 
     ui->textBrowser->setText("");
     ui->fileOverview->setPlainText(p->toPlainText());
-    currentQuery = "";
+    currentSearchTerm = "";
 }
 
 // Sync overview scrolling with editor scrolling
@@ -923,24 +867,12 @@ void MainWindow::on_actionOverview_triggered()
     }
 }
 
-//  Toggle toolbar
-void MainWindow::on_actionToolbar_triggered()
-{
-    if(ui->toolbar->width() == 0){
-        ui->toolbar->setMaximumWidth(38);
-        ui->toolbar->setMinimumWidth(38);
-    }else{
-        ui->toolbar->setMaximumWidth(0);
-        ui->toolbar->setMinimumWidth(0);
-    }
-}
-
 //  Get directory of current file
 string MainWindow::getDirectory(){
    ostringstream oss;
 
     if (filename != ""){
-        QStringList path = QString::fromStdString(filename).split("/");
+        QStringList path = filename.split("/");
         int len = path.length();
 
         for(int i = 0; i < len - 1; i++){
@@ -958,16 +890,12 @@ string MainWindow::getDirectory(){
 *   If current tab has no file open then open directory of last active file
 *   Else open users home directory
 */
-void MainWindow::on_openFolderButton_clicked()
+void MainWindow::on_actionOpen_containg_folder_triggered()
 {
     ostringstream oss;
     oss << "xdg-open " << getDirectory();
     ui->textBrowser->setPlainText(QString::fromStdString(runner.run(oss.str())));
     p->setFocus();
-}
-void MainWindow::on_actionOpen_containg_folder_triggered()
-{
-    MainWindow::on_openFolderButton_clicked();
 }
 
 

@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     templates.cpp \
     snippets.cpp \
     files.cpp \
-    runner.cpp
+    runner.cpp \
+    filelist.cpp
 
 HEADERS  += mainwindow.h \
     conversion.h \
@@ -28,7 +29,8 @@ HEADERS  += mainwindow.h \
     templates.h \
     snippets.h \
     files.h \
-    runner.h
+    runner.h \
+    filelist.h
 
 FORMS    += mainwindow.ui
 

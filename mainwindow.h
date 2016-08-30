@@ -19,8 +19,6 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_openButton_clicked();
-
     void on_actionOpen_triggered();
 
     void on_actionNew_triggered();
@@ -36,12 +34,6 @@ private slots:
     void on_actionSave_as_triggered();
 
     void on_actionFind_triggered();
-
-    void on_newTabButton_clicked();
-
-    void on_saveButton_clicked();
-
-    void on_searchButton_clicked();
 
     void on_actionHex_triggered();
 
@@ -99,10 +91,6 @@ private slots:
 
     std::string getDirectory();
 
-    void on_openFolderButton_clicked();
-
-    void on_runButton_clicked();
-
     void selectText(int pos,int len);
 
     void on_findButton_clicked();
@@ -143,8 +131,6 @@ private slots:
 
     void on_actionOverview_triggered();
 
-    void on_actionToolbar_triggered();
-
     void highlightCurrentLine();
 
     void on_actionOpen_containg_folder_triggered();
@@ -154,19 +140,14 @@ private:
     Highlighter *highlighter;
     QShortcut *shortcut;
 
-    int cTab;
-    int Tabs;
     int numBlocks;
     int newNumBlocks;
     int outputMode;
-    int is64bit;
     int foundPosElement;
-    int queryLen;
-    int *currentTab;
-    int *openTabs;
+    int searchTermLen;
     int *outputModeP;
 
-    std::string filename;
+    QString filename;
 
 };
 

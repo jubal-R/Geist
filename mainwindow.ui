@@ -266,211 +266,6 @@ background-color: #404f4f;</string>
        <number>2</number>
       </property>
       <item>
-       <widget class="QWidget" name="toolbar" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>0</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">color: white;
-background-color: #212121;
-</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <property name="spacing">
-          <number>4</number>
-         </property>
-         <property name="leftMargin">
-          <number>4</number>
-         </property>
-         <property name="topMargin">
-          <number>2</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QPushButton" name="newTabButton">
-           <property name="maximumSize">
-            <size>
-             <width>30</width>
-             <height>30</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;New&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">border: 1px solid #676767;
-border-radius: 3px 3px 3px 3px;
-padding: 4px;
-background:qlineargradient(spread:pad, x1:0.015, y1:1, x2:0, y2:0, stop:0 rgba(32, 32, 32, 255), stop:0.751244 rgba(42, 42, 42, 255), stop:1 rgba(32, 32, 32, 255));</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="openButton">
-           <property name="maximumSize">
-            <size>
-             <width>30</width>
-             <height>30</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">border: 1px solid #676767;
-border-radius: 3px 3px 3px 3px;
-padding: 4px;
-background:qlineargradient(spread:pad, x1:0.015, y1:1, x2:0, y2:0, stop:0 rgba(32, 32, 32, 255), stop:0.751244 rgba(42, 42, 42, 255), stop:1 rgba(32, 32, 32, 255));</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="saveButton">
-           <property name="maximumSize">
-            <size>
-             <width>30</width>
-             <height>30</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">border: 1px solid #676767;
-border-radius: 3px 3px 3px 3px;
-padding: 4px;
-background:qlineargradient(spread:pad, x1:0.015, y1:1, x2:0, y2:0, stop:0 rgba(32, 32, 32, 255), stop:0.751244 rgba(42, 42, 42, 255), stop:1 rgba(32, 32, 32, 255));</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="searchButton">
-           <property name="maximumSize">
-            <size>
-             <width>30</width>
-             <height>30</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Find&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">border: 1px solid #676767;
-border-radius: 3px 3px 3px 3px;
-padding: 4px;
-background:qlineargradient(spread:pad, x1:0.015, y1:1, x2:0, y2:0, stop:0 rgba(32, 32, 32, 255), stop:0.751244 rgba(42, 42, 42, 255), stop:1 rgba(32, 32, 32, 255));</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="runButton">
-           <property name="maximumSize">
-            <size>
-             <width>30</width>
-             <height>30</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">border: 1px solid #676767;
-border-radius: 3px 3px 3px 3px;
-padding: 4px;
-background:qlineargradient(spread:pad, x1:0.015, y1:1, x2:0, y2:0, stop:0 rgba(32, 32, 32, 255), stop:0.751244 rgba(42, 42, 42, 255), stop:1 rgba(32, 32, 32, 255));</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="compileButton">
-           <property name="maximumSize">
-            <size>
-             <width>30</width>
-             <height>30</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Compile&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">border: 1px solid #676767;
-border-radius: 3px 3px 3px 3px;
-padding: 4px;
-background:qlineargradient(spread:pad, x1:0.015, y1:1, x2:0, y2:0, stop:0 rgba(32, 32, 32, 255), stop:0.751244 rgba(42, 42, 42, 255), stop:1 rgba(32, 32, 32, 255));</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="openFolderButton">
-           <property name="maximumSize">
-            <size>
-             <width>30</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>open directory</string>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">border: 1px solid #676767;
-border-radius: 3px 3px 3px 3px;
-padding: 4px;
-background:qlineargradient(spread:pad, x1:0.015, y1:1, x2:0, y2:0, stop:0 rgba(32, 32, 32, 255), stop:0.751244 rgba(42, 42, 42, 255), stop:1 rgba(32, 32, 32, 255));</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="verticalSpacer">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
        <widget class="QListWidget" name="listWidget">
         <property name="maximumSize">
          <size>
@@ -756,7 +551,6 @@ background-color: rgba(255, 255, 255, 0);</string>
     </property>
     <addaction name="actionFullScreen"/>
     <addaction name="actionOverview"/>
-    <addaction name="actionToolbar"/>
    </widget>
    <widget class="QMenu" name="menuTemplates">
     <property name="title">
@@ -871,16 +665,10 @@ background-color: rgba(255, 255, 255, 0);</string>
    <property name="text">
     <string>Ascii</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+A</string>
-   </property>
   </action>
   <action name="actionHex">
    <property name="text">
     <string>Hex</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+H</string>
    </property>
   </action>
   <action name="actionChmodx">
@@ -1024,11 +812,6 @@ background-color: rgba(255, 255, 255, 0);</string>
     <string>Overview</string>
    </property>
   </action>
-  <action name="actionToolbar">
-   <property name="text">
-    <string>Toolbar</string>
-   </property>
-  </action>
   <action name="actionOpen_containg_folder">
    <property name="text">
     <string>Open containg folder</string>
@@ -1041,11 +824,6 @@ background-color: rgba(255, 255, 255, 0);</string>
   <tabstop>listWidget</tabstop>
   <tabstop>textBrowser</tabstop>
   <tabstop>fileOverview</tabstop>
-  <tabstop>openFolderButton</tabstop>
-  <tabstop>openButton</tabstop>
-  <tabstop>newTabButton</tabstop>
-  <tabstop>runButton</tabstop>
-  <tabstop>saveButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>
