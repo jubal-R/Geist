@@ -52,7 +52,7 @@ class Highlighter : public QSyntaxHighlighter
     Q_OBJECT
 
 public:
-    Highlighter(QTextDocument *parent = 0);
+    Highlighter(QString filetype, QTextDocument *parent = 0);
 
 protected:
     void highlightBlock(const QString &text);
@@ -74,6 +74,10 @@ private:
     QTextCharFormat multiLineCommentFormat;
     QTextCharFormat quotationFormat;
     QTextCharFormat functionFormat;
+
+    QStringList compiledLanguages;
+    QStringList scriptingLanguages;
+    QStringList markupLanguages;
 };
 
 #endif // HIGHLIGHTER_H

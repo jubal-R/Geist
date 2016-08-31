@@ -42,103 +42,335 @@
 
 #include "highlighter.h"
 
-Highlighter::Highlighter(QTextDocument *parent)
+Highlighter::Highlighter(QString filetype, QTextDocument *parent)
     : QSyntaxHighlighter(parent)
 {
     HighlightingRule rule;
 
-    //Functions
-    functionFormat.setFontItalic(true);
-    functionFormat.setForeground(QColor(77,171,171));
-    rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
-    rule.format = functionFormat;
-    highlightingRules.append(rule);
+    compiledLanguages = QString::fromStdString("c cpp cs java").split(" ");
+    scriptingLanguages = QString::fromStdString("js php pl ps1 py rb sh").split(" ");
+    markupLanguages = QString::fromStdString("html xml").split(" ");
 
-    keywordFormat.setForeground(QColor(245, 51, 74));
-    keywordFormat.setFontWeight(QFont::Bold);
-    QStringList keywordPatterns;
-    keywordPatterns << "\\bchar\\b" << "\\bclass\\b" << "\\bconst\\b"
-                    << "\\bdouble\\b" << "\\belse\\b" << "\\bend\\b"<< "\\benum\\b" << "\\bexplicit\\b"
-                    << "\\bfor\\b" << "\\bfriend\\b" << "\\bif\\b" << "\\bimport\\b" << "\\binline\\b" << "\\bint\\b"
-                    << "\\blong\\b" << "\\bnamespace\\b" << "\\bnew\\b" << "\\bnull\\b" << "\\boperator\\b"
-                    << "\\bprivate\\b" << "\\bprotected\\b" << "\\bpublic\\b"
-                    << "\\brequire\\b" << "\\bshort\\b" << "\\bsignals\\b" << "\\bsigned\\b"
-                    << "\\bslots\\b" << "\\bstatic\\b" << "\\bstruct\\b"
-                    << "\\btemplate\\b" << "\\btypedef\\b" << "\\btypename\\b"
-                    << "\\bunion\\b" << "\\bunsigned\\b" << "\\bvirtual\\b"
-                    << "\\bvoid\\b" << "\\bvolatile\\b" << "\\bwhile\\b";
-    foreach (const QString &pattern, keywordPatterns) {
-        rule.pattern = QRegExp(pattern);
-        rule.format = keywordFormat;
+    if(compiledLanguages.contains(filetype)){
+        //Functions
+        functionFormat.setFontItalic(true);
+        functionFormat.setForeground(QColor(77,171,171));
+        rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
+        rule.format = functionFormat;
         highlightingRules.append(rule);
+
+        keywordFormat.setForeground(QColor(245, 51, 74));
+        keywordFormat.setFontWeight(QFont::Bold);
+        QStringList keywordPatterns;
+        keywordPatterns << "\\bchar\\b" << "\\bclass\\b" << "\\bconst\\b"
+                        << "\\bdouble\\b" << "\\belse\\b" << "\\bend\\b"<< "\\benum\\b" << "\\bexplicit\\b"
+                        << "\\bfor\\b" << "\\bfriend\\b" << "\\bif\\b" << "\\bimport\\b" << "\\bint\\b"
+                        << "\\blong\\b" << "\\bnamespace\\b" << "\\bnew\\b" << "\\bnull\\b" << "\\boperator\\b"
+                        << "\\bprivate\\b" << "\\bprotected\\b" << "\\bpublic\\b"
+                        << "\\brequire\\b" << "\\bshort\\b" << "\\bsignals\\b" << "\\bsigned\\b"
+                        << "\\bslots\\b" << "\\bstatic\\b" << "\\bstruct\\b"
+                        << "\\btemplate\\b" << "\\btypedef\\b" << "\\btypename\\b"
+                        << "\\bunsigned\\b" << "\\bvirtual\\b"
+                        << "\\bvoid\\b" << "\\bvolatile\\b" << "\\bwhile\\b";
+        foreach (const QString &pattern, keywordPatterns) {
+            rule.pattern = QRegExp(pattern);
+            rule.format = keywordFormat;
+            highlightingRules.append(rule);
+        }
+
+        //classFormat.setFontWeight(QFont::Bold);
+        classFormat.setForeground(QColor(209, 84, 84));
+        rule.pattern = QRegExp("\\bQ[A-Za-z]+\\b");
+        rule.format = classFormat;
+        highlightingRules.append(rule);
+
+        //Nums :D
+    //    classFormat.setFontWeight(QFont::Bold);
+        classFormat.setForeground(QColor(247, 235, 96));
+        rule.pattern = QRegExp("\\b[0-9\\.]+\\b");
+        rule.format = classFormat;
+        highlightingRules.append(rule);
+
+        //Quotes
+        quotationFormat.setForeground(QColor(151, 214, 232));
+        rule.pattern = QRegExp("\".*\"");
+        rule.format = quotationFormat;
+        highlightingRules.append(rule);
+
+        quotationFormat.setForeground(QColor(151, 214, 232));
+        rule.pattern = QRegExp("'.*'");
+        rule.format = quotationFormat;
+        highlightingRules.append(rule);
+
+        //Comments
+        singleLineCommentFormat.setFontItalic(true);
+        singleLineCommentFormat.setForeground(QColor(178, 179, 191));
+        rule.pattern = QRegExp("//[^\n]*");
+        rule.format = singleLineCommentFormat;
+        highlightingRules.append(rule);
+
+        singleLineCommentFormat.setForeground(QColor(178, 179, 191));
+        rule.pattern = QRegExp("#[^\n]*");
+        rule.format = singleLineCommentFormat;
+        highlightingRules.append(rule);
+
+        multiLineCommentFormat.setFontItalic(true);
+        multiLineCommentFormat.setForeground(QColor(178, 179, 191));
+
+        commentStartExpression = QRegExp("/\\*");
+        commentEndExpression = QRegExp("\\*/");
+
+    }else if(scriptingLanguages.contains(filetype)){
+
+        //Functions
+        functionFormat.setFontItalic(true);
+        functionFormat.setForeground(QColor(77,171,171));
+        rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
+        rule.format = functionFormat;
+        highlightingRules.append(rule);
+
+        keywordFormat.setForeground(QColor(245, 51, 74));
+        keywordFormat.setFontWeight(QFont::Bold);
+        QStringList keywordPatterns;
+        keywordPatterns << "\\bclass\\b" << "\\bdef\\b" << "\\bnew\\b" << "\\bnull\\b"
+                        << "\\belse\\b" << "\\bend\\b"<< "\\bbreak\\b" << "\\bdel\\b"
+                        << "\\bfor\\b" << "\\bforeach\\b" << "\\bif\\b" << "\\bimport\\b"
+                        << "\\bprivate\\b" << "\\btry\\b" << "\\bpublic\\b"
+                        << "\\brequire\\b" << "\\breturn\\b" << "\\bdo\\b" << "\\bwhile\\b";
+        foreach (const QString &pattern, keywordPatterns) {
+            rule.pattern = QRegExp(pattern);
+            rule.format = keywordFormat;
+            highlightingRules.append(rule);
+        }
+
+        //classFormat.setFontWeight(QFont::Bold);
+        classFormat.setForeground(QColor(209, 84, 84));
+        rule.pattern = QRegExp("\\bQ[A-Za-z]+\\b");
+        rule.format = classFormat;
+        highlightingRules.append(rule);
+
+        //Ruby class/instance vars
+        classFormat.setForeground(QColor(84, 84, 200));
+        rule.pattern = QRegExp("@\\b\\w+\\b");
+        rule.format = classFormat;
+        highlightingRules.append(rule);
+
+        classFormat.setForeground(QColor(84, 84, 200));
+        rule.pattern = QRegExp("@@\\b\\w+\\b");
+        rule.format = classFormat;
+        highlightingRules.append(rule);
+
+        //Nums :D
+    //    classFormat.setFontWeight(QFont::Bold);
+        classFormat.setForeground(QColor(247, 235, 96));
+        rule.pattern = QRegExp("\\b[0-9\\.]+\\b");
+        rule.format = classFormat;
+        highlightingRules.append(rule);
+
+        //Quotes
+        quotationFormat.setForeground(QColor(151, 214, 232));
+        rule.pattern = QRegExp("\".*\"");
+        rule.format = quotationFormat;
+        highlightingRules.append(rule);
+
+        quotationFormat.setForeground(QColor(151, 214, 232));
+        rule.pattern = QRegExp("'.*'");
+        rule.format = quotationFormat;
+        highlightingRules.append(rule);
+
+        //Comments
+        singleLineCommentFormat.setFontItalic(true);
+        singleLineCommentFormat.setForeground(QColor(178, 179, 191));
+        rule.pattern = QRegExp("//[^\n]*");
+        rule.format = singleLineCommentFormat;
+        highlightingRules.append(rule);
+
+        singleLineCommentFormat.setForeground(QColor(178, 179, 191));
+        rule.pattern = QRegExp("#[^\n]*");
+        rule.format = singleLineCommentFormat;
+        highlightingRules.append(rule);
+
+        multiLineCommentFormat.setFontItalic(true);
+        multiLineCommentFormat.setForeground(QColor(178, 179, 191));
+
+        commentStartExpression = QRegExp("/\\*");
+        commentEndExpression = QRegExp("\\*/");
+
+    }else if(markupLanguages.contains(filetype)){
+
+        //Functions
+        functionFormat.setFontItalic(true);
+        functionFormat.setForeground(QColor(77,171,171));
+        rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
+        rule.format = functionFormat;
+        highlightingRules.append(rule);
+
+        // Tags
+        classFormat.setForeground(QColor(187,245,64));
+        rule.pattern = QRegExp("<\\w+\\s+[^>]*>");
+        rule.format = classFormat;
+        highlightingRules.append(rule);
+
+        classFormat.setForeground(QColor(187,245,64));
+        rule.pattern = QRegExp("<\\w+>");
+        rule.format = classFormat;
+        highlightingRules.append(rule);
+
+        classFormat.setForeground(QColor(187,245,64));
+        rule.pattern = QRegExp("</\\b\\w+\\b>");
+        rule.format = classFormat;
+        highlightingRules.append(rule);
+
+        keywordFormat.setForeground(QColor(245, 51, 74));
+        keywordFormat.setFontWeight(QFont::Bold);
+        QStringList keywordPatterns;
+        keywordPatterns << "\\bclass\\b" << "\\bid\\b" << "\\bhref\\b" << "\\bsrc\\b"
+                        << "\\blang\\b" << "\\bcharset\\b" << "\\bname\\b" << "\\bcontent\\b"
+                        << "\\brel\\b" << "\\btype\\b";
+        foreach (const QString &pattern, keywordPatterns) {
+            rule.pattern = QRegExp(pattern);
+            rule.format = keywordFormat;
+            highlightingRules.append(rule);
+        }
+
+        //classFormat.setFontWeight(QFont::Bold);
+        classFormat.setForeground(QColor(209, 84, 84));
+        rule.pattern = QRegExp("\\bQ[A-Za-z]+\\b");
+        rule.format = classFormat;
+        highlightingRules.append(rule);
+
+        //Quotes
+        quotationFormat.setForeground(QColor(151, 214, 232));
+        rule.pattern = QRegExp("\".*\"");
+        rule.format = quotationFormat;
+        highlightingRules.append(rule);
+
+        quotationFormat.setForeground(QColor(151, 214, 232));
+        rule.pattern = QRegExp("'.*'");
+        rule.format = quotationFormat;
+        highlightingRules.append(rule);
+
+        //Comments
+        singleLineCommentFormat.setFontItalic(true);
+        singleLineCommentFormat.setForeground(QColor(178, 179, 191));
+        rule.pattern = QRegExp("//[^\n]*");
+        rule.format = singleLineCommentFormat;
+        highlightingRules.append(rule);
+
+        singleLineCommentFormat.setForeground(QColor(178, 179, 191));
+        rule.pattern = QRegExp("#[^\n]*");
+        rule.format = singleLineCommentFormat;
+        highlightingRules.append(rule);
+
+        multiLineCommentFormat.setFontItalic(true);
+        multiLineCommentFormat.setForeground(QColor(178, 179, 191));
+
+        commentStartExpression = QRegExp("/\\*");
+        commentEndExpression = QRegExp("\\*/");
+
+    }else if(filetype == "css"){
+
+        keywordFormat.setForeground(QColor(245, 51, 74));
+        keywordFormat.setFontWeight(QFont::Bold);
+        QStringList keywordPatterns;
+        keywordPatterns << "\\bhtml\\b" << "\\bbody\\b" << "\\bp\\b" << "\\ba\\b" << "\\bhr\\b"
+                        << "\\bimg\\b" << "\\bheader\\b" << "\\bfooter\\b" << "\\bh1\\b"
+                        << "\\bh2\\b" << "\\bh3\\b" << "\\bh4\\b" << "\\bh5\\b" << "\\bh6\\b"
+                        << "\\bul\\b" << "\\bol\\b" << "\\bli\\b" << "\\bmain\\b" << "\\bnav\\b"
+                        << "\\bmenu\\b" << "\\bmenuitem\\b" << "\\bq\\b" << "\\btable\\b" << "\\btd\\b";
+        foreach (const QString &pattern, keywordPatterns) {
+            rule.pattern = QRegExp(pattern);
+            rule.format = keywordFormat;
+            highlightingRules.append(rule);
+        }
+
+        //Nums :D
+        classFormat.setForeground(QColor(247, 235, 96));
+        rule.pattern = QRegExp("\\b[0-9\\.]+\\b");
+        rule.format = classFormat;
+        highlightingRules.append(rule);
+
+        // Attributes
+        classFormat.setForeground(QColor(77,171,171));
+        rule.pattern = QRegExp("\\w+:");
+        rule.format = classFormat;
+        highlightingRules.append(rule);
+
+        classFormat.setForeground(QColor(77,171,171));
+        rule.pattern = QRegExp("\\w+-\\w+:");
+        rule.format = classFormat;
+        highlightingRules.append(rule);
+
+        // IDs
+        classFormat.setForeground(QColor(187,245,64));
+        rule.pattern = QRegExp("#\\w+\\b");
+        rule.format = classFormat;
+        highlightingRules.append(rule);
+
+        // classes
+        classFormat.setForeground(QColor(187,245,64));
+        rule.pattern = QRegExp("\\.\\w+\\b");
+        rule.format = classFormat;
+        highlightingRules.append(rule);
+
+        //Quotes
+        quotationFormat.setForeground(QColor(151, 214, 232));
+        rule.pattern = QRegExp("\".*\"");
+        rule.format = quotationFormat;
+        highlightingRules.append(rule);
+
+        quotationFormat.setForeground(QColor(151, 214, 232));
+        rule.pattern = QRegExp("'.*'");
+        rule.format = quotationFormat;
+        highlightingRules.append(rule);
+
+        commentStartExpression = QRegExp("/\\*");
+        commentEndExpression = QRegExp("\\*/");
+
+
+    }else if(filetype == "sql"){
+
+        keywordFormat.setForeground(QColor(245, 51, 74));
+        keywordFormat.setFontWeight(QFont::Bold);
+        QStringList keywordPatterns;
+        keywordPatterns << "\\bSELECT\\b" << "\\bFROM\\b" << "\\bWHERE\\b" << "\\bAND\\b" << "\\bOR\\b"
+                        << "\\bDELETE\\b" << "\\bORDER\\b" << "\\bUNION\\b" << "\\bUPDATE\\b"
+                        << "\\bINSERT\\b" << "\\bINTO\\b" << "\\bVALUES\\b" << "\\bCREATE\\b"
+                        << "\\bTABLE\\b";
+        foreach (const QString &pattern, keywordPatterns) {
+            rule.pattern = QRegExp(pattern);
+            rule.format = keywordFormat;
+            highlightingRules.append(rule);
+        }
+
+        //Quotes
+        quotationFormat.setForeground(QColor(151, 214, 232));
+        rule.pattern = QRegExp("\".*\"");
+        rule.format = quotationFormat;
+        highlightingRules.append(rule);
+
+        quotationFormat.setForeground(QColor(151, 214, 232));
+        rule.pattern = QRegExp("'.*'");
+        rule.format = quotationFormat;
+        highlightingRules.append(rule);
+
+        commentStartExpression = QRegExp("/\\*");
+        commentEndExpression = QRegExp("\\*/");
+
+    }else{
+
+        //Nums :D
+        classFormat.setFontWeight(QFont::Normal);
+        rule.pattern = QRegExp("\\b[0-9\\.]+\\b");
+        rule.format = classFormat;
+        highlightingRules.append(rule);
+
+        commentStartExpression = QRegExp("/\\*");
+        commentEndExpression = QRegExp("\\*/");
     }
 
-    //classFormat.setFontWeight(QFont::Bold);
-    classFormat.setForeground(QColor(209, 84, 84));
-    rule.pattern = QRegExp("\\bQ[A-Za-z]+\\b");
-    rule.format = classFormat;
-    highlightingRules.append(rule);
-
-    //Operators :D
-//    classFormat.setFontWeight(QFont::Bold);
-//    classFormat.setForeground(QColor(209, 84, 84));
-//    rule.pattern = QRegExp("\\b[]+\\b");
-//    rule.format = classFormat;
-//    highlightingRules.append(rule);
-
-    //CSS :D
-//    classFormat.setForeground(QColor(84, 84, 200));
-//    rule.pattern = QRegExp("\\b[A-Za-z\\-]+\\:");
-//    rule.format = classFormat;
-//    highlightingRules.append(rule);
-
-    //Ruby class/instance vars
-    classFormat.setForeground(QColor(84, 84, 200));
-    rule.pattern = QRegExp("@\\b\\w+\\b");
-    rule.format = classFormat;
-    highlightingRules.append(rule);
-
-    classFormat.setForeground(QColor(84, 84, 200));
-    rule.pattern = QRegExp("@@\\b\\w+\\b");
-    rule.format = classFormat;
-    highlightingRules.append(rule);
-
-    //Nums :D
-//    classFormat.setFontWeight(QFont::Bold);
-    classFormat.setForeground(QColor(247, 235, 96));
-    rule.pattern = QRegExp("\\b[0-9\\.]+\\b");
-    rule.format = classFormat;
-    highlightingRules.append(rule);
-
-    //Quotes
-    quotationFormat.setForeground(QColor(151, 214, 232));
-    rule.pattern = QRegExp("\".*\"");
-    rule.format = quotationFormat;
-    highlightingRules.append(rule);
-
-    quotationFormat.setForeground(QColor(151, 214, 232));
-    rule.pattern = QRegExp("'.*'");
-    rule.format = quotationFormat;
-    highlightingRules.append(rule);
-
-    //Comments
-    singleLineCommentFormat.setFontItalic(true);
-    singleLineCommentFormat.setForeground(QColor(178, 179, 191));
-    rule.pattern = QRegExp("//[^\n]*");
-    rule.format = singleLineCommentFormat;
-    highlightingRules.append(rule);
-
-    singleLineCommentFormat.setForeground(QColor(178, 179, 191));
-    rule.pattern = QRegExp("#[^\n]*");
-    rule.format = singleLineCommentFormat;
-    highlightingRules.append(rule);
-
-    multiLineCommentFormat.setFontItalic(true);
-    multiLineCommentFormat.setForeground(QColor(178, 179, 191));
-
-    commentStartExpression = QRegExp("/\\*");
-    commentEndExpression = QRegExp("\\*/");
 }
+
 
 void Highlighter::highlightBlock(const QString &text)
 {

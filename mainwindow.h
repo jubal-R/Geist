@@ -135,6 +135,8 @@ private slots:
 
     void on_actionOpen_containg_folder_triggered();
 
+    QString getFileType(QString file);
+
 private:
     Ui::MainWindow *ui;
     Highlighter *highlighter;

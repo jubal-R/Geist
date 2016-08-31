@@ -104,7 +104,7 @@ MainWindow::MainWindow(QWidget *parent) :
     newTab();
     connect(p, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
     p->setFocus();
-    highlighter = new Highlighter(ui->fileOverview->document());    // Set highlighter for file overview
+//    highlighter = new Highlighter(ui->fileOverview->document());    // Set highlighter for file overview
     highlightCurrentLine();
 
     ui->listWidget->addItem("1");
@@ -165,6 +165,7 @@ void MainWindow::on_tabWidget_currentChanged(int index)
     connect(p, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
     ui->fileOverview->setPlainText(p->toPlainText());
     filename = ui->tabWidget->tabToolTip(ui->tabWidget->currentIndex());
+    ui->labelFileType->setText(getFileType(filename));
     foundPositions.clear();
     foundPosElement = 0;
 }
@@ -221,12 +222,20 @@ void MainWindow::on_actionNew_triggered()
     MainWindow::newTab();
 }
 
+QString MainWindow::getFileType(QString file){
+    QStringList sl = file.split(".");
+    if(sl.length() > 1)
+        return sl.last();
+    else
+        return "";
+}
+
 /*  Open file
 *   Opens in new tab unless current tab is empty
 *   If file does not exist it will be created on save
 */
 void MainWindow::open(){
-    string file = QFileDialog::getOpenFileName(this, tr("Open File"), currentDirectory, tr("All (*)")).toStdString();
+    QString file = QFileDialog::getOpenFileName(this, tr("Open File"), currentDirectory, tr("All (*)"));
 
     if (file != ""){
 
@@ -234,7 +243,8 @@ void MainWindow::open(){
             newTab();
         }
 
-        filename = QString::fromStdString(file);
+        filename = file;
+        QString filetype = getFileType(file);
         p->setPlainText(QString::fromStdString(files.read(filename.toStdString())));
 
         if (filename.length() > 22){
@@ -244,11 +254,13 @@ void MainWindow::open(){
         }
         // Store file path in tool tip
         ui->tabWidget->setTabToolTip(ui->tabWidget->currentIndex(), filename);
+        ui->labelFileType->setText(filetype);
 
         // Add file info to filelist
         node * fileNode = new node;
-        fileNode->filepath = file;
-        fileNode->highlighter = new Highlighter(p->document());
+        fileNode->filepath = file.toStdString();
+        fileNode->filetype = filetype.toStdString();
+        fileNode->highlighter = new Highlighter(filetype, p->document());
         filelist.insertNode(fileNode);
 
         ui->textBrowser->setText("");
@@ -279,9 +291,11 @@ void MainWindow::on_actionSave_triggered()
 void MainWindow::on_actionSave_as_triggered()
 {
     filename = QFileDialog::getSaveFileName(this, tr("Open File"), currentDirectory, tr("All (*)"));
+    QString filetype = getFileType(filename);
 
     if (filename != ""){
         files.write(filename.toStdString(), p->toPlainText().toStdString());
+
 
         // Add info to filelist
         QString currentFile = ui->tabWidget->tabToolTip(ui->tabWidget->currentIndex());
@@ -289,7 +303,8 @@ void MainWindow::on_actionSave_as_triggered()
             // Add file info to filelist
             node * fileNode = new node;
             fileNode->filepath = filename.toStdString();
-            fileNode->highlighter = new Highlighter(p->document());
+            fileNode->filetype = filetype.toStdString();
+            fileNode->highlighter = new Highlighter(filetype, p->document());
             filelist.insertNode(fileNode);
         }else{
             filelist.setFilepath(currentFile.toStdString(), filename.toStdString());
@@ -297,6 +312,7 @@ void MainWindow::on_actionSave_as_triggered()
 
         ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename.right(20));
         ui->tabWidget->setTabToolTip(ui->tabWidget->currentIndex(), filename);
+        ui->labelFileType->setText(filetype);
 
         ui->textBrowser->setText("Saved");
        }
