@@ -286,12 +286,11 @@ background-color: #404f4f;</string>
          <enum>Qt::RightToLeft</enum>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: #1f1f1f;
+         <string notr="true">background-color: #073642;
 margin-top: 28px;
 padding-left: 5px;
-color: rgb(173, 173, 173);
-border: 1px solid #303030;
-border-radius: 3px 3px 3px 3px;
+color: #839496;
+border: none;
 font: 10pt &quot;Liberation Mono&quot;;</string>
         </property>
         <property name="frameShape">
@@ -367,7 +366,7 @@ font: 10pt &quot;Liberation Mono&quot;;</string>
 font-size: 1pt;
 color: rgb(255, 255, 255);
 margin-top: 28px;
-background-color: #212121;
+background-color: #073642;
 border: 0px;</string>
         </property>
         <property name="verticalScrollBarPolicy">
@@ -595,6 +594,19 @@ background-color: rgba(255, 255, 255, 0);</string>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
+   <widget class="QMenu" name="menuPreferences">
+    <property name="title">
+     <string>Preferences</string>
+    </property>
+    <widget class="QMenu" name="menuTheme">
+     <property name="title">
+      <string>Theme</string>
+     </property>
+     <addaction name="actionDark"/>
+     <addaction name="actionSolarized_Dark"/>
+    </widget>
+    <addaction name="menuTheme"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
@@ -602,6 +614,7 @@ background-color: rgba(255, 255, 255, 0);</string>
    <addaction name="menuSearch"/>
    <addaction name="menuTemplates"/>
    <addaction name="menuTools"/>
+   <addaction name="menuPreferences"/>
    <addaction name="menuAbout"/>
   </widget>
   <action name="actionOpen">
@@ -825,6 +838,16 @@ background-color: rgba(255, 255, 255, 0);</string>
   <action name="actionOpen_containg_folder">
    <property name="text">
     <string>Open containg folder</string>
+   </property>
+  </action>
+  <action name="actionDark">
+   <property name="text">
+    <string>Dark</string>
+   </property>
+  </action>
+  <action name="actionSolarized_Dark">
+   <property name="text">
+    <string>Solarized Dark</string>
    </property>
   </action>
  </widget>

@@ -137,6 +137,10 @@ private slots:
 
     QString getFileType(QString file);
 
+    void on_actionDark_triggered();
+
+    void on_actionSolarized_Dark_triggered();
+
 private:
     Ui::MainWindow *ui;
     Highlighter *highlighter;
@@ -150,6 +154,7 @@ private:
     int *outputModeP;
 
     QString filename;
+    QString theme;
 
 };
 

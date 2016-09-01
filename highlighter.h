@@ -78,6 +78,18 @@ private:
     QStringList compiledLanguages;
     QStringList scriptingLanguages;
     QStringList markupLanguages;
+
+    QColor keywordColor;
+    QColor keyword2Color;
+    QColor functionsColor;
+    QColor valueColor;
+    QColor formatStringColor;
+    QColor commentColor;
+    QColor varColor;
+    QColor tagColor;
+    QColor htmlAttributesColor;
+    QColor cssClassesIDsColor;
+    QColor cssAttributesColor;
 };
 
 #endif // HIGHLIGHTER_H
