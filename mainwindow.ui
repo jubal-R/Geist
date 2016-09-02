@@ -115,8 +115,10 @@
           <string>Search</string>
          </property>
          <property name="styleSheet">
-          <string notr="true">background-color: #404f4f;
-border-color: #e3e3e3;</string>
+          <string notr="true">background-color: #073642;
+border-color: #e3e3e3;
+font-size: 11pt;
+color:#e0e0e0;</string>
          </property>
         </widget>
        </item>
@@ -151,8 +153,9 @@ border-color: #e3e3e3;</string>
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">background-color: #404f4f;
-border-color: #e3e3e3;</string>
+          <string notr="true">background-color: #073642;
+border-color: #e3e3e3;
+color:#e0e0e0;</string>
          </property>
         </widget>
        </item>
@@ -168,7 +171,8 @@ border-color: #e3e3e3;</string>
           <string notr="true">border: 1px solid #e3e3e3;
 border-radius: 3px 3px 3px 3px;
 padding: 2px 5px;
-background-color: #404f4f;</string>
+background-color: #073642;
+color:#e0e0e0;</string>
          </property>
          <property name="text">
           <string>Replace</string>
@@ -187,7 +191,8 @@ background-color: #404f4f;</string>
           <string notr="true">border: 1px solid #e3e3e3;
 border-radius: 3px 3px 3px 3px;
 padding: 2px 5px;
-background-color: #404f4f;</string>
+background-color: #073642;
+color:#e0e0e0;</string>
          </property>
          <property name="text">
           <string>Replace all</string>
@@ -209,7 +214,8 @@ background-color: #404f4f;</string>
           <string notr="true">border: 1px solid #e3e3e3;
 border-radius: 3px 3px 3px 3px;
 padding: 2px 5px;
-background-color: #404f4f;</string>
+background-color: #073642;
+color:#e0e0e0;</string>
          </property>
          <property name="text">
           <string>Find</string>
@@ -231,7 +237,8 @@ background-color: #404f4f;</string>
           <string notr="true">border: 1px solid #e3e3e3;
 border-radius: 3px 3px 3px 3px;
 padding: 2px 5px;
-background-color: #404f4f;</string>
+background-color: #073642;
+color:#e0e0e0;</string>
          </property>
          <property name="text">
           <string>Find Prev</string>
@@ -529,6 +536,9 @@ background-color: rgba(255, 255, 255, 0);</string>
     <addaction name="actionDelete_line"/>
     <addaction name="actionRemove_word"/>
     <addaction name="actionToggle_comment"/>
+    <addaction name="actionJoin_Lines"/>
+    <addaction name="actionMove_Line_Up"/>
+    <addaction name="actionSwap_line_down"/>
    </widget>
    <widget class="QMenu" name="menuSearch">
     <property name="title">
@@ -560,6 +570,7 @@ background-color: rgba(255, 255, 255, 0);</string>
     </property>
     <addaction name="actionFullScreen"/>
     <addaction name="actionOverview"/>
+    <addaction name="actionMenubar"/>
    </widget>
    <widget class="QMenu" name="menuTemplates">
     <property name="title">
@@ -848,6 +859,48 @@ background-color: rgba(255, 255, 255, 0);</string>
   <action name="actionSolarized_Dark">
    <property name="text">
     <string>Solarized Dark</string>
+   </property>
+  </action>
+  <action name="actionNext_Word">
+   <property name="text">
+    <string>Next Word</string>
+   </property>
+  </action>
+  <action name="actionPrev_Word">
+   <property name="text">
+    <string>Prev Word</string>
+   </property>
+  </action>
+  <action name="actionJoin_Lines">
+   <property name="text">
+    <string>Join Lines</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+J</string>
+   </property>
+  </action>
+  <action name="actionMove_Line_Up">
+   <property name="text">
+    <string>Swap Line Up</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Up</string>
+   </property>
+  </action>
+  <action name="actionSwap_line_down">
+   <property name="text">
+    <string>Swap Line Down</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Down</string>
+   </property>
+  </action>
+  <action name="actionMenubar">
+   <property name="text">
+    <string>Menubar</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+M</string>
    </property>
   </action>
  </widget>

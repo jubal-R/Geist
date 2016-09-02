@@ -943,3 +943,49 @@ void MainWindow::on_actionSolarized_Dark_triggered()
     ui->listWidget->setStyleSheet("background-color: #073642;; margin-top: 28px; padding-left: 5px; color: #839496; border: none; font: 10pt \"Liberation Mono\";");
     ui->fileOverview->setStyleSheet("font-family: \"Liberation Mono\"; font-size: 1pt; color: rgb(255, 255, 255); margin-top: 28px; background-color: #073642; border: 0px;");
 }
+
+void MainWindow::on_actionJoin_Lines_triggered()
+{
+    QTextCursor cur = p->textCursor();
+
+    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+    cur.deleteChar();
+
+    p->setTextCursor(cur);
+}
+
+void MainWindow::on_actionMove_Line_Up_triggered()
+{
+    selectLine();
+    QTextCursor cur = p->textCursor();
+    QString line = cur.selectedText().append("\n");
+    cur.removeSelectedText();
+    cur.deletePreviousChar();
+    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+    cur.insertText(line);
+    cur.movePosition(QTextCursor::Up, QTextCursor::MoveAnchor);
+
+    p->setTextCursor(cur);
+}
+
+void MainWindow::on_actionSwap_line_down_triggered()
+{
+    selectLine();
+    QTextCursor cur = p->textCursor();
+    QString line = cur.selectedText().prepend("\n");
+    cur.removeSelectedText();
+    cur.deleteChar();
+    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+    cur.insertText(line);
+
+    p->setTextCursor(cur);
+}
+
+void MainWindow::on_actionMenubar_triggered()
+{
+    if(ui->menuBar->height() > 0){
+        ui->menuBar->setMaximumHeight(0);
+    }else{
+        ui->menuBar->setMaximumHeight(100);
+    }
+}

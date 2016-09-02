@@ -141,6 +141,14 @@ private slots:
 
     void on_actionSolarized_Dark_triggered();
 
+    void on_actionJoin_Lines_triggered();
+
+    void on_actionMove_Line_Up_triggered();
+
+    void on_actionSwap_line_down_triggered();
+
+    void on_actionMenubar_triggered();
+
 private:
     Ui::MainWindow *ui;
     Highlighter *highlighter;
