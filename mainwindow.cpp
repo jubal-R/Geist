@@ -956,27 +956,50 @@ void MainWindow::on_actionJoin_Lines_triggered()
 
 void MainWindow::on_actionMove_Line_Up_triggered()
 {
-    selectLine();
     QTextCursor cur = p->textCursor();
-    QString line = cur.selectedText().append("\n");
-    cur.removeSelectedText();
-    cur.deletePreviousChar();
+    //  Select current line and store value
     cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-    cur.insertText(line);
+    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+    QString newTop = cur.selectedText();
+    cur.removeSelectedText();
+    // Select line above and store value
     cur.movePosition(QTextCursor::Up, QTextCursor::MoveAnchor);
+    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+    QString newBottom = cur.selectedText();
+    cur.removeSelectedText();
+    // Insert new values
+    cur.insertText(newTop);
+    cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
+    cur.insertText(newBottom);
+    // Position cursor
+    cur.movePosition(QTextCursor::Up, QTextCursor::MoveAnchor);
+    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
 
     p->setTextCursor(cur);
 }
 
 void MainWindow::on_actionSwap_line_down_triggered()
 {
-    selectLine();
     QTextCursor cur = p->textCursor();
-    QString line = cur.selectedText().prepend("\n");
+    //  Select current line and store value
+    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+    QString newBottom = cur.selectedText();
     cur.removeSelectedText();
-    cur.deleteChar();
+    // Select line below and store value
+    cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
+    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+    QString newTop = cur.selectedText();
+    cur.removeSelectedText();
+    // Insert new values
+    cur.insertText(newBottom);
+    cur.movePosition(QTextCursor::Up, QTextCursor::MoveAnchor);
+    cur.insertText(newTop);
+    // Position cursor
+    cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
     cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
-    cur.insertText(line);
 
     p->setTextCursor(cur);
 }
