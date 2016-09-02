@@ -376,7 +376,7 @@ void MainWindow::on_actionRun_triggered()
 void MainWindow::on_actionFind_triggered()
 {
     if (ui->findLineEdit->maximumWidth() < 300){
-        ui->findReplaceBar->setMaximumHeight(30);
+        ui->findReplaceBar->setMaximumHeight(60);
         ui->findLineEdit->setMaximumWidth(300);
         ui->findPrevButton->setMaximumWidth(150);
         ui->findButton->setMaximumWidth(150);
@@ -576,7 +576,7 @@ void MainWindow::on_actionReplace_triggered()
 
     if (ui->replaceLineEdit->width() == 0){
         width = 150;
-        ui->findReplaceBar->setMaximumHeight(30);
+        ui->findReplaceBar->setMaximumHeight(60);
         ui->findLineEdit->setFocus();
     }else{
         ui->findReplaceBar->setMaximumHeight(0);

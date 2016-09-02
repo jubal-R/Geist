@@ -51,217 +51,6 @@
      </widget>
     </item>
     <item>
-     <widget class="QWidget" name="findReplaceBar" native="true">
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);</string>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <property name="spacing">
-        <number>2</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_2">
-         <property name="maximumSize">
-          <size>
-           <width>0</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>To Replace:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="findLineEdit">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>0</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="toolTip">
-          <string>Search</string>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">background-color: #073642;
-border-color: #e3e3e3;
-font-size: 11pt;
-color:#e0e0e0;</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_3">
-         <property name="maximumSize">
-          <size>
-           <width>0</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string notr="true"/>
-         </property>
-         <property name="text">
-          <string>Replace with:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="replaceLineEdit">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>0</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">background-color: #073642;
-border-color: #e3e3e3;
-color:#e0e0e0;</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="replaceButton">
-         <property name="maximumSize">
-          <size>
-           <width>0</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">border: 1px solid #e3e3e3;
-border-radius: 3px 3px 3px 3px;
-padding: 2px 5px;
-background-color: #073642;
-color:#e0e0e0;</string>
-         </property>
-         <property name="text">
-          <string>Replace</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="replaceAllButton">
-         <property name="maximumSize">
-          <size>
-           <width>0</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">border: 1px solid #e3e3e3;
-border-radius: 3px 3px 3px 3px;
-padding: 2px 5px;
-background-color: #073642;
-color:#e0e0e0;</string>
-         </property>
-         <property name="text">
-          <string>Replace all</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="findButton">
-         <property name="maximumSize">
-          <size>
-           <width>0</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="toolTip">
-          <string>Find next</string>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">border: 1px solid #e3e3e3;
-border-radius: 3px 3px 3px 3px;
-padding: 2px 5px;
-background-color: #073642;
-color:#e0e0e0;</string>
-         </property>
-         <property name="text">
-          <string>Find</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="findPrevButton">
-         <property name="maximumSize">
-          <size>
-           <width>0</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="toolTip">
-          <string>Find Previous</string>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">border: 1px solid #e3e3e3;
-border-radius: 3px 3px 3px 3px;
-padding: 2px 5px;
-background-color: #073642;
-color:#e0e0e0;</string>
-         </property>
-         <property name="text">
-          <string>Find Prev</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <property name="spacing">
        <number>0</number>
@@ -404,6 +193,231 @@ border: 0px;</string>
        </layout>
       </item>
      </layout>
+    </item>
+    <item>
+     <widget class="QWidget" name="findReplaceBar" native="true">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
+padding:10px;</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <property name="spacing">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="maximumSize">
+          <size>
+           <width>0</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>To Replace:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="findLineEdit">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>0</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Search</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: #073642;
+border-color: #e3e3e3;
+font-size: 11pt;
+color:#e0e0e0;
+padding: 0;</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="maximumSize">
+          <size>
+           <width>0</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="text">
+          <string>Replace with:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="replaceLineEdit">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>0</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: #073642;
+border-color: #e3e3e3;
+color:#e0e0e0;
+font-size: 11pt;
+padding: 0;</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="replaceButton">
+         <property name="maximumSize">
+          <size>
+           <width>0</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: 1px solid #e3e3e3;
+border-radius: 3px 3px 3px 3px;
+padding: 2px 5px;
+background-color: #073642;
+color:#e0e0e0;
+margin: 0 5px;</string>
+         </property>
+         <property name="text">
+          <string>Replace</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="replaceAllButton">
+         <property name="maximumSize">
+          <size>
+           <width>0</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: 1px solid #e3e3e3;
+border-radius: 3px 3px 3px 3px;
+padding: 2px 5px;
+background-color: #073642;
+color:#e0e0e0;
+margin: 0 5px;</string>
+         </property>
+         <property name="text">
+          <string>Replace all</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="findButton">
+         <property name="maximumSize">
+          <size>
+           <width>0</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Find next</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: 1px solid #e3e3e3;
+border-radius: 3px 3px 3px 3px;
+padding: 2px 5px;
+background-color: #073642;
+color:#e0e0e0;
+margin: 0 5px;</string>
+         </property>
+         <property name="text">
+          <string>Find</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="findPrevButton">
+         <property name="maximumSize">
+          <size>
+           <width>0</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Find Previous</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: 1px solid #e3e3e3;
+border-radius: 3px 3px 3px 3px;
+padding: 2px 5px;
+background-color: #073642;
+color:#e0e0e0;
+margin: 0 5px;</string>
+         </property>
+         <property name="text">
+          <string>Find Prev</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </item>
     <item>
      <widget class="QWidget" name="statusBar" native="true">
