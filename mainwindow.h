@@ -67,7 +67,7 @@ private slots:
 
     void save();
 
-    void open();
+    void open(QString file);
 
     void newTab();
 

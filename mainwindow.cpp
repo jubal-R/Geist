@@ -88,21 +88,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->menuBar->setStyleSheet("color:white; background-color:#212121; QMenuBar::item {background:black;}");
     ui->centralWidget->layout()->setContentsMargins(0,0,0,0);
 
-
-    //  Setup window based on user's settings
-    string set = files.read("settings.txt");
-    settings = QString::fromStdString(set).split("\n");
-    if (settings.size() > 3){
-        MainWindow::resize(settings.at(0).toInt(), settings.at(1).toInt());
-        ui->fileOverview->setMaximumWidth(settings.at(2).toInt());
-        // Set theme if not default
-        if(settings.at(3) != theme){
-            if(settings.at(3) == "dark"){
-                on_actionDark_triggered();
-            }
-        }
-    }
-
     //  Disbale manual scrolling for line numbers
     ui->listWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->listWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -117,6 +102,23 @@ MainWindow::MainWindow(QWidget *parent) :
     QListWidgetItem *item = ui->listWidget->item(numBlocks-1);
     item->setSizeHint(QSize(item->sizeHint().height(), 14));
 
+    //  Setup window based on user's settings
+    string set = files.read("settings.txt");
+    settings = QString::fromStdString(set).split("\n");
+    if (settings.size() > 3){
+        MainWindow::resize(settings.at(0).toInt(), settings.at(1).toInt());
+        ui->fileOverview->setMaximumWidth(settings.at(2).toInt());
+        // Set theme if not default
+        if(settings.at(3) != theme){
+            if(settings.at(3) == "dark"){
+                on_actionDark_triggered();
+            }
+        }
+        for(int i = 4; i < settings.size(); i++){
+            open(settings.at(i));
+        }
+    }
+
 }
 
 MainWindow::~MainWindow()
@@ -124,11 +126,16 @@ MainWindow::~MainWindow()
     /*  Save settings
     *   Window size, overview toggle values
     */
-    if (settings.at(0).toInt() != MainWindow::width() || settings.at(1).toInt() != MainWindow::height() || settings.at(2).toInt() != ui->fileOverview->maximumWidth() || settings.at(3) != theme){
-        ostringstream oss;
-        oss << MainWindow::width() << "\n" << MainWindow::height() << "\n" << ui->fileOverview->width() << "\n" << theme.toStdString();
-        files.write("settings.txt", oss.str());
+    ostringstream oss;
+    oss << MainWindow::width() << "\n" << MainWindow::height() << "\n" << ui->fileOverview->width() << "\n" << theme.toStdString() << "\n";
+
+    QStringList openFiles = filelist.getFilesList();
+    int numOpenFiles = openFiles.length();
+    for(int i = 0; i < numOpenFiles; i++){
+        oss << openFiles.at(i).toStdString() << "\n";
     }
+
+    files.write("settings.txt", oss.str());
 
     delete ui;
 }
@@ -240,8 +247,7 @@ QString MainWindow::getFileType(QString file){
 *   Opens in new tab unless current tab is empty
 *   If file does not exist it will be created on save
 */
-void MainWindow::open(){
-    QString file = QFileDialog::getOpenFileName(this, tr("Open File"), currentDirectory, tr("All (*)"));
+void MainWindow::open(QString file){
 
     if (file != ""){
 
@@ -276,7 +282,8 @@ void MainWindow::open(){
 }
 void MainWindow::on_actionOpen_triggered()
 {
-    open();
+    QString file = QFileDialog::getOpenFileName(this, tr("Open File"), currentDirectory, tr("All (*)"));
+    open(file);
 }
 
 //  Save file

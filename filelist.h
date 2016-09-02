@@ -18,6 +18,7 @@ public:
     void removeNode(std::string file);
     void setFilepath(std::string oldfilepath, std::string newfilepath);
     std::string getData(int index);
+    QStringList getFilesList();
 private:
     node * head;
     int len;
