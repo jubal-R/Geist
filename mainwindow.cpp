@@ -83,7 +83,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tabWidget->setStyleSheet("QPlainTextEdit { background-color: #002b36; color:#839496; border: 0px; selection-background-color: #404f4f; font-family: \"Liberation Mono\"; font-size:10pt;} "
                                  "QScrollBar:vertical{background: #002b36;} QScrollBar:horizontal{background: #002b36;}"
                                  "QTabBar::tab:selected{color: white; border-bottom: 3px solid #2F4F4F;}"
-                                 "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; margin: 0 -2px;padding: 1px 5px; background-color: #212121; border-bottom: 3px solid #212121;}");
+                                 "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; padding: 1px 5px; background-color: #212121; border-bottom: 3px solid #212121;}");
 
     ui->menuBar->setStyleSheet("color:white; background-color:#212121; QMenuBar::item {background:black;}");
     ui->centralWidget->layout()->setContentsMargins(0,0,0,0);
@@ -91,6 +91,13 @@ MainWindow::MainWindow(QWidget *parent) :
     //  Disbale manual scrolling for line numbers
     ui->listWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->listWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    // Hide find/replace bar by default
+    ui->findReplaceBar->hide();
+    ui->replaceLineEdit->hide();
+    ui->replaceButton->hide();
+    ui->replaceAllButton->hide();
+    ui->label_3->hide();
 
     // Create and setup initial tab
     newTab();
@@ -140,25 +147,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
-
-//  Highlight Current Line
-void MainWindow::highlightCurrentLine(){
-   QList<QTextEdit::ExtraSelection> extraSelections;
-
-   QTextEdit::ExtraSelection selections;
-   QColor lineColor = QColor(7, 54, 66);
-   selections.format.setBackground(lineColor);
-   selections.format.setProperty(QTextFormat::FullWidthSelection, true);
-   selections.cursor = p->textCursor();
-   selections.cursor.clearSelection();
-   extraSelections.append(selections);
-
-   p->setExtraSelections(extraSelections);
-   ui->listWidget->verticalScrollBar()->setValue(p->verticalScrollBar()->value());
-}
-
-//  Tabs
+/*
+ *****************************
+ *         Tabs              *
+ *****************************
+*/
 
 // Switch tab
 void MainWindow::on_tabWidget_currentChanged(int index)
@@ -178,7 +171,7 @@ void MainWindow::on_tabWidget_currentChanged(int index)
     connect(p, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
     ui->fileOverview->setPlainText(p->toPlainText());
     filename = ui->tabWidget->tabToolTip(ui->tabWidget->currentIndex());
-    ui->labelFileType->setText(getFileType(filename));
+    ui->labelFileType->setText(getFileType(filename).toUpper());
     foundPositions.clear();
     foundPosElement = 0;
 }
@@ -235,12 +228,30 @@ void MainWindow::on_actionNew_triggered()
     MainWindow::newTab();
 }
 
+/*
+ *****************************
+ *         Files             *
+ *****************************
+*/
+
 QString MainWindow::getFileType(QString file){
     QStringList sl = file.split(".");
     if(sl.length() > 1)
         return sl.last();
     else
         return "";
+}
+
+/*  Open directory of currently active file in default file manager
+*   If current tab has no file open then open directory of last active file
+*   Else open users home directory
+*/
+void MainWindow::on_actionOpen_containg_folder_triggered()
+{
+    ostringstream oss;
+    oss << "xdg-open " << getDirectory();
+    ui->textBrowser->setPlainText(QString::fromStdString(runner.run(oss.str())));
+    p->setFocus();
 }
 
 /*  Open file
@@ -259,14 +270,14 @@ void MainWindow::open(QString file){
         QString filetype = getFileType(file);
         p->setPlainText(QString::fromStdString(files.read(filename.toStdString())));
 
-        if (filename.length() > 22){
-            ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename.right(22));
+        if (filename.length() >= 21){
+            ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename.right(21));
         }else{
             ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename);
         }
         // Store file path in tool tip
         ui->tabWidget->setTabToolTip(ui->tabWidget->currentIndex(), filename);
-        ui->labelFileType->setText(filetype);
+        ui->labelFileType->setText(filetype.toUpper());
 
         // Add file info to filelist
         node * fileNode = new node;
@@ -323,100 +334,53 @@ void MainWindow::on_actionSave_as_triggered()
             filelist.setFilepath(currentFile.toStdString(), filename.toStdString());
         }
 
-        ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename.right(20));
+        ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename.right(21));
         ui->tabWidget->setTabToolTip(ui->tabWidget->currentIndex(), filename);
-        ui->labelFileType->setText(filetype);
+        ui->labelFileType->setText(filetype.toUpper());
 
         ui->textBrowser->setText("Saved");
        }
 }
 
-/*  Run program (in gnome terminal)
-*   If html opens in default browser instead
-*   Supported languages: html, perl, python, ruby, sh
+/*
+ *****************************
+ *         Searching         *
+ *****************************
 */
-void MainWindow::run(bool sudo){
-    ostringstream oss;
 
-    if (sudo){
-        oss << "sudo ";
-    }
-
-    QStringList fileExtension = filename.split(".");
-    int len = fileExtension.length();
-
-    if (fileExtension[len - 1] == "py"){
-        oss << filename.toStdString();
-        runner.runGnomeTerminal(oss.str());
-
-    }else if (fileExtension[len - 1] == "rb"){
-        oss << "ruby " << filename.toStdString();
-        runner.runGnomeTerminal(oss.str());
-    }else if (fileExtension[len - 1] == "pl"){
-        oss << "perl " << filename.toStdString();
-        runner.runGnomeTerminal(oss.str());
-    }else if (fileExtension[len - 1] == "sh"){
-        oss << filename.toStdString();
-        runner.runGnomeTerminal(oss.str());
-
-    }else if (fileExtension[len - 1] == "html"){
-        oss << "xdg-open " << filename.toStdString();
-        ui->textBrowser->setPlainText(QString::fromStdString(runner.run(oss.str())));
-
-    }else{
-
-    }
-
-}
-void MainWindow::on_actionRun_in_xterm_triggered()
-{
-    MainWindow::run(false);
-}
-void MainWindow::on_actionRun_triggered()
-{
-    MainWindow::run(true);
+// Selects current line where cursor is positioned
+void MainWindow::selectLine(){
+    QTextCursor cur = p->textCursor();
+    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+    p->setTextCursor(cur);
 }
 
-//  Search find
+// Selects current word
+void MainWindow::selectWord(){
+    QTextCursor cur = p->textCursor();
+    cur.movePosition(QTextCursor::StartOfWord, QTextCursor::MoveAnchor);
+    cur.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
+    p->setTextCursor(cur);
+}
 
 // Toggle find bar
 void MainWindow::on_actionFind_triggered()
 {
-    if (ui->findLineEdit->maximumWidth() < 300){
-        ui->findReplaceBar->setMaximumHeight(60);
-        ui->findLineEdit->setMaximumWidth(300);
-        ui->findPrevButton->setMaximumWidth(150);
-        ui->findButton->setMaximumWidth(150);
-
-        if (ui->label_2->width() > 0){
-            ui->label_2->setMaximumWidth(0);
-            ui->label_3->setMaximumWidth(0);
-            ui->replaceLineEdit->setMaximumWidth(0);
-            ui->replaceButton->setMaximumWidth(0);
-            ui->replaceAllButton->setMaximumWidth(0);
-        }
+    if(ui->findReplaceBar->isHidden()){
+        ui->findReplaceBar->show();
         ui->findLineEdit->setFocus();
-        ui->findLineEdit->selectAll();
     }else{
-        ui->findLineEdit->setMaximumWidth(0);
-        ui->findPrevButton->setMaximumWidth(0);
-        ui->findButton->setMaximumWidth(0);
-        ui->findReplaceBar->setMaximumHeight(0);
-        p->setFocus();
-    }
-}
+        if(ui->replaceLineEdit->isHidden()){
+            ui->findReplaceBar->hide();
+            p->setFocus();
+        }else{
+            ui->replaceLineEdit->hide();
+            ui->replaceButton->hide();
+            ui->replaceAllButton->hide();
+            ui->label_3->hide();
+        }
 
-// Go To (Line number)
-void MainWindow::on_actionGoTo_triggered()
-{
-    bool ok = 0;
-
-    if (int line = QInputDialog::getText(this, tr("Enter"),tr("Go to:"), QLineEdit::Normal,"", &ok).toInt()){
-        QTextCursor cur = p->textCursor();
-        cur.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
-        cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, line-1);
-        p->setTextCursor(cur);
-        ui->listWidget->verticalScrollBar()->setValue(p->verticalScrollBar()->value());
     }
 }
 
@@ -506,22 +470,6 @@ void MainWindow::selectText(int pos, int len){
     }
 }
 
-// Selects current line where cursor is positioned
-void MainWindow::selectLine(){
-    QTextCursor cur = p->textCursor();
-    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-    p->setTextCursor(cur);
-}
-
-// Selects current word
-void MainWindow::selectWord(){
-    QTextCursor cur = p->textCursor();
-    cur.movePosition(QTextCursor::StartOfWord, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
-    p->setTextCursor(cur);
-}
-
 //  Find next instance of search term
 void MainWindow::findNext(){
     if (ui->findLineEdit->text() == currentSearchTerm){
@@ -579,25 +527,32 @@ void MainWindow::on_actionFind_Previous_triggered()
 //  Toggle replace bar
 void MainWindow::on_actionReplace_triggered()
 {
-    int width = 0;
-
-    if (ui->replaceLineEdit->width() == 0){
-        width = 150;
-        ui->findReplaceBar->setMaximumHeight(60);
+    if(ui->findReplaceBar->isHidden()){
+        ui->findReplaceBar->show();
         ui->findLineEdit->setFocus();
+        if(ui->replaceLineEdit->isHidden()){
+            ui->replaceLineEdit->show();
+            ui->replaceButton->show();
+            ui->replaceAllButton->show();
+            ui->label_3->show();
+        }
     }else{
-        ui->findReplaceBar->setMaximumHeight(0);
-        p->setFocus();
-    }
 
-    ui->findLineEdit->setMaximumWidth(width);
-    ui->label_2->setMaximumWidth(width);
-    ui->label_3->setMaximumWidth(width);
-    ui->replaceLineEdit->setMaximumWidth(width);
-    ui->replaceButton->setMaximumWidth(width);
-    ui->replaceAllButton->setMaximumWidth(width);
-    ui->findPrevButton->setMaximumWidth(width);
-    ui->findButton->setMaximumWidth(width);
+        if(ui->replaceLineEdit->isHidden()){
+            ui->replaceLineEdit->show();
+            ui->replaceButton->show();
+            ui->replaceAllButton->show();
+            ui->label_3->show();
+        }else{
+            ui->replaceLineEdit->hide();
+            ui->replaceButton->hide();
+            ui->replaceAllButton->hide();
+            ui->findReplaceBar->hide();
+            ui->label_3->hide();
+            p->setFocus();
+        }
+
+    }
 }
 
 // Replace currently selected found instance of text to be replaced
@@ -652,6 +607,36 @@ void MainWindow::on_replaceAllButton_clicked()
         p->setTextCursor(cur);
 
     }while(foundPositions.length() > 1);
+}
+
+// Go To (Line number)
+void MainWindow::on_actionGoTo_triggered()
+{
+    bool ok = 0;
+
+    if (int line = QInputDialog::getText(this, tr("Enter"),tr("Go to:"), QLineEdit::Normal,"", &ok).toInt()){
+        QTextCursor cur = p->textCursor();
+        cur.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
+        cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, line-1);
+        p->setTextCursor(cur);
+        ui->listWidget->verticalScrollBar()->setValue(p->verticalScrollBar()->value());
+    }
+}
+
+/*
+ *****************************
+ *         Editing           *
+ *****************************
+*/
+
+//  undo/redo
+void MainWindow::on_actionUndo_triggered()
+{
+    p->undo();
+}
+void MainWindow::on_actionRedo_triggered()
+{
+    p->redo();
 }
 
 //  Delete line where cusor currently resides
@@ -715,6 +700,75 @@ void MainWindow::on_actionToggle_comment_triggered()
     p->verticalScrollBar()->setValue(scrollLocation);
 }
 
+// Join lines
+void MainWindow::on_actionJoin_Lines_triggered()
+{
+    QTextCursor cur = p->textCursor();
+
+    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+    cur.deleteChar();
+
+    p->setTextCursor(cur);
+}
+
+// Swap line up
+void MainWindow::on_actionMove_Line_Up_triggered()
+{
+    QTextCursor cur = p->textCursor();
+    //  Select current line and store value
+    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+    QString newTop = cur.selectedText();
+    cur.removeSelectedText();
+    // Select line above and store value
+    cur.movePosition(QTextCursor::Up, QTextCursor::MoveAnchor);
+    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+    QString newBottom = cur.selectedText();
+    cur.removeSelectedText();
+    // Insert new values
+    cur.insertText(newTop);
+    cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
+    cur.insertText(newBottom);
+    // Position cursor
+    cur.movePosition(QTextCursor::Up, QTextCursor::MoveAnchor);
+    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+
+    p->setTextCursor(cur);
+}
+
+// Swap line down
+void MainWindow::on_actionSwap_line_down_triggered()
+{
+    QTextCursor cur = p->textCursor();
+    //  Select current line and store value
+    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+    QString newBottom = cur.selectedText();
+    cur.removeSelectedText();
+    // Select line below and store value
+    cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
+    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+    QString newTop = cur.selectedText();
+    cur.removeSelectedText();
+    // Insert new values
+    cur.insertText(newBottom);
+    cur.movePosition(QTextCursor::Up, QTextCursor::MoveAnchor);
+    cur.insertText(newTop);
+    // Position cursor
+    cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
+    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+
+    p->setTextCursor(cur);
+}
+
+/*
+ *****************************
+ *         Tools             *
+ *****************************
+*/
+
 /*  Strings
 *   Strips all nonprintable ascii characters from contents of current tab
 */
@@ -756,38 +810,59 @@ void MainWindow::on_actionChmodx_triggered()
        }
 }
 
-//  undo redo
-void MainWindow::on_actionUndo_triggered()
-{
-    p->undo();
-}
-void MainWindow::on_actionRedo_triggered()
-{
-    p->redo();
-}
+/*  Run program (in gnome terminal)
+*   If html opens in default browser instead
+*   Supported languages: html, perl, python, ruby, sh
+*/
+void MainWindow::run(bool sudo){
+    ostringstream oss;
 
-//  Close program
-void MainWindow::on_actionExit_triggered()
-{
-    QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, "Test", "Quit?", QMessageBox::Yes|QMessageBox::No);
+    if (sudo){
+        oss << "sudo ";
+    }
 
-    if (reply == QMessageBox::Yes) {
-      QApplication::quit();
-    } else {
+    QStringList fileExtension = filename.split(".");
+    int len = fileExtension.length();
+
+    if (fileExtension[len - 1] == "py"){
+        oss << filename.toStdString();
+        runner.runGnomeTerminal(oss.str());
+
+    }else if (fileExtension[len - 1] == "rb"){
+        oss << "ruby " << filename.toStdString();
+        runner.runGnomeTerminal(oss.str());
+    }else if (fileExtension[len - 1] == "pl"){
+        oss << "perl " << filename.toStdString();
+        runner.runGnomeTerminal(oss.str());
+    }else if (fileExtension[len - 1] == "sh"){
+        oss << filename.toStdString();
+        runner.runGnomeTerminal(oss.str());
+
+    }else if (fileExtension[len - 1] == "html"){
+        oss << "xdg-open " << filename.toStdString();
+        ui->textBrowser->setPlainText(QString::fromStdString(runner.run(oss.str())));
+
+    }else{
 
     }
-}
 
-//  Display about info
-void MainWindow::on_actionAbout_triggered()
+}
+void MainWindow::on_actionRun_in_xterm_triggered()
 {
-    QMessageBox::information(this, tr("My App"), *licencePointer,QMessageBox::Close);
+    MainWindow::run(false);
+}
+void MainWindow::on_actionRun_triggered()
+{
+    MainWindow::run(true);
 }
 
-/*  File Templates
-*   If current tab is empty fill it with the selected code template
+/*
+ *****************************
+ *         Templates         *
+ *****************************
 */
+
+// If current tab is empty fill it with the selected code template
 void MainWindow::getTemp(int num){
 
     if(p->toPlainText() == ""){
@@ -809,6 +884,113 @@ void MainWindow::on_actionHtml_triggered(){ MainWindow::getTemp(3);}
 void MainWindow::on_actionJava_triggered(){ MainWindow::getTemp(4);}
 void MainWindow::on_actionPhp_triggered(){ MainWindow::getTemp(5);}
 void MainWindow::on_actionCss_triggered(){ MainWindow::getTemp(6);}
+
+//  Get directory of current file
+string MainWindow::getDirectory(){
+   ostringstream oss;
+
+    if (filename != ""){
+        QStringList path = filename.split("/");
+        int len = path.length();
+
+        for(int i = 0; i < len - 1; i++){
+            oss << path[i].toStdString() << "/";
+        }
+
+    }else{
+        oss << currentDirectory.toStdString();
+    }
+
+    return oss.str();
+}
+
+/*
+ *****************************
+ *         View              *
+ *****************************
+*/
+
+//  Toggle fullScreen
+void MainWindow::on_actionFullScreen_triggered()
+{
+    if(MainWindow::isFullScreen())
+    {
+        MainWindow::showNormal();
+    }else{
+        MainWindow::showFullScreen();
+    }
+}
+
+//  Toggle file overview
+void MainWindow::on_actionOverview_triggered()
+{
+    if(ui->fileOverview->width() == 0){
+        ui->fileOverview->setMaximumWidth(110);
+    }else{
+        ui->fileOverview->setMaximumWidth(0);
+    }
+}
+
+//  Toggle Menubar
+void MainWindow::on_actionMenubar_triggered()
+{
+    if(ui->menuBar->height() > 0){
+        ui->menuBar->setMaximumHeight(0);
+    }else{
+        ui->menuBar->setMaximumHeight(100);
+    }
+}
+
+/*
+ *****************************
+ *         Themes            *
+ *****************************
+*/
+
+void MainWindow::on_actionDark_triggered()
+{
+    theme = "dark";
+    ui->tabWidget->setStyleSheet("QPlainTextEdit { background-color: #272822; color:#e0e0e0; border: 0px; selection-background-color: #404f4f; font-family: \"Liberation Mono\"; font-size:10pt;} "
+            "QScrollBar:vertical{background: #002b36;} QScrollBar:horizontal{background: #002b36;}"
+            "QTabBar::tab:selected{color: white; border-bottom: 3px solid #2F4F4F;}"
+            "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; margin: 0 -2px;padding: 1px 5px; background-color: #212121; border-bottom: 3px solid #212121;}");
+    ui->listWidget->setStyleSheet("background-color: #2a2b25; margin-top: 28px; padding-left: 5px; color: #839496; border: none; font: 10pt \"Liberation Mono\";");
+    ui->fileOverview->setStyleSheet("font-family: \"Liberation Mono\"; font-size: 1pt; color: rgb(255, 255, 255); margin-top: 28px; background-color: #2a2b25; border: 0px;");
+
+}
+
+void MainWindow::on_actionSolarized_Dark_triggered()
+{
+    theme = "solarizedDark";
+    ui->tabWidget->setStyleSheet("QPlainTextEdit { background-color: #002b36; color:#839496; border: 0px; selection-background-color: #404f4f; font-family: \"Liberation Mono\"; font-size:10pt;} "
+                                 "QScrollBar:vertical{background: #002b36;} QScrollBar:horizontal{background: #002b36;}"
+                                 "QTabBar::tab:selected{color: white; border-bottom: 3px solid #2F4F4F;}"
+                                 "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; margin: 0 -2px;padding: 1px 5px; background-color: #212121; border-bottom: 3px solid #212121;}");
+    ui->listWidget->setStyleSheet("background-color: #073642;; margin-top: 28px; padding-left: 5px; color: #839496; border: none; font: 10pt \"Liberation Mono\";");
+    ui->fileOverview->setStyleSheet("font-family: \"Liberation Mono\"; font-size: 1pt; color: rgb(255, 255, 255); margin-top: 28px; background-color: #073642; border: 0px;");
+}
+
+/*
+ *****************************
+ *         Window            *
+ *****************************
+*/
+
+//  Highlight Current Line
+void MainWindow::highlightCurrentLine(){
+   QList<QTextEdit::ExtraSelection> extraSelections;
+
+   QTextEdit::ExtraSelection selections;
+   QColor lineColor = QColor(7, 54, 66);
+   selections.format.setBackground(lineColor);
+   selections.format.setProperty(QTextFormat::FullWidthSelection, true);
+   selections.cursor = p->textCursor();
+   selections.cursor.clearSelection();
+   extraSelections.append(selections);
+
+   p->setExtraSelections(extraSelections);
+   ui->listWidget->verticalScrollBar()->setValue(p->verticalScrollBar()->value());
+}
 
 //  Line nums Block count
 void MainWindow::updateLineNums(int newBlockCount){
@@ -836,7 +1018,7 @@ void MainWindow::updateLineNums(int newBlockCount){
     }
 
     ostringstream oss;
-    oss << " Lines: " << newBlockCount << "\t";
+    oss << newBlockCount << " Lines";
     ui->label->setText(QString::fromStdString(oss.str()));
 }
 void MainWindow::onBlockCountChanged(int newBlockCount)
@@ -874,148 +1056,21 @@ void MainWindow::scrollOverview(int scrollValue){
     ui->fileOverview->verticalScrollBar()->setValue(scrollValue * 2.5);
 }
 
-//  Toggle fullScreen
-void MainWindow::on_actionFullScreen_triggered()
+//  Close program
+void MainWindow::on_actionExit_triggered()
 {
-    if(MainWindow::isFullScreen())
-    {
-        MainWindow::showNormal();
-    }else{
-        MainWindow::showFullScreen();
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Test", "Quit?", QMessageBox::Yes|QMessageBox::No);
+
+    if (reply == QMessageBox::Yes) {
+      QApplication::quit();
+    } else {
+
     }
 }
 
-//  Toggle file overview
-void MainWindow::on_actionOverview_triggered()
+//  Display about info
+void MainWindow::on_actionAbout_triggered()
 {
-    if(ui->fileOverview->width() == 0){
-        ui->fileOverview->setMaximumWidth(110);
-    }else{
-        ui->fileOverview->setMaximumWidth(0);
-    }
-}
-
-//  Get directory of current file
-string MainWindow::getDirectory(){
-   ostringstream oss;
-
-    if (filename != ""){
-        QStringList path = filename.split("/");
-        int len = path.length();
-
-        for(int i = 0; i < len - 1; i++){
-            oss << path[i].toStdString() << "/";
-        }
-
-    }else{
-        oss << currentDirectory.toStdString();
-    }
-
-    return oss.str();
-}
-
-/*  Open directory of currently active file in default file manager
-*   If current tab has no file open then open directory of last active file
-*   Else open users home directory
-*/
-void MainWindow::on_actionOpen_containg_folder_triggered()
-{
-    ostringstream oss;
-    oss << "xdg-open " << getDirectory();
-    ui->textBrowser->setPlainText(QString::fromStdString(runner.run(oss.str())));
-    p->setFocus();
-}
-
-
-
-void MainWindow::on_actionDark_triggered()
-{
-    theme = "dark";
-    ui->tabWidget->setStyleSheet("QPlainTextEdit { background-color: #272822; color:#e0e0e0; border: 0px; selection-background-color: #404f4f; font-family: \"Liberation Mono\"; font-size:10pt;} "
-            "QScrollBar:vertical{background: #002b36;} QScrollBar:horizontal{background: #002b36;}"
-            "QTabBar::tab:selected{color: white; border-bottom: 3px solid #2F4F4F;}"
-            "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; margin: 0 -2px;padding: 1px 5px; background-color: #212121; border-bottom: 3px solid #212121;}");
-    ui->listWidget->setStyleSheet("background-color: #2a2b25; margin-top: 28px; padding-left: 5px; color: #839496; border: none; font: 10pt \"Liberation Mono\";");
-    ui->fileOverview->setStyleSheet("font-family: \"Liberation Mono\"; font-size: 1pt; color: rgb(255, 255, 255); margin-top: 28px; background-color: #2a2b25; border: 0px;");
-
-}
-
-void MainWindow::on_actionSolarized_Dark_triggered()
-{
-    theme = "solarizedDark";
-    ui->tabWidget->setStyleSheet("QPlainTextEdit { background-color: #002b36; color:#839496; border: 0px; selection-background-color: #404f4f; font-family: \"Liberation Mono\"; font-size:10pt;} "
-                                 "QScrollBar:vertical{background: #002b36;} QScrollBar:horizontal{background: #002b36;}"
-                                 "QTabBar::tab:selected{color: white; border-bottom: 3px solid #2F4F4F;}"
-                                 "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; margin: 0 -2px;padding: 1px 5px; background-color: #212121; border-bottom: 3px solid #212121;}");
-    ui->listWidget->setStyleSheet("background-color: #073642;; margin-top: 28px; padding-left: 5px; color: #839496; border: none; font: 10pt \"Liberation Mono\";");
-    ui->fileOverview->setStyleSheet("font-family: \"Liberation Mono\"; font-size: 1pt; color: rgb(255, 255, 255); margin-top: 28px; background-color: #073642; border: 0px;");
-}
-
-void MainWindow::on_actionJoin_Lines_triggered()
-{
-    QTextCursor cur = p->textCursor();
-
-    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
-    cur.deleteChar();
-
-    p->setTextCursor(cur);
-}
-
-void MainWindow::on_actionMove_Line_Up_triggered()
-{
-    QTextCursor cur = p->textCursor();
-    //  Select current line and store value
-    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-    QString newTop = cur.selectedText();
-    cur.removeSelectedText();
-    // Select line above and store value
-    cur.movePosition(QTextCursor::Up, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-    QString newBottom = cur.selectedText();
-    cur.removeSelectedText();
-    // Insert new values
-    cur.insertText(newTop);
-    cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
-    cur.insertText(newBottom);
-    // Position cursor
-    cur.movePosition(QTextCursor::Up, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
-
-    p->setTextCursor(cur);
-}
-
-void MainWindow::on_actionSwap_line_down_triggered()
-{
-    QTextCursor cur = p->textCursor();
-    //  Select current line and store value
-    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-    QString newBottom = cur.selectedText();
-    cur.removeSelectedText();
-    // Select line below and store value
-    cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-    QString newTop = cur.selectedText();
-    cur.removeSelectedText();
-    // Insert new values
-    cur.insertText(newBottom);
-    cur.movePosition(QTextCursor::Up, QTextCursor::MoveAnchor);
-    cur.insertText(newTop);
-    // Position cursor
-    cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
-
-    p->setTextCursor(cur);
-}
-
-void MainWindow::on_actionMenubar_triggered()
-{
-    if(ui->menuBar->height() > 0){
-        ui->menuBar->setMaximumHeight(0);
-    }else{
-        ui->menuBar->setMaximumHeight(100);
-    }
+    QMessageBox::information(this, tr("My App"), *licencePointer,QMessageBox::Close);
 }
