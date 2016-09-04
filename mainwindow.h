@@ -39,10 +39,6 @@ private slots:
 
     void on_actionAscii_triggered();
 
-    void on_actionChmodx_triggered();
-
-    void on_actionRun_triggered();
-
     void on_actionStrings_triggered();
 
     void on_findLineEdit_returnPressed();
@@ -71,8 +67,6 @@ private slots:
 
     void newTab();
 
-    void run(bool sudo);
-
     void on_actionAsm_triggered();
 
     void on_actionC_triggered();
@@ -82,8 +76,6 @@ private slots:
     void on_actionHtml_triggered();
 
     void on_actionJava_triggered();
-
-    void on_actionPhp_triggered();
 
     void getTemp(int num);
 
@@ -123,8 +115,6 @@ private slots:
 
     void on_replaceLineEdit_returnPressed();
 
-    void on_actionRun_in_xterm_triggered();
-
     void on_findLineEdit_textChanged(const QString &arg1);
 
     void on_actionToggle_comment_triggered();
@@ -149,6 +139,16 @@ private slots:
 
     void on_actionMenubar_triggered();
 
+    void on_actionSolarized_triggered();
+
+    void on_action8_triggered();
+
+    void on_action4_triggered();
+
+    void on_action2_triggered();
+
+    void setTabWidth(int width);
+
 private:
     Ui::MainWindow *ui;
     Highlighter *highlighter;
@@ -160,9 +160,11 @@ private:
     int foundPosElement;
     int searchTermLen;
     int *outputModeP;
+    int tabWidth;
 
     QString filename;
     QString theme;
+    QColor lineColor;
 
 };
 

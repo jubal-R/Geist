@@ -59,19 +59,21 @@ MainWindow::MainWindow(QWidget *parent) :
     outputMode = 0;
     foundPosElement = 0;
     searchTermLen = 0;
+    tabWidth = 4;
 
     outputModeP = &outputMode; //  0 = ascii, 1 = hex, 2 = strings
 
     filename = "";  // Name of file in current tab
     theme = "solarizedDark"; // Default theme
+    lineColor = QColor(7, 54, 66);
 
     // UI Setup
     ui->setupUi(this);
 
     //  Style Sheet
     this->setWindowTitle("Geist");
-    MainWindow::setStyleSheet("QMenu {background-color: rgb(48, 47, 54); color:white; selection-background-color: #404f4f;border: 1px solid #303030;border-radius: 3px 3px 3px 3px;}"
-                              "QMenuBar::item {background:#212121;} QMenuBar::item:selected {background: #232629;}"
+    MainWindow::setStyleSheet("QMenu {background-color: rgb(48, 47, 54); color:white; selection-background-color: #404f4f;border: 1px solid #404f4f; border-radius: 3px 3px 3px 3px;}"
+                              "QMenuBar::item {background:#262626;} QMenuBar::item:selected {background: #232629;}"
                               "QMessageBox {color:white;}"
                               "QLineEdit {border: 1px solid #676767; border-radius: 5px 5px 5px 5px;}"
                               "QScrollBar::sub-page:vertical {background: #002b36;} QScrollBar::add-page:vertical {background: #002b36;}"
@@ -80,12 +82,12 @@ MainWindow::MainWindow(QWidget *parent) :
                               "QScrollBar:horizontal{background: white;height:12px;margin: 0px 0px 0px 0px;} QScrollBar::handle:horizontal {background:#073642;border: 2px solid #002b36;border-radius: 5px 5px 5px 5px; min-height: 30px;}");
 
 
-    ui->tabWidget->setStyleSheet("QPlainTextEdit { background-color: #002b36; color:#839496; border: 0px; selection-background-color: #404f4f; font-family: \"Liberation Mono\"; font-size:10pt;} "
+    ui->tabWidget->setStyleSheet("QPlainTextEdit { background-color: #002b36; color:#839496; border: 0px; selection-background-color: #404f4f; font-family: \"Anonymous Pro\"; font-size:11pt;} "
                                  "QScrollBar:vertical{background: #002b36;} QScrollBar:horizontal{background: #002b36;}"
                                  "QTabBar::tab:selected{color: white; border-bottom: 3px solid #2F4F4F;}"
-                                 "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; padding: 1px 5px; background-color: #212121; border-bottom: 3px solid #212121;}");
+                                 "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; padding: 1px 5px; background-color: #262626; border-bottom: 3px solid #212121;}");
 
-    ui->menuBar->setStyleSheet("color:white; background-color:#212121; QMenuBar::item {background:black;}");
+    ui->menuBar->setStyleSheet("color:white; background-color:#262626; QMenuBar::item {background:black;}");
     ui->centralWidget->layout()->setContentsMargins(0,0,0,0);
 
     //  Disbale manual scrolling for line numbers
@@ -99,6 +101,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->replaceAllButton->hide();
     ui->label_3->hide();
 
+    // Read settings file
+    string set = files.read("settings.txt");
+    settings = QString::fromStdString(set).split("\n");
+
+    if(settings.size() > 4){
+        tabWidth = settings.at(4).toInt();  // After first tab
+    }
+
     // Create and setup initial tab
     newTab();
     connect(p, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
@@ -110,18 +120,18 @@ MainWindow::MainWindow(QWidget *parent) :
     item->setSizeHint(QSize(item->sizeHint().height(), 14));
 
     //  Setup window based on user's settings
-    string set = files.read("settings.txt");
-    settings = QString::fromStdString(set).split("\n");
-    if (settings.size() > 3){
+    if (settings.size() > 4){
         MainWindow::resize(settings.at(0).toInt(), settings.at(1).toInt());
         ui->fileOverview->setMaximumWidth(settings.at(2).toInt());
         // Set theme if not default
         if(settings.at(3) != theme){
             if(settings.at(3) == "dark"){
                 on_actionDark_triggered();
+            }else if(settings.at(3) == "solarized"){
+                on_actionSolarized_triggered();
             }
         }
-        for(int i = 4; i < settings.size(); i++){
+        for(int i = 5; i < settings.size(); i++){
             open(settings.at(i));
         }
     }
@@ -135,6 +145,7 @@ MainWindow::~MainWindow()
     */
     ostringstream oss;
     oss << MainWindow::width() << "\n" << MainWindow::height() << "\n" << ui->fileOverview->width() << "\n" << theme.toStdString() << "\n";
+    oss << tabWidth << "\n";
 
     QStringList openFiles = filelist.getFilesList();
     int numOpenFiles = openFiles.length();
@@ -211,15 +222,8 @@ void MainWindow::newTab(){
         ui->tabWidget->setTabToolTip(ui->tabWidget->currentIndex(), "");
         filename = "";
 
-        QFont font;
-        font.setFamily("DejaVu Sans Mono");
-        font.setStyleHint(QFont::Monospace);
-        font.setFixedPitch(true);
-        font.setPointSize(9);
-        p->setFont(font);
-        QFontMetrics metrics(font);
+        setTabWidth(tabWidth);
 
-        p->setTabStopWidth(4 * metrics.width(' ') );
         p->setWordWrapMode(QTextOption::NoWrap);
     }
 }
@@ -796,66 +800,6 @@ void MainWindow::on_actionAscii_triggered()
     }
 }
 
-//  Run chmod +x on current file
-void MainWindow::on_actionChmodx_triggered()
-{
-    ostringstream oss;
-    oss << "chmod +x " << filename.toStdString();
-    string output = runner.run(oss.str());
-
-    if (output == ""){
-        ui->textBrowser->setPlainText("+x permission granted.");
-    }else{
-        ui->textBrowser->setPlainText(QString::fromStdString(output));
-       }
-}
-
-/*  Run program (in gnome terminal)
-*   If html opens in default browser instead
-*   Supported languages: html, perl, python, ruby, sh
-*/
-void MainWindow::run(bool sudo){
-    ostringstream oss;
-
-    if (sudo){
-        oss << "sudo ";
-    }
-
-    QStringList fileExtension = filename.split(".");
-    int len = fileExtension.length();
-
-    if (fileExtension[len - 1] == "py"){
-        oss << filename.toStdString();
-        runner.runGnomeTerminal(oss.str());
-
-    }else if (fileExtension[len - 1] == "rb"){
-        oss << "ruby " << filename.toStdString();
-        runner.runGnomeTerminal(oss.str());
-    }else if (fileExtension[len - 1] == "pl"){
-        oss << "perl " << filename.toStdString();
-        runner.runGnomeTerminal(oss.str());
-    }else if (fileExtension[len - 1] == "sh"){
-        oss << filename.toStdString();
-        runner.runGnomeTerminal(oss.str());
-
-    }else if (fileExtension[len - 1] == "html"){
-        oss << "xdg-open " << filename.toStdString();
-        ui->textBrowser->setPlainText(QString::fromStdString(runner.run(oss.str())));
-
-    }else{
-
-    }
-
-}
-void MainWindow::on_actionRun_in_xterm_triggered()
-{
-    MainWindow::run(false);
-}
-void MainWindow::on_actionRun_triggered()
-{
-    MainWindow::run(true);
-}
-
 /*
  *****************************
  *         Templates         *
@@ -882,8 +826,7 @@ void MainWindow::on_actionC_triggered(){ MainWindow::getTemp(1);}
 void MainWindow::on_actionCpluspluss_triggered(){ MainWindow::getTemp(2);}
 void MainWindow::on_actionHtml_triggered(){ MainWindow::getTemp(3);}
 void MainWindow::on_actionJava_triggered(){ MainWindow::getTemp(4);}
-void MainWindow::on_actionPhp_triggered(){ MainWindow::getTemp(5);}
-void MainWindow::on_actionCss_triggered(){ MainWindow::getTemp(6);}
+void MainWindow::on_actionCss_triggered(){ MainWindow::getTemp(5);}
 
 //  Get directory of current file
 string MainWindow::getDirectory(){
@@ -953,10 +896,24 @@ void MainWindow::on_actionDark_triggered()
     ui->tabWidget->setStyleSheet("QPlainTextEdit { background-color: #272822; color:#e0e0e0; border: 0px; selection-background-color: #404f4f; font-family: \"Liberation Mono\"; font-size:10pt;} "
             "QScrollBar:vertical{background: #002b36;} QScrollBar:horizontal{background: #002b36;}"
             "QTabBar::tab:selected{color: white; border-bottom: 3px solid #2F4F4F;}"
-            "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; margin: 0 -2px;padding: 1px 5px; background-color: #212121; border-bottom: 3px solid #212121;}");
-    ui->listWidget->setStyleSheet("background-color: #2a2b25; margin-top: 28px; padding-left: 5px; color: #839496; border: none; font: 10pt \"Liberation Mono\";");
-    ui->fileOverview->setStyleSheet("font-family: \"Liberation Mono\"; font-size: 1pt; color: rgb(255, 255, 255); margin-top: 28px; background-color: #2a2b25; border: 0px;");
+            "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; margin: 0 -2px;padding: 1px 5px; background-color: #262626; border-bottom: 3px solid #212121;}");
+    ui->listWidget->setStyleSheet("background-color: #32332c; margin-top: 28px; padding-left: 5px; color: #839496; border: none; font: 10pt \"Anonymous Pro\";");
+    ui->fileOverview->setStyleSheet("font-family: \"Liberation Mono\"; font-size: 1pt; color: rgb(255, 255, 255); margin-top: 28px; background-color: #32332c; border: 0px;");
+    lineColor = QColor(50, 51, 44);
+    highlightCurrentLine();
+}
 
+void MainWindow::on_actionSolarized_triggered()
+{
+    theme = "solarized";
+    ui->tabWidget->setStyleSheet("QPlainTextEdit { background-color: #fdf6e3; color:#839496; border: 0px; selection-background-color: #404f4f; font-family: \"Liberation Mono\"; font-size:10pt;} "
+                                 "QScrollBar:vertical{background: #002b36;} QScrollBar:horizontal{background: #002b36;}"
+                                 "QTabBar::tab:selected{color: white; border-bottom: 3px solid #2F4F4F;}"
+                                 "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; margin: 0 -2px;padding: 1px 5px; background-color: #262626; border-bottom: 3px solid #212121;}");
+    ui->listWidget->setStyleSheet("background-color: #eee8d5; margin-top: 28px; padding-left: 5px; color: #839496; border: none; font: 10pt \"Anonymous Pro\";");
+    ui->fileOverview->setStyleSheet("font-family: \"Liberation Mono\"; font-size: 1pt; color: rgb(255, 255, 255); margin-top: 28px; background-color: #eee8d5; border: 0px; color:#212121");
+    lineColor = QColor(238, 232, 213);
+    highlightCurrentLine();
 }
 
 void MainWindow::on_actionSolarized_Dark_triggered()
@@ -965,9 +922,11 @@ void MainWindow::on_actionSolarized_Dark_triggered()
     ui->tabWidget->setStyleSheet("QPlainTextEdit { background-color: #002b36; color:#839496; border: 0px; selection-background-color: #404f4f; font-family: \"Liberation Mono\"; font-size:10pt;} "
                                  "QScrollBar:vertical{background: #002b36;} QScrollBar:horizontal{background: #002b36;}"
                                  "QTabBar::tab:selected{color: white; border-bottom: 3px solid #2F4F4F;}"
-                                 "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; margin: 0 -2px;padding: 1px 5px; background-color: #212121; border-bottom: 3px solid #212121;}");
-    ui->listWidget->setStyleSheet("background-color: #073642;; margin-top: 28px; padding-left: 5px; color: #839496; border: none; font: 10pt \"Liberation Mono\";");
+                                 "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; margin: 0 -2px;padding: 1px 5px; background-color: #262626; border-bottom: 3px solid #212121;}");
+    ui->listWidget->setStyleSheet("background-color: #073642; margin-top: 28px; padding-left: 5px; color: #839496; border: none; font: 10pt \"Anonymous Pro\";");
     ui->fileOverview->setStyleSheet("font-family: \"Liberation Mono\"; font-size: 1pt; color: rgb(255, 255, 255); margin-top: 28px; background-color: #073642; border: 0px;");
+    lineColor = QColor(7, 54, 66);
+    highlightCurrentLine();
 }
 
 /*
@@ -981,7 +940,6 @@ void MainWindow::highlightCurrentLine(){
    QList<QTextEdit::ExtraSelection> extraSelections;
 
    QTextEdit::ExtraSelection selections;
-   QColor lineColor = QColor(7, 54, 66);
    selections.format.setBackground(lineColor);
    selections.format.setProperty(QTextFormat::FullWidthSelection, true);
    selections.cursor = p->textCursor();
@@ -1072,5 +1030,35 @@ void MainWindow::on_actionExit_triggered()
 //  Display about info
 void MainWindow::on_actionAbout_triggered()
 {
-    QMessageBox::information(this, tr("My App"), *licencePointer,QMessageBox::Close);
+    QMessageBox::information(this, tr("About Geist"), *licencePointer,QMessageBox::Close);
+}
+
+// Set tab stop width
+void MainWindow::setTabWidth(int width){
+    QFont font;
+    font.setFamily("Anonymous Pro");
+    font.setStyleHint(QFont::Monospace);
+    font.setFixedPitch(true);
+    font.setPointSize(10);
+    QFontMetrics metrics(font);
+
+    p->setTabStopWidth(width * metrics.width(' ') );
+}
+
+void MainWindow::on_action8_triggered()
+{
+    tabWidth = 8;
+    setTabWidth(8);
+}
+
+void MainWindow::on_action4_triggered()
+{
+    tabWidth = 4;
+    setTabWidth(4);
+}
+
+void MainWindow::on_action2_triggered()
+{
+    tabWidth = 2;
+    setTabWidth(2);
 }

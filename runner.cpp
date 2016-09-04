@@ -31,22 +31,3 @@ string Runner::run(string path){
 
     return oss2.str();
 }
-
-//  Run in gnome terminal
-string Runner::runGnomeTerminal(string path){
-    ostringstream oss;
-    ostringstream oss2;
-    oss << "gnome-terminal -e \"" << path << "\" 2>&1";
-    FILE *in;
-    char buff[512];
-    if(!(in = popen(oss.str().c_str() ,"r") )){
-        return "Fail :(";
-    }
-    while(fgets(buff, sizeof(buff), in) !=NULL){
-        oss2 << buff;
-    }
-    pclose(in);
-
-    return oss2.str();
-}
-

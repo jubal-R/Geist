@@ -7,8 +7,6 @@ class Runner
 public:
     Runner();
     std::string run(std::string path);
-    std::string runxterm(std::string path);
-    std::string runGnomeTerminal(std::string path);
 };
 
 #endif // STUFF_H

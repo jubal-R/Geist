@@ -24,7 +24,7 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="styleSheet">
-    <string notr="true">background-color: #212121;
+    <string notr="true">background-color: #262626;
 </string>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -71,8 +71,8 @@
         </property>
         <property name="font">
          <font>
-          <family>Liberation Mono</family>
-          <pointsize>10</pointsize>
+          <family>Anonymous Pro</family>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <italic>false</italic>
           <bold>false</bold>
@@ -87,7 +87,7 @@ margin-top: 28px;
 padding-left: 5px;
 color: #839496;
 border: none;
-font: 10pt &quot;Liberation Mono&quot;;</string>
+font: 11pt &quot;Anonymous Pro&quot;;</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -101,7 +101,7 @@ font: 10pt &quot;Liberation Mono&quot;;</string>
         <property name="gridSize">
          <size>
           <width>0</width>
-          <height>16</height>
+          <height>15</height>
          </size>
         </property>
         <property name="uniformItemSizes">
@@ -150,7 +150,7 @@ font: 10pt &quot;Liberation Mono&quot;;</string>
         </property>
         <property name="font">
          <font>
-          <family>Liberation Mono</family>
+          <family>Anonymous Pro</family>
           <pointsize>1</pointsize>
           <weight>50</weight>
           <italic>false</italic>
@@ -158,7 +158,7 @@ font: 10pt &quot;Liberation Mono&quot;;</string>
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">font-family: &quot;Liberation Mono&quot;;
+         <string notr="true">font-family: &quot;Anonymous Pro&quot;;
 font-size: 1pt;
 color: rgb(255, 255, 255);
 margin-top: 28px;
@@ -640,15 +640,6 @@ background-color: rgba(255, 255, 255, 0);</string>
     <addaction name="actionCss"/>
     <addaction name="actionHtml"/>
     <addaction name="actionJava"/>
-    <addaction name="actionPhp"/>
-   </widget>
-   <widget class="QMenu" name="menuRun">
-    <property name="title">
-     <string>Run</string>
-    </property>
-    <addaction name="actionRun_in_xterm"/>
-    <addaction name="actionRun"/>
-    <addaction name="actionChmodx"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
@@ -672,14 +663,23 @@ background-color: rgba(255, 255, 255, 0);</string>
       <string>Theme</string>
      </property>
      <addaction name="actionDark"/>
+     <addaction name="actionSolarized"/>
      <addaction name="actionSolarized_Dark"/>
     </widget>
+    <widget class="QMenu" name="menuTab_Width">
+     <property name="title">
+      <string>Tab Width</string>
+     </property>
+     <addaction name="action2"/>
+     <addaction name="action4"/>
+     <addaction name="action8"/>
+    </widget>
+    <addaction name="menuTab_Width"/>
     <addaction name="menuTheme"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
-   <addaction name="menuRun"/>
    <addaction name="menuSearch"/>
    <addaction name="menuTemplates"/>
    <addaction name="menuTools"/>
@@ -763,19 +763,6 @@ background-color: rgba(255, 255, 255, 0);</string>
     <string>Hex</string>
    </property>
   </action>
-  <action name="actionChmodx">
-   <property name="text">
-    <string>Chmod +x</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+X</string>
-   </property>
-  </action>
-  <action name="actionRun">
-   <property name="text">
-    <string>Sudo ./</string>
-   </property>
-  </action>
   <action name="actionStrings">
    <property name="text">
     <string>Strings</string>
@@ -830,11 +817,6 @@ background-color: rgba(255, 255, 255, 0);</string>
     <string>java</string>
    </property>
   </action>
-  <action name="actionPhp">
-   <property name="text">
-    <string>php</string>
-   </property>
-  </action>
   <action name="actionCss">
    <property name="text">
     <string>css</string>
@@ -886,17 +868,6 @@ background-color: rgba(255, 255, 255, 0);</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+/</string>
-   </property>
-  </action>
-  <action name="actionRun_in_xterm">
-   <property name="text">
-    <string>Run</string>
-   </property>
-   <property name="toolTip">
-    <string>Run</string>
-   </property>
-   <property name="shortcut">
-    <string>F10</string>
    </property>
   </action>
   <action name="actionOverview">
@@ -959,6 +930,26 @@ background-color: rgba(255, 255, 255, 0);</string>
    </property>
    <property name="shortcut">
     <string>Alt+M</string>
+   </property>
+  </action>
+  <action name="actionSolarized">
+   <property name="text">
+    <string>Solarized</string>
+   </property>
+  </action>
+  <action name="action4">
+   <property name="text">
+    <string>4</string>
+   </property>
+  </action>
+  <action name="action8">
+   <property name="text">
+    <string>8</string>
+   </property>
+  </action>
+  <action name="action2">
+   <property name="text">
+    <string>2</string>
    </property>
   </action>
  </widget>
