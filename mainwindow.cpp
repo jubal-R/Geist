@@ -185,6 +185,7 @@ void MainWindow::on_tabWidget_currentChanged(int index)
     ui->labelFileType->setText(getFileType(filename).toUpper());
     foundPositions.clear();
     foundPosElement = 0;
+    highlightCurrentLine();
 
 }
 
@@ -891,12 +892,21 @@ void MainWindow::on_actionMenubar_triggered()
 void MainWindow::on_actionDark_triggered()
 {
     theme = "dark";
-    ui->tabWidget->setStyleSheet("QPlainTextEdit { background-color: #272822; color:#e0e0e0; border: 0px; selection-background-color: #404f4f; font-family: \"Liberation Mono\"; font-size:10pt;} "
-            "QScrollBar:vertical{background: #002b36;} QScrollBar:horizontal{background: #002b36;}"
+    MainWindow::setStyleSheet("QMenu {background-color: rgb(48, 47, 54); color:white; selection-background-color: #404f4f;border: 1px solid #404f4f; border-radius: 3px 3px 3px 3px;}"
+                              "QMenuBar::item {background:#262626;} QMenuBar::item:selected {background: #232629;}"
+                              "QMessageBox {color:white;}"
+                              "QLineEdit {border: 1px solid #676767; border-radius: 5px 5px 5px 5px;}"
+                              "QScrollBar::sub-page:vertical {background: #272822;} QScrollBar::add-page:vertical {background: #272822;}"
+                              "QScrollBar::sub-page:horizonal {background: #272822;} QScrollBar::add-page:horizontal {background: #272822;}"
+                              "QScrollBar:vertical{background: white;width:12px;margin: 0px 0px 0px 0px;} QScrollBar::handle:vertical {background:#32332c;border: 2px solid #272822;border-radius: 5px 5px 5px 5px; min-height: 30px;}"
+                              "QScrollBar:horizontal{background: white;height:12px;margin: 0px 0px 0px 0px;} QScrollBar::handle:horizontal {background:#32332c;border: 2px solid #272822;border-radius: 5px 5px 5px 5px; min-height: 30px;}");
+
+    ui->tabWidget->setStyleSheet("QPlainTextEdit { background-color: #272822; color:#e0e0e0; border: 0px; selection-background-color: #404f4f; font-family: \"Anonymous Pro\"; font-size:11pt;} "
+            "QScrollBar:vertical{background: #272822;} QScrollBar:horizontal{background: #272822;}"
             "QTabBar::tab:selected{color: white; border-bottom: 3px solid #2F4F4F;}"
             "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; margin: 0 -2px;padding: 1px 5px; background-color: #262626; border-bottom: 3px solid #212121;}");
-    ui->listWidget->setStyleSheet("background-color: #32332c; margin-top: 28px; padding-left: 5px; color: #839496; border: none; font: 10pt \"Anonymous Pro\";");
-    ui->fileOverview->setStyleSheet("font-family: \"Liberation Mono\"; font-size: 1pt; color: rgb(255, 255, 255); margin-top: 28px; background-color: #32332c; border: 0px;");
+    ui->listWidget->setStyleSheet("background-color: #32332c; margin-top: 28px; padding-left: 5px; color: #839496; border: none; font: 11pt \"Anonymous Pro\";");
+    ui->fileOverview->setStyleSheet("font-family: \"Anonymous Pro\"; font-size: 1pt; color: rgb(255, 255, 255); margin-top: 28px; background-color: #32332c; border: 0px;");
     lineColor = QColor(50, 51, 44);
     highlightCurrentLine();
 }
@@ -904,12 +914,21 @@ void MainWindow::on_actionDark_triggered()
 void MainWindow::on_actionSolarized_triggered()
 {
     theme = "solarized";
-    ui->tabWidget->setStyleSheet("QPlainTextEdit { background-color: #fdf6e3; color:#839496; border: 0px; selection-background-color: #404f4f; font-family: \"Liberation Mono\"; font-size:10pt;} "
-                                 "QScrollBar:vertical{background: #002b36;} QScrollBar:horizontal{background: #002b36;}"
+    MainWindow::setStyleSheet("QMenu {background-color: rgb(48, 47, 54); color:white; selection-background-color: #404f4f;border: 1px solid #404f4f; border-radius: 3px 3px 3px 3px;}"
+                              "QMenuBar::item {background:#262626;} QMenuBar::item:selected {background: #232629;}"
+                              "QMessageBox {color:white;}"
+                              "QLineEdit {border: 1px solid #676767; border-radius: 5px 5px 5px 5px;}"
+                              "QScrollBar::sub-page:vertical {background: #fdf6e3;} QScrollBar::add-page:vertical {background: #fdf6e3;}"
+                              "QScrollBar::sub-page:horizonal {background: #fdf6e3;} QScrollBar::add-page:horizontal {background: #fdf6e3;}"
+                              "QScrollBar:vertical{background: white;width:12px;margin: 0px 0px 0px 0px;} QScrollBar::handle:vertical {background:#ede7d5;border: 2px solid #fdf6e3;border-radius: 5px 5px 5px 5px; min-height: 30px;}"
+                              "QScrollBar:horizontal{background: white;height:12px;margin: 0px 0px 0px 0px;} QScrollBar::handle:horizontal {background:#ede7d5;border: 2px solid #fdf6e3;border-radius: 5px 5px 5px 5px; min-height: 30px;}");
+
+    ui->tabWidget->setStyleSheet("QPlainTextEdit { background-color: #fdf6e3; color:#839496; border: 0px; selection-background-color: #404f4f; font-family: \"Anonymous Pro\"; font-size:11pt;} "
+                                 "QScrollBar:vertical{background: #fdf6e3;} QScrollBar:horizontal{background: #fdf6e3;}"
                                  "QTabBar::tab:selected{color: white; border-bottom: 3px solid #2F4F4F;}"
                                  "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; margin: 0 -2px;padding: 1px 5px; background-color: #262626; border-bottom: 3px solid #212121;}");
-    ui->listWidget->setStyleSheet("background-color: #eee8d5; margin-top: 28px; padding-left: 5px; color: #839496; border: none; font: 10pt \"Anonymous Pro\";");
-    ui->fileOverview->setStyleSheet("font-family: \"Liberation Mono\"; font-size: 1pt; color: rgb(255, 255, 255); margin-top: 28px; background-color: #eee8d5; border: 0px; color:#212121");
+    ui->listWidget->setStyleSheet("background-color: #eee8d5; margin-top: 28px; padding-left: 5px; color: #839496; border: none; font: 11pt \"Anonymous Pro\";");
+    ui->fileOverview->setStyleSheet("font-family: \"Anonymous Pro\"; font-size: 1pt; color: rgb(255, 255, 255); margin-top: 28px; background-color: #eee8d5; border: 0px; color:#212121");
     lineColor = QColor(238, 232, 213);
     highlightCurrentLine();
 }
@@ -917,12 +936,21 @@ void MainWindow::on_actionSolarized_triggered()
 void MainWindow::on_actionSolarized_Dark_triggered()
 {
     theme = "solarizedDark";
-    ui->tabWidget->setStyleSheet("QPlainTextEdit { background-color: #002b36; color:#839496; border: 0px; selection-background-color: #404f4f; font-family: \"Liberation Mono\"; font-size:10pt;} "
+    MainWindow::setStyleSheet("QMenu {background-color: rgb(48, 47, 54); color:white; selection-background-color: #404f4f;border: 1px solid #404f4f; border-radius: 3px 3px 3px 3px;}"
+                              "QMenuBar::item {background:#262626;} QMenuBar::item:selected {background: #232629;}"
+                              "QMessageBox {color:white;}"
+                              "QLineEdit {border: 1px solid #676767; border-radius: 5px 5px 5px 5px;}"
+                              "QScrollBar::sub-page:vertical {background: #002b36;} QScrollBar::add-page:vertical {background: #002b36;}"
+                              "QScrollBar::sub-page:horizonal {background: #002b36;} QScrollBar::add-page:horizontal {background: #002b36;}"
+                              "QScrollBar:vertical{background: white;width:12px;margin: 0px 0px 0px 0px;} QScrollBar::handle:vertical {background:#073642;border: 2px solid #002b36;border-radius: 5px 5px 5px 5px; min-height: 30px;}"
+                              "QScrollBar:horizontal{background: white;height:12px;margin: 0px 0px 0px 0px;} QScrollBar::handle:horizontal {background:#073642;border: 2px solid #002b36;border-radius: 5px 5px 5px 5px; min-height: 30px;}");
+
+    ui->tabWidget->setStyleSheet("QPlainTextEdit { background-color: #002b36; color:#839496; border: 0px; selection-background-color: #404f4f; font-family: \"Anonymous Pro\"; font-size:11pt;} "
                                  "QScrollBar:vertical{background: #002b36;} QScrollBar:horizontal{background: #002b36;}"
                                  "QTabBar::tab:selected{color: white; border-bottom: 3px solid #2F4F4F;}"
                                  "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; margin: 0 -2px;padding: 1px 5px; background-color: #262626; border-bottom: 3px solid #212121;}");
-    ui->listWidget->setStyleSheet("background-color: #073642; margin-top: 28px; padding-left: 5px; color: #839496; border: none; font: 10pt \"Anonymous Pro\";");
-    ui->fileOverview->setStyleSheet("font-family: \"Liberation Mono\"; font-size: 1pt; color: rgb(255, 255, 255); margin-top: 28px; background-color: #073642; border: 0px;");
+    ui->listWidget->setStyleSheet("background-color: #073642; margin-top: 28px; padding-left: 5px; color: #839496; border: none; font: 11pt \"Anonymous Pro\";");
+    ui->fileOverview->setStyleSheet("font-family: \"Anonymous Pro\"; font-size: 1pt; color: rgb(255, 255, 255); margin-top: 28px; background-color: #073642; border: 0px;");
     lineColor = QColor(7, 54, 66);
     highlightCurrentLine();
 }
