@@ -66,6 +66,36 @@ Highlighter::Highlighter(QString filetype, QString theme, QTextDocument *parent)
         htmlAttributesColor = QColor(166, 226, 46);
         cssClassesIDsColor = QColor(166, 226, 46);
         cssAttributesColor = QColor(102, 217, 239);
+    }else if(theme == "tomorrow"){
+        // tomorrow
+        keywordColor = QColor(135, 88, 166);
+        keyword2Color = QColor(135, 88, 166);
+        functionsColor = QColor(66, 114, 173);
+        valueColor = QColor(112, 138, 0);
+        numColor = QColor(245, 135, 32);
+        operatorColor = QColor(77, 77, 76);
+        formatStringColor = QColor(199, 40, 40);
+        commentColor = QColor(144, 143, 140);
+        varColor = QColor(199, 40, 40);
+        tagColor = QColor(199, 40, 40);
+        htmlAttributesColor = QColor(245, 135, 32);
+        cssClassesIDsColor = QColor(62, 153, 158);
+        cssAttributesColor = QColor(77, 77, 76);
+    }else if(theme == "tomorrowNight"){
+        // tomorrow night
+        keywordColor = QColor(177, 149, 186);
+        keyword2Color = QColor(177, 149, 186);
+        functionsColor = QColor(128, 162, 189);
+        valueColor = QColor(182, 189, 106);
+        numColor = QColor(222, 146, 95);
+        operatorColor = QColor(197, 199, 198);
+        formatStringColor = QColor(222, 146, 95);
+        commentColor = QColor(149, 150, 149);
+        varColor = QColor(204, 102, 102);
+        tagColor = QColor(204, 102, 102);
+        htmlAttributesColor = QColor(222, 146, 95);
+        cssClassesIDsColor = QColor(138, 189, 181);
+        cssAttributesColor = QColor(197, 199, 198);
     }else{
         // Solarized
         keywordColor = QColor(181, 137, 0);

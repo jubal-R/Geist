@@ -154,6 +154,10 @@ private slots:
 
     void updateHighlighterTheme();
 
+    void on_actionTommorrow_triggered();
+
+    void on_actionTommorrow_Night_triggered();
+
 private:
     Ui::MainWindow *ui;
     Highlighter *highlighter;

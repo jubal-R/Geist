@@ -666,6 +666,8 @@ background-color: rgba(255, 255, 255, 0);</string>
      <addaction name="actionDark"/>
      <addaction name="actionSolarized"/>
      <addaction name="actionSolarized_Dark"/>
+     <addaction name="actionTommorrow"/>
+     <addaction name="actionTommorrow_Night"/>
     </widget>
     <widget class="QMenu" name="menuTab_Width">
      <property name="title">
@@ -956,6 +958,16 @@ background-color: rgba(255, 255, 255, 0);</string>
   <action name="actionClose_All">
    <property name="text">
     <string>Close All</string>
+   </property>
+  </action>
+  <action name="actionTommorrow">
+   <property name="text">
+    <string>Tomorrow</string>
+   </property>
+  </action>
+  <action name="actionTommorrow_Night">
+   <property name="text">
+    <string>Tomorrow Night</string>
    </property>
   </action>
  </widget>
