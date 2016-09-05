@@ -147,10 +147,9 @@ MainWindow::~MainWindow()
     oss << MainWindow::width() << "\n" << MainWindow::height() << "\n" << ui->fileOverview->width() << "\n" << theme.toStdString() << "\n";
     oss << tabWidth << "\n";
 
-    QStringList openFiles = filelist.getFilesList();
-    int numOpenFiles = openFiles.length();
+    int numOpenFiles = ui->tabWidget->count();
     for(int i = 0; i < numOpenFiles; i++){
-        oss << openFiles.at(i).toStdString() << "\n";
+        oss << ui->tabWidget->tabToolTip(i).toStdString() << "\n";
     }
 
     files.write("settings.txt", oss.str());
