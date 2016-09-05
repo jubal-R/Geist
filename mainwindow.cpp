@@ -1106,3 +1106,6 @@ void MainWindow::on_action2_triggered()
     setTabWidth(2);
 }
 
+void MainWindow::openWith(QString file){
+    open(file);
+}
