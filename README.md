@@ -5,6 +5,23 @@ a release soon. Once it is ready I will publish both windows and linux versions 
 ##Screenshots:
 ![Geist](https://github.com/jubal-R/Geist/blob/master/Screenshots/geist.png)
 
+##License
+Geist - All purpose text/code editor
+Copyright (C) 2016  Jubal Rosenbarker
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 ##Fonts Used:
 - Noto Sans - https://www.google.com/get/noto/
 - Anonymous Pro - http://www.marksimonson.com/fonts/view/anonymous-pro
