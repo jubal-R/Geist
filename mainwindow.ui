@@ -652,6 +652,7 @@ background-color: rgba(255, 255, 255, 0);</string>
     <addaction name="actionSave"/>
     <addaction name="actionSave_as"/>
     <addaction name="separator"/>
+    <addaction name="actionClose_All"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuPreferences">
@@ -950,6 +951,11 @@ background-color: rgba(255, 255, 255, 0);</string>
   <action name="action2">
    <property name="text">
     <string>2</string>
+   </property>
+  </action>
+  <action name="actionClose_All">
+   <property name="text">
+    <string>Close All</string>
    </property>
   </action>
  </widget>

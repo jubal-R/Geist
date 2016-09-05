@@ -185,14 +185,13 @@ void MainWindow::on_tabWidget_currentChanged(int index)
     ui->labelFileType->setText(getFileType(filename).toUpper());
     foundPositions.clear();
     foundPosElement = 0;
+
 }
 
 //  Close tab
 void MainWindow::on_tabWidget_tabCloseRequested(int index)
 {
-    if (ui->tabWidget->count() > 1){
-
-    }else{
+    if (ui->tabWidget->count() < 2){
         newTab();
     }
 
@@ -223,7 +222,6 @@ void MainWindow::newTab(){
         filename = "";
 
         setTabWidth(tabWidth);
-
         p->setWordWrapMode(QTextOption::NoWrap);
     }
 }
@@ -1027,6 +1025,15 @@ void MainWindow::on_actionExit_triggered()
     }
 }
 
+// Close all tabs
+void MainWindow::on_actionClose_All_triggered()
+{
+    while(ui->tabWidget->count() > 1){
+        on_tabWidget_tabCloseRequested(0);
+    }
+    on_tabWidget_tabCloseRequested(0);
+}
+
 //  Display about info
 void MainWindow::on_actionAbout_triggered()
 {
@@ -1042,7 +1049,15 @@ void MainWindow::setTabWidth(int width){
     font.setPointSize(10);
     QFontMetrics metrics(font);
 
-    p->setTabStopWidth(width * metrics.width(' ') );
+    int current = ui->tabWidget->currentIndex();
+
+    for(int i = 0; i < ui->tabWidget->count(); i++){
+        ui->tabWidget->setCurrentIndex(i);
+        p->setTabStopWidth(width * metrics.width(' ') );
+    }
+
+    ui->tabWidget->setCurrentIndex(current);
+
 }
 
 void MainWindow::on_action8_triggered()
@@ -1062,3 +1077,4 @@ void MainWindow::on_action2_triggered()
     tabWidth = 2;
     setTabWidth(2);
 }
+

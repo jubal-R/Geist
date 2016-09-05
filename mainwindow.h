@@ -149,6 +149,8 @@ private slots:
 
     void setTabWidth(int width);
 
+    void on_actionClose_All_triggered();
+
 private:
     Ui::MainWindow *ui;
     Highlighter *highlighter;
