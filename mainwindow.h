@@ -152,6 +152,8 @@ private slots:
 
     void on_actionClose_All_triggered();
 
+    void updateHighlighterTheme();
+
 private:
     Ui::MainWindow *ui;
     Highlighter *highlighter;

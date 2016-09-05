@@ -42,7 +42,7 @@
 
 #include "highlighter.h"
 
-Highlighter::Highlighter(QString filetype, QTextDocument *parent)
+Highlighter::Highlighter(QString filetype, QString theme, QTextDocument *parent)
     : QSyntaxHighlighter(parent)
 {
     HighlightingRule rule;
@@ -51,31 +51,37 @@ Highlighter::Highlighter(QString filetype, QTextDocument *parent)
     scriptingLanguages = QString::fromStdString("js php pl ps1 py rb sh").split(" ");
     markupLanguages = QString::fromStdString("html ui xml").split(" ");
 
-    // molokai
-//    keywordColor = QColor(102, 217, 239);
-//    keyword2Color = QColor(249, 38, 114);
-//    functionsColor = QColor(166, 226, 46);
-//    valueColor = QColor(253, 151, 31);
-//    formatStringColor = QColor(220, 50, 47);
-//    commentColor = QColor(178, 179, 191);
-//    varColor = QColor(38, 139, 210);
-//    tagColor = QColor(249, 38, 114);
-//    htmlAttributesColor = QColor(166, 226, 46);
-//    cssClassesIDsColor = QColor(166, 226, 46);
-//    cssAttributesColor = QColor(102, 217, 239);
-
-    // Solarized
-    keywordColor = QColor(181, 137, 0);
-    keyword2Color = QColor(133, 153, 0);
-    functionsColor = QColor(88, 110, 117);
-    valueColor = QColor(42, 161, 152);
-    formatStringColor = QColor(220, 50, 47);
-    commentColor = QColor(178, 179, 191);
-    varColor = QColor(38, 139, 210);
-    tagColor = QColor(38, 139, 210);
-    htmlAttributesColor = QColor(181, 137, 0);
-    cssClassesIDsColor = QColor(133, 153, 0);
-    cssAttributesColor = QColor(77,171,171);
+    if(theme == "monokai"){
+        // monokai
+        keywordColor = QColor(102, 217, 239);
+        keyword2Color = QColor(249, 38, 114);
+        functionsColor = QColor(166, 226, 46);
+        valueColor = QColor(230, 218, 117);
+        numColor = QColor(174, 130, 255);
+        operatorColor = QColor(249, 38, 114);
+        formatStringColor = QColor(174, 130, 255);
+        commentColor = QColor(178, 179, 191);
+        varColor = QColor(102, 217, 239);
+        tagColor = QColor(249, 38, 114);
+        htmlAttributesColor = QColor(166, 226, 46);
+        cssClassesIDsColor = QColor(166, 226, 46);
+        cssAttributesColor = QColor(102, 217, 239);
+    }else{
+        // Solarized
+        keywordColor = QColor(181, 137, 0);
+        keyword2Color = QColor(133, 153, 0);
+        functionsColor = QColor(88, 110, 117);
+        valueColor = QColor(42, 161, 152);
+        numColor = QColor(42, 161, 152);
+        operatorColor = QColor(181, 137, 0);
+        formatStringColor = QColor(220, 50, 47);
+        commentColor = QColor(178, 179, 191);
+        varColor = QColor(38, 139, 210);
+        tagColor = QColor(38, 139, 210);
+        htmlAttributesColor = QColor(181, 137, 0);
+        cssClassesIDsColor = QColor(133, 153, 0);
+        cssAttributesColor = QColor(77,171,171);
+    }
 
     if(compiledLanguages.contains(filetype)){
         //Functions
@@ -109,7 +115,7 @@ Highlighter::Highlighter(QString filetype, QTextDocument *parent)
         }
 
         //Nums :D
-        classFormat.setForeground(valueColor);
+        classFormat.setForeground(numColor);
         rule.pattern = QRegExp("\\b[0-9\\.]+\\b");
         rule.format = classFormat;
         highlightingRules.append(rule);
@@ -176,12 +182,12 @@ Highlighter::Highlighter(QString filetype, QTextDocument *parent)
         }
 
         //Operators :D
-        classFormat.setForeground(QColor(255,61,165));
+        classFormat.setForeground(operatorColor);
         rule.pattern = QRegExp("\\b[+-*/=<>]+\\b");
         rule.format = classFormat;
         highlightingRules.append(rule);
 
-        classFormat.setForeground(QColor(181, 137, 0));
+        classFormat.setForeground(operatorColor);
         rule.pattern = QRegExp("\\s[+-*/=<>]+\\s");
         rule.format = classFormat;
         highlightingRules.append(rule);
@@ -204,7 +210,7 @@ Highlighter::Highlighter(QString filetype, QTextDocument *parent)
         highlightingRules.append(rule);
 
         //Nums :D
-        classFormat.setForeground(valueColor);
+        classFormat.setForeground(numColor);
         rule.pattern = QRegExp("\\b[0-9\\.]+\\b");
         rule.format = classFormat;
         highlightingRules.append(rule);
@@ -326,7 +332,7 @@ Highlighter::Highlighter(QString filetype, QTextDocument *parent)
         }
 
         //Nums :D
-        classFormat.setForeground(valueColor);
+        classFormat.setForeground(numColor);
         rule.pattern = QRegExp("\\b[0-9\\.]+\\b");
         rule.format = classFormat;
         highlightingRules.append(rule);

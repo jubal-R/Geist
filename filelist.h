@@ -17,6 +17,7 @@ public:
     void insertNode(node * newNode);
     void removeNode(std::string file);
     void setFilepath(std::string oldfilepath, std::string newfilepath);
+    node * getNode(std::string);
     std::string getData(int index);
     QStringList getFilesList();
 private:

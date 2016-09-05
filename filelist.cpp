@@ -91,6 +91,25 @@ void FileList::setFilepath(std::string oldfp, std::string newfp){
 
 }
 
+node * FileList::getNode(std::string file){
+    if(head->next != NULL && file != ""){
+
+        node * n = head;
+        node * p = head;
+
+        while(file != n->filepath && n->next != NULL){
+            p = n;
+            n = n->next;
+        }
+
+        if(file == n->filepath){
+            return n;
+        }
+
+    }
+    return NULL;
+}
+
 QStringList FileList::getFilesList(){
     QStringList list;
     node * n = head;

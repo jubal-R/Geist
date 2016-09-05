@@ -152,7 +152,7 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->fileOverview->setMaximumWidth(settings.at(2).toInt());
         // Set theme if not default
         if(settings.at(3) != theme){
-            if(settings.at(3) == "dark"){
+            if(settings.at(3) == "monokai"){
                 on_actionDark_triggered();
             }else if(settings.at(3) == "solarized"){
                 on_actionSolarized_triggered();
@@ -312,7 +312,7 @@ void MainWindow::open(QString file){
         node * fileNode = new node;
         fileNode->filepath = file.toStdString();
         fileNode->filetype = filetype.toStdString();
-        fileNode->highlighter = new Highlighter(filetype, p->document());
+        fileNode->highlighter = new Highlighter(filetype, theme, p->document());
         filelist.insertNode(fileNode);
 
         ui->textBrowser->setText("");
@@ -357,7 +357,7 @@ void MainWindow::on_actionSave_as_triggered()
             node * fileNode = new node;
             fileNode->filepath = filename.toStdString();
             fileNode->filetype = filetype.toStdString();
-            fileNode->highlighter = new Highlighter(filetype, p->document());
+            fileNode->highlighter = new Highlighter(filetype, theme, p->document());
             filelist.insertNode(fileNode);
         }else{
             filelist.setFilepath(currentFile.toStdString(), filename.toStdString());
@@ -915,9 +915,25 @@ void MainWindow::on_actionMenubar_triggered()
  *****************************
 */
 
+void MainWindow::updateHighlighterTheme(){
+    int current = ui->tabWidget->currentIndex();
+    int numOpenTabs = ui->tabWidget->count();
+    for(int i = 0; i < numOpenTabs; i++){
+        ui->tabWidget->setCurrentIndex(i);
+        node * n = filelist.getNode(ui->tabWidget->tabToolTip(i).toStdString());
+        if(n != NULL){
+            if(n->highlighter != NULL){
+                delete n->highlighter;
+            }
+            n->highlighter = new Highlighter(getFileType(ui->tabWidget->tabToolTip(i)), theme, p->document());
+        }
+    }
+    ui->tabWidget->setCurrentIndex(current);
+}
+
 void MainWindow::on_actionDark_triggered()
 {
-    theme = "dark";
+    theme = "monokai";
     MainWindow::setStyleSheet("QMenu {background-color: rgb(48, 47, 54); color:white; selection-background-color: #404f4f;border: 1px solid #404f4f; border-radius: 3px 3px 3px 3px;}"
                               "QMenuBar::item {background:#262626;} QMenuBar::item:selected {background: #232629;}"
                               "QMessageBox {color:white;}"
@@ -933,8 +949,12 @@ void MainWindow::on_actionDark_triggered()
             "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; margin: 0 -2px;padding: 1px 5px; background-color: #262626; border-bottom: 3px solid #212121;}");
     ui->listWidget->setStyleSheet("background-color: #32332c; margin-top: 28px; padding-left: 5px; color: #839496; border: none; font: 11pt \"Anonymous Pro\";");
     ui->fileOverview->setStyleSheet("font-family: \"Anonymous Pro\"; font-size: 1pt; color: rgb(255, 255, 255); margin-top: 28px; background-color: #32332c; border: 0px;");
+
+    updateHighlighterTheme();
+
     lineColor = QColor(50, 51, 44);
     highlightCurrentLine();
+
 }
 
 void MainWindow::on_actionSolarized_triggered()
@@ -955,6 +975,9 @@ void MainWindow::on_actionSolarized_triggered()
                                  "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; margin: 0 -2px;padding: 1px 5px; background-color: #262626; border-bottom: 3px solid #212121;}");
     ui->listWidget->setStyleSheet("background-color: #eee8d5; margin-top: 28px; padding-left: 5px; color: #839496; border: none; font: 11pt \"Anonymous Pro\";");
     ui->fileOverview->setStyleSheet("font-family: \"Anonymous Pro\"; font-size: 1pt; color: rgb(255, 255, 255); margin-top: 28px; background-color: #eee8d5; border: 0px; color:#212121");
+
+    updateHighlighterTheme();
+
     lineColor = QColor(238, 232, 213);
     highlightCurrentLine();
 }
@@ -977,6 +1000,9 @@ void MainWindow::on_actionSolarized_Dark_triggered()
                                  "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; margin: 0 -2px;padding: 1px 5px; background-color: #262626; border-bottom: 3px solid #212121;}");
     ui->listWidget->setStyleSheet("background-color: #073642; margin-top: 28px; padding-left: 5px; color: #839496; border: none; font: 11pt \"Anonymous Pro\";");
     ui->fileOverview->setStyleSheet("font-family: \"Anonymous Pro\"; font-size: 1pt; color: rgb(255, 255, 255); margin-top: 28px; background-color: #073642; border: 0px;");
+
+    updateHighlighterTheme();
+
     lineColor = QColor(7, 54, 66);
     highlightCurrentLine();
 }

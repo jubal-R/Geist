@@ -52,7 +52,7 @@ class Highlighter : public QSyntaxHighlighter
     Q_OBJECT
 
 public:
-    Highlighter(QString filetype, QTextDocument *parent = 0);
+    Highlighter(QString filetype, QString theme, QTextDocument *parent = 0);
 
 protected:
     void highlightBlock(const QString &text);
@@ -83,6 +83,8 @@ private:
     QColor keyword2Color;
     QColor functionsColor;
     QColor valueColor;
+    QColor numColor;
+    QColor operatorColor;
     QColor formatStringColor;
     QColor commentColor;
     QColor varColor;
