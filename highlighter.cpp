@@ -47,8 +47,8 @@ Highlighter::Highlighter(QString filetype, QString theme, QTextDocument *parent)
 {
     HighlightingRule rule;
 
-    compiledLanguages = QString::fromStdString("asm c cpp cs java").split(" ");
-    scriptingLanguages = QString::fromStdString("js php pl ps1 py rb sh").split(" ");
+    compiledLanguages = QString::fromStdString("adb abs asm c cpp cs dart go h java m rs rlib swift").split(" ");
+    scriptingLanguages = QString::fromStdString("coffee hs js php pl ps1 py rb sh").split(" ");
     markupLanguages = QString::fromStdString("html ui xml").split(" ");
 
     if(theme == "monokai"){
