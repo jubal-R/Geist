@@ -21,6 +21,7 @@
 #include "files.h"
 #include "conversion.h"
 #include "snippets.h"
+#include "mytextedit.h"
 #include "runner.h"
 #include "templates.h"
 #include <QFile>
@@ -42,7 +43,7 @@
 using namespace std;
 
 
-QPlainTextEdit *p;
+MyTextEdit *p;
 
 Conversion conversion;
 FileList filelist;
@@ -202,7 +203,7 @@ void MainWindow::on_tabWidget_currentChanged(int index)
         disconnect(p, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
     }
 
-    p = qobject_cast<QPlainTextEdit *>(ui->tabWidget->widget(index));
+    p = qobject_cast<MyTextEdit *>(ui->tabWidget->widget(index));
     newNumBlocks = p->document()->blockCount();
     QObject::connect(p->verticalScrollBar(), SIGNAL(valueChanged(int)), ui->listWidget->verticalScrollBar(), SLOT(setValue(int)));
     QObject::connect(p->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(scrollOverview(int)));
@@ -247,7 +248,7 @@ void MainWindow::on_tabWidget_tabCloseRequested(int index)
 //  Create new tab
 void MainWindow::newTab(){
     if (ui->tabWidget->count() < 50){
-        ui->tabWidget->addTab(new QPlainTextEdit, "New File");
+        ui->tabWidget->addTab(new MyTextEdit, "New File");
         ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);
         ui->tabWidget->setTabToolTip(ui->tabWidget->currentIndex(), "");
         filename = "";

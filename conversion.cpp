@@ -102,7 +102,7 @@ string Conversion::getStrings(string s){
         }else if(s[i] == 10){
             oss << "\n";
         }else{
-            oss << " ";
+            oss << "";
         }
     }
     return oss.str();
