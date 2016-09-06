@@ -4,10 +4,38 @@
 MyTextEdit::MyTextEdit(QWidget *parent) :
     QPlainTextEdit(parent)
 {
-
+    filepath = "";
+    fileType = "";
+    highlighter = NULL;
 }
 
+QString MyTextEdit::getFilepath(){
+    return filepath;
+}
+
+QString MyTextEdit::getFileType(){
+    return fileType;
+}
+
+void MyTextEdit::setFilePath(QString newFilepath){
+    filepath = newFilepath;
+}
+void MyTextEdit::setFileType(QString newFileType){
+    fileType = newFileType;
+}
+
+void MyTextEdit::setHighlighter(Highlighter * h){
+    if(highlighter != NULL){
+        delete highlighter;
+    }
+
+    highlighter = h;
+}
+
+
+
 void MyTextEdit::keyPressEvent ( QKeyEvent * e ){
+    // Indent selection
     if(e->key() == 16777217){
         QTextCursor cur = this->textCursor();
         if (cur.hasSelection()){

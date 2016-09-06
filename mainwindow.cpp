@@ -17,7 +17,6 @@
 */
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "filelist.h"
 #include "files.h"
 #include "conversion.h"
 #include "snippets.h"
@@ -46,7 +45,6 @@ using namespace std;
 MyTextEdit *p;
 
 Conversion conversion;
-FileList filelist;
 Files files;
 Snippets snippets;
 Runner runner;
@@ -212,8 +210,8 @@ void MainWindow::on_tabWidget_currentChanged(int index)
     connect(p, SIGNAL(blockCountChanged(int)), this, SLOT(onBlockCountChanged(int)));
     connect(p, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
     ui->fileOverview->setPlainText(p->toPlainText());
-    filename = ui->tabWidget->tabToolTip(ui->tabWidget->currentIndex());
-    ui->labelFileType->setText(getFileType(filename).toUpper());
+    filename = p->getFilepath();
+    ui->labelFileType->setText(p->getFileType().toUpper());
     foundPositions.clear();
     foundPosElement = 0;
     highlightCurrentLine();
@@ -227,6 +225,10 @@ void MainWindow::on_tabWidget_tabCloseRequested(int index)
         newTab();
     }
 
+    // delete highlighter
+    ui->tabWidget->setCurrentIndex(index);
+    p->setHighlighter(NULL);
+
         // Set the new current tab
         if (index > 0){
             ui->tabWidget->setCurrentWidget(ui->tabWidget->widget(index - 1));
@@ -234,8 +236,6 @@ void MainWindow::on_tabWidget_tabCloseRequested(int index)
             ui->tabWidget->setCurrentWidget(ui->tabWidget->widget(index + 1));
         }
 
-        // Delete filelist data
-        filelist.removeNode(ui->tabWidget->tabToolTip(index).toStdString());
 
         // Delete the tab
         delete ui->tabWidget->widget(index);
@@ -304,6 +304,10 @@ void MainWindow::open(QString file){
         QString filetype = getFileType(file);
         p->setPlainText(QString::fromStdString(files.read(filename.toStdString())));
 
+        p->setFilePath(filename);
+        p->setFileType(filetype);
+        p->setHighlighter(new Highlighter(filetype, theme, p->document() ));
+
         if (filename.length() >= 21){
             ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename.right(21));
         }else{
@@ -312,13 +316,6 @@ void MainWindow::open(QString file){
         // Store file path in tool tip
         ui->tabWidget->setTabToolTip(ui->tabWidget->currentIndex(), filename);
         ui->labelFileType->setText(filetype.toUpper());
-
-        // Add file info to filelist
-        node * fileNode = new node;
-        fileNode->filepath = file.toStdString();
-        fileNode->filetype = filetype.toStdString();
-        fileNode->highlighter = new Highlighter(filetype, theme, p->document());
-        filelist.insertNode(fileNode);
 
         ui->textBrowser->setText("");
         *outputModeP = 0;
@@ -354,19 +351,9 @@ void MainWindow::on_actionSave_as_triggered()
     if (filename != ""){
         files.write(filename.toStdString(), p->toPlainText().toStdString());
 
-
-        // Add info to filelist
-        QString currentFile = ui->tabWidget->tabToolTip(ui->tabWidget->currentIndex());
-        if(currentFile == ""){
-            // Add file info to filelist
-            node * fileNode = new node;
-            fileNode->filepath = filename.toStdString();
-            fileNode->filetype = filetype.toStdString();
-            fileNode->highlighter = new Highlighter(filetype, theme, p->document());
-            filelist.insertNode(fileNode);
-        }else{
-            filelist.setFilepath(currentFile.toStdString(), filename.toStdString());
-        }
+        p->setFilePath(filename);
+        p->setFileType(filetype);
+        p->setHighlighter(new Highlighter(filetype, theme, p->document() ));
 
         ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename.right(21));
         ui->tabWidget->setTabToolTip(ui->tabWidget->currentIndex(), filename);
@@ -925,13 +912,7 @@ void MainWindow::updateHighlighterTheme(){
     int numOpenTabs = ui->tabWidget->count();
     for(int i = 0; i < numOpenTabs; i++){
         ui->tabWidget->setCurrentIndex(i);
-        node * n = filelist.getNode(ui->tabWidget->tabToolTip(i).toStdString());
-        if(n != NULL){
-            if(n->highlighter != NULL){
-                delete n->highlighter;
-            }
-            n->highlighter = new Highlighter(getFileType(ui->tabWidget->tabToolTip(i)), theme, p->document());
-        }
+        p->setHighlighter(new Highlighter(p->getFileType(), theme, p->document() ));
     }
     ui->tabWidget->setCurrentIndex(current);
 }

@@ -20,7 +20,6 @@ SOURCES += main.cpp\
     snippets.cpp \
     files.cpp \
     runner.cpp \
-    filelist.cpp \
     mytextedit.cpp
 
 HEADERS  += mainwindow.h \
@@ -31,7 +30,6 @@ HEADERS  += mainwindow.h \
     snippets.h \
     files.h \
     runner.h \
-    filelist.h \
     mytextedit.h
 
 FORMS    += mainwindow.ui
