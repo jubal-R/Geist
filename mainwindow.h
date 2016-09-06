@@ -104,11 +104,7 @@ private slots:
 
     void on_replaceButton_clicked();
 
-    void selectLine();
-
     void on_actionDelete_line_triggered();
-
-    void selectWord();
 
     void on_actionRemove_word_triggered();
 

@@ -369,22 +369,6 @@ void MainWindow::on_actionSave_as_triggered()
  *****************************
 */
 
-// Selects current line where cursor is positioned
-void MainWindow::selectLine(){
-    QTextCursor cur = p->textCursor();
-    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-    p->setTextCursor(cur);
-}
-
-// Selects current word
-void MainWindow::selectWord(){
-    QTextCursor cur = p->textCursor();
-    cur.movePosition(QTextCursor::StartOfWord, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
-    p->setTextCursor(cur);
-}
-
 // Toggle find bar
 void MainWindow::on_actionFind_triggered()
 {
@@ -663,27 +647,13 @@ void MainWindow::on_actionRedo_triggered()
 //  Delete line where cusor currently resides
 void MainWindow::on_actionDelete_line_triggered()
 {
-    selectLine();
-    QTextCursor cur = p->textCursor();
-    if(cur.selectedText() != ""){
-        cur.removeSelectedText();
-        cur.insertText(ui->replaceLineEdit->text());
-    }
-    p->setTextCursor(cur);
+    p->deleteLine();
 }
 
 //  Delete word where cusor currently resides
 void MainWindow::on_actionRemove_word_triggered()
 {
-    selectWord();
-    QTextCursor cur = p->textCursor();
-
-    if (cur.selectedText() != ""){
-        cur.removeSelectedText();
-        cur.insertText(ui->replaceLineEdit->text());
-    }
-
-    p->setTextCursor(cur);
+    p->deleteWord();
 }
 
 /*  Toggles currently selected line(s) between commented out and uncommented
@@ -691,97 +661,25 @@ void MainWindow::on_actionRemove_word_triggered()
 */
 void MainWindow::on_actionToggle_comment_triggered()
 {
-    QTextCursor cur = p->textCursor();
-
-    if (cur.hasSelection() == false){
-        selectLine();
-    }
-
-    int scrollLocation = p->verticalScrollBar()->value();
-    int end = cur.selectionEnd();
-    QString content = p->toPlainText();
-    cur.setPosition(cur.selectionStart());
-    cur.movePosition(QTextCursor::StartOfBlock, QTextCursor::MoveAnchor);
-    int start = cur.position();
-
-    for(int pos = start; pos < end; pos++){
-        if(content.at(pos - 1) == '\n'|| pos == start){
-            if(content.at(pos) == '/' && content.at(pos + 1) == '/'){
-                content.remove(pos, 2);
-                end -= 2;
-            }else{
-                content.insert(pos, "//");
-                pos += 2;
-                end += 2;
-            }
-        }
-    }
-
-    p->setPlainText(content);
-    p->verticalScrollBar()->setValue(scrollLocation);
+    p->toggleComment();
 }
 
 // Join lines
 void MainWindow::on_actionJoin_Lines_triggered()
 {
-    QTextCursor cur = p->textCursor();
-
-    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
-    cur.deleteChar();
-
-    p->setTextCursor(cur);
+    p->joinLines();
 }
 
 // Swap line up
 void MainWindow::on_actionMove_Line_Up_triggered()
 {
-    QTextCursor cur = p->textCursor();
-    //  Select current line and store value
-    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-    QString newTop = cur.selectedText();
-    cur.removeSelectedText();
-    // Select line above and store value
-    cur.movePosition(QTextCursor::Up, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-    QString newBottom = cur.selectedText();
-    cur.removeSelectedText();
-    // Insert new values
-    cur.insertText(newTop);
-    cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
-    cur.insertText(newBottom);
-    // Position cursor
-    cur.movePosition(QTextCursor::Up, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
-
-    p->setTextCursor(cur);
+    p->swapLineUp();
 }
 
 // Swap line down
 void MainWindow::on_actionSwap_line_down_triggered()
 {
-    QTextCursor cur = p->textCursor();
-    //  Select current line and store value
-    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-    QString newBottom = cur.selectedText();
-    cur.removeSelectedText();
-    // Select line below and store value
-    cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-    QString newTop = cur.selectedText();
-    cur.removeSelectedText();
-    // Insert new values
-    cur.insertText(newBottom);
-    cur.movePosition(QTextCursor::Up, QTextCursor::MoveAnchor);
-    cur.insertText(newTop);
-    // Position cursor
-    cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
-
-    p->setTextCursor(cur);
+    p->swapLineDown();
 }
 
 /*

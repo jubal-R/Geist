@@ -14,6 +14,14 @@ public:
     void setFilePath(QString newFilepath);
     void setFileType(QString newFileType);
     void setHighlighter(Highlighter * h);
+    void selectLine();
+    void selectWord();
+    void deleteLine();
+    void deleteWord();
+    void joinLines();
+    void swapLineUp();
+    void swapLineDown();
+    void toggleComment();
 
 protected:
     virtual void keyPressEvent(QKeyEvent * e);
