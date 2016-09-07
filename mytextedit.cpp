@@ -114,6 +114,7 @@ void MyTextEdit::swapLineDown(){
 }
 
 /*  Toggles currently selected line(s) between commented out and uncommented
+*   comments based on language of file type
 *   If no text is selected then it selects the current line
 */
 void MyTextEdit::toggleComment(){
@@ -129,45 +130,146 @@ void MyTextEdit::toggleComment(){
     QString line = cur.selectedText();
     cur.clearSelection();
 
-    if(line.startsWith("//")){
-        cur.deleteChar();cur.deleteChar();
-        endSelection -= 2;
-        cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+    if(fileType == "html"){
+        if(line.startsWith("<!--")){
+            cur.deleteChar();cur.deleteChar();cur.deleteChar();cur.deleteChar();
+            endSelection -= 4;
 
-        while(cur.position() < endSelection){
-            cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
-            cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
-            cur.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
-            line = cur.selectedText();
+            cur.setPosition(endSelection);
+            cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+            cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+            QString line = cur.selectedText();
             cur.clearSelection();
+            if(line.endsWith("-->")){
+                cur.deletePreviousChar();cur.deletePreviousChar();cur.deletePreviousChar();
+            }
+        }else{
+            cur.insertText("<!--");
+            endSelection += 3;
 
-            if(line.startsWith("//")){
-                cur.deleteChar();cur.deleteChar();
-                endSelection -= 2;
+            cur.setPosition(endSelection);
+            cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+            cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+            QString line = cur.selectedText();
+            cur.clearSelection();
+            if(!line.endsWith("-->")){
+                cur.insertText("-->");
+            }
+        }
+
+    }else if(fileType == "css"){
+        if(line.startsWith("/*")){
+            cur.deleteChar();cur.deleteChar();
+            endSelection -= 2;
+
+            cur.setPosition(endSelection);
+            cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+            cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+            QString line = cur.selectedText();
+            cur.clearSelection();
+            if(line.endsWith("*/")){
+                cur.deletePreviousChar();cur.deletePreviousChar();
+            }
+        }else{
+            cur.insertText("/*");
+            endSelection += 2;
+
+            cur.setPosition(endSelection);
+            cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+            cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+            QString line = cur.selectedText();
+            cur.clearSelection();
+            if(!line.endsWith("*/")){
+                cur.insertText("*/");
+            }
+        }
+
+
+    }else if(fileType == "py"){
+        if(line.startsWith("#")){
+            cur.deleteChar();
+            endSelection -= 1;
+            cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+
+            while(cur.position() < endSelection){
+                cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
+                cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+                cur.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
+                line = cur.selectedText();
+                cur.clearSelection();
+
+                if(line.startsWith("#")){
+                    cur.deleteChar();cur.deleteChar();
+                    endSelection -= 1;
+                }
+
+                cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
             }
 
+        }else{
+            cur.insertText("#");
+            endSelection += 1;
             cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+
+            while(cur.position() < endSelection){
+                cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
+                cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+                cur.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
+                line = cur.selectedText();
+                cur.clearSelection();
+
+                if(!line.startsWith("#")){
+                    cur.insertText("#");
+                    endSelection += 1;
+                }
+
+                cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+            }
         }
 
     }else{
-        cur.insertText("//");
-        endSelection += 2;
-        cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
 
-        while(cur.position() < endSelection){
-            cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
+        if(line.startsWith("//")){
+            cur.deleteChar();cur.deleteChar();
+            endSelection -= 2;
             cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
-            cur.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
-            line = cur.selectedText();
-            cur.clearSelection();
 
-            if(!line.startsWith("//")){
-                cur.insertText("//");
-                endSelection += 2;
+            while(cur.position() < endSelection){
+                cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
+                cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+                cur.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
+                line = cur.selectedText();
+                cur.clearSelection();
+
+                if(line.startsWith("//")){
+                    cur.deleteChar();cur.deleteChar();
+                    endSelection -= 2;
+                }
+
+                cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
             }
 
+        }else{
+            cur.insertText("//");
+            endSelection += 2;
             cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+
+            while(cur.position() < endSelection){
+                cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
+                cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+                cur.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
+                line = cur.selectedText();
+                cur.clearSelection();
+
+                if(!line.startsWith("//")){
+                    cur.insertText("//");
+                    endSelection += 2;
+                }
+
+                cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+            }
         }
+
     }
 
     this->setTextCursor(cur);

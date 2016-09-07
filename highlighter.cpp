@@ -328,22 +328,11 @@ Highlighter::Highlighter(QString filetype, QString theme, QTextDocument *parent)
         highlightingRules.append(rule);
 
         //Comments
-        singleLineCommentFormat.setFontItalic(true);
-        singleLineCommentFormat.setForeground(commentColor);
-        rule.pattern = QRegExp("//[^\n]*");
-        rule.format = singleLineCommentFormat;
-        highlightingRules.append(rule);
-
-        singleLineCommentFormat.setForeground(commentColor);
-        rule.pattern = QRegExp("#[^\n]*");
-        rule.format = singleLineCommentFormat;
-        highlightingRules.append(rule);
-
         multiLineCommentFormat.setFontItalic(true);
         multiLineCommentFormat.setForeground(commentColor);
 
-        commentStartExpression = QRegExp("/\\*");
-        commentEndExpression = QRegExp("\\*/");
+        commentStartExpression = QRegExp("<!--");
+        commentEndExpression = QRegExp("-->");
 
     }else if(filetype == "css"){
 
