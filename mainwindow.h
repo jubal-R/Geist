@@ -154,6 +154,14 @@ private slots:
 
     void on_actionTommorrow_Night_triggered();
 
+    void setMainWindowStyle(QString backgroundColor, QString lineColor);
+
+    void setTabWidgetStyle(QString foregroundColor, QString backgroundColor);
+
+    void setLineNumStyle(QString lineColor, QString foregroundColor);
+
+    void setOverViewStyle(QString lineColor, QString foregroundColor);
+
 private:
     Ui::MainWindow *ui;
     Highlighter *highlighter;
