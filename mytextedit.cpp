@@ -311,7 +311,7 @@ void MyTextEdit::setHighlighter(Highlighter * h){
 */
 
 void MyTextEdit::keyPressEvent ( QKeyEvent * e ){
-    // Indent selection
+    // Indent selection on tab
     if(e->key() == 16777217){
         QTextCursor cur = this->textCursor();
         if (cur.hasSelection()){
@@ -334,6 +334,39 @@ void MyTextEdit::keyPressEvent ( QKeyEvent * e ){
         }else{
             QPlainTextEdit::keyPressEvent(e);
         }
+
+    }else if(e->key() == 16777218){
+        // Unindent Selection on backtab
+        QTextCursor cur = this->textCursor();
+        if (!cur.hasSelection()){
+            selectLine();
+        }
+        int endSelection = cur.selectionEnd();
+        cur.setPosition(cur.selectionStart());
+        cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+        cur.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
+        QString line = cur.selectedText();
+        cur.clearSelection();
+        if(line.startsWith("\t")){
+            cur.deleteChar();
+            endSelection -= 1;
+        }
+
+        cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+        while(cur.position() < endSelection){
+            cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
+            cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+            cur.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
+            QString line = cur.selectedText();
+            cur.clearSelection();
+            if(line.startsWith("\t")){
+                cur.deleteChar();
+                endSelection -= 1;
+            }
+            cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+        }
+
+        this->setTextCursor(cur);
 
     }else{
         QPlainTextEdit::keyPressEvent(e);

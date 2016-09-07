@@ -19,6 +19,8 @@ Ctrl+/				Toggle comment.
 Ctrl+J				Joins the current line with the next line.
 Ctrl+UpArrow		Swaps line with line above it.
 Ctrl+Down Arrow	Swaps line with line below it.
+Tab(Selection)   Indent selection
+Shift+Tab        Unindent selection. If no selection, unindents current line.
 
 	Move
 Ctrl+LeftArrow	Moves the cursor one word to the left.
