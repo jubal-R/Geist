@@ -31,6 +31,26 @@ void MyTextEdit::selectWord(){
     this->setTextCursor(cur);
 }
 
+// Returns word under cursor
+QString MyTextEdit::lineUnderCursor(){
+    selectLine();
+    QTextCursor cur = this->textCursor();
+    QString line = cur.selectedText();
+    cur.clearSelection();
+    this->setTextCursor(cur);
+    return line;
+}
+
+// Returns word under cursor
+QString MyTextEdit::wordUnderCursor(){
+    selectWord();
+    QTextCursor cur = this->textCursor();
+    QString word = cur.selectedText();
+    cur.clearSelection();
+    this->setTextCursor(cur);
+    return word;
+}
+
 // Deletes current line where cursor is positioned
 void MyTextEdit::deleteLine(){
     selectLine();
@@ -113,6 +133,8 @@ void MyTextEdit::swapLineDown(){
     this->setTextCursor(cur);
 }
 
+
+
 /*  Toggles currently selected line(s) between commented out and uncommented
 *   comments based on language of file type
 *   If no text is selected then it selects the current line
@@ -125,145 +147,99 @@ void MyTextEdit::toggleComment(){
 
     int endSelection = cur.selectionEnd();
     cur.setPosition(cur.selectionStart());
-    cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
-    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
-    QString line = cur.selectedText();
-    cur.clearSelection();
+    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+    this->setTextCursor(cur);
 
-    if(fileType == "html"){
-        if(line.startsWith("<!--")){
-            cur.deleteChar();cur.deleteChar();cur.deleteChar();cur.deleteChar();
-            endSelection -= 4;
+    QString line = lineUnderCursor();
 
-            cur.setPosition(endSelection);
-            cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-            cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-            QString line = cur.selectedText();
-            cur.clearSelection();
-            if(line.endsWith("-->")){
-                cur.deletePreviousChar();cur.deletePreviousChar();cur.deletePreviousChar();
-            }
+    QString commentStart;
+    QString commentEnd;
+
+    if(fileType == "html" or fileType == "css"){
+
+        if(fileType == "html"){
+            commentStart = "<!--";
+            commentEnd = "-->";
         }else{
-            cur.insertText("<!--");
-            endSelection += 3;
-
-            cur.setPosition(endSelection);
-            cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-            cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-            QString line = cur.selectedText();
-            cur.clearSelection();
-            if(!line.endsWith("-->")){
-                cur.insertText("-->");
-            }
+            commentStart = "/*";
+            commentEnd = "*/";
         }
 
-    }else if(fileType == "css"){
-        if(line.startsWith("/*")){
-            cur.deleteChar();cur.deleteChar();
-            endSelection -= 2;
+        if(line.startsWith(commentStart)){
+            for(int i=0; i < commentStart.length(); i++){
+                cur.deleteChar();
+            }
+            endSelection -= commentStart.length();
 
             cur.setPosition(endSelection);
-            cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-            cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-            QString line = cur.selectedText();
-            cur.clearSelection();
-            if(line.endsWith("*/")){
-                cur.deletePreviousChar();cur.deletePreviousChar();
+            cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+            this->setTextCursor(cur);
+            QString line = lineUnderCursor();
+
+            if(line.endsWith(commentEnd)){
+                for(int i=0; i < commentEnd.length(); i++){
+                    cur.deletePreviousChar();
+                }
             }
         }else{
-            cur.insertText("/*");
-            endSelection += 2;
+            cur.insertText(commentStart);
+            endSelection += commentStart.length();
 
             cur.setPosition(endSelection);
-            cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-            cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-            QString line = cur.selectedText();
-            cur.clearSelection();
-            if(!line.endsWith("*/")){
-                cur.insertText("*/");
-            }
-        }
-
-
-    }else if(fileType == "py"){
-        if(line.startsWith("#")){
-            cur.deleteChar();
-            endSelection -= 1;
             cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+            this->setTextCursor(cur);
+            QString line = lineUnderCursor();
 
-            while(cur.position() < endSelection){
-                cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
-                cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
-                cur.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
-                line = cur.selectedText();
-                cur.clearSelection();
-
-                if(line.startsWith("#")){
-                    cur.deleteChar();cur.deleteChar();
-                    endSelection -= 1;
-                }
-
-                cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
-            }
-
-        }else{
-            cur.insertText("#");
-            endSelection += 1;
-            cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
-
-            while(cur.position() < endSelection){
-                cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
-                cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
-                cur.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
-                line = cur.selectedText();
-                cur.clearSelection();
-
-                if(!line.startsWith("#")){
-                    cur.insertText("#");
-                    endSelection += 1;
-                }
-
-                cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+            if(!line.endsWith(commentEnd)){
+                cur.insertText(commentEnd);
             }
         }
 
     }else{
+        if(fileType == "py"){
+            commentStart = "#";
+        }else{
+            commentStart = "//";
+        }
 
-        if(line.startsWith("//")){
-            cur.deleteChar();cur.deleteChar();
-            endSelection -= 2;
+        if(line.startsWith(commentStart)){
+            for(int i=0; i < commentStart.length(); i++){
+                cur.deleteChar();
+            }
+            endSelection -= commentStart.length();
             cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
 
             while(cur.position() < endSelection){
                 cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
-                cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
-                cur.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
-                line = cur.selectedText();
-                cur.clearSelection();
+                this->setTextCursor(cur);
+                line = lineUnderCursor();
 
-                if(line.startsWith("//")){
-                    cur.deleteChar();cur.deleteChar();
-                    endSelection -= 2;
+                if(line.startsWith(commentStart)){
+                    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+                    for(int i=0; i < commentStart.length(); i++){
+                        cur.deleteChar();
+                    }
+                    endSelection -= commentStart.length();
+
                 }
-
                 cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
+
             }
 
         }else{
-            cur.insertText("//");
-            endSelection += 2;
+            cur.insertText(commentStart);
+            endSelection += commentStart.length();
             cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
 
             while(cur.position() < endSelection){
                 cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
-                cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
-                cur.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
-                line = cur.selectedText();
-                cur.clearSelection();
+                this->setTextCursor(cur);
+                line = lineUnderCursor();
 
-                if(!line.startsWith("//")){
-                    cur.insertText("//");
-                    endSelection += 2;
+                if(!line.startsWith(commentStart)){
+                    cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+                    cur.insertText(commentStart);
+                    endSelection += commentStart.length();
                 }
 
                 cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);

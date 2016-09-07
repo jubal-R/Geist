@@ -16,6 +16,8 @@ public:
     void setHighlighter(Highlighter * h);
     void selectLine();
     void selectWord();
+    QString lineUnderCursor();
+    QString wordUnderCursor();
     void deleteLine();
     void deleteWord();
     void joinLines();
