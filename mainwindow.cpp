@@ -20,7 +20,7 @@
 #include "files.h"
 #include "conversion.h"
 #include "snippets.h"
-#include "mytextedit.h"
+#include "geisttextedit.h"
 #include "runner.h"
 #include "templates.h"
 #include <QFile>
@@ -42,7 +42,7 @@
 using namespace std;
 
 
-MyTextEdit *p;
+GeistTextEdit *p;
 
 Conversion conversion;
 Files files;
@@ -199,7 +199,7 @@ void MainWindow::on_tabWidget_currentChanged(int index)
         disconnect(p, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
     }
 
-    p = qobject_cast<MyTextEdit *>(ui->tabWidget->widget(index));
+    p = qobject_cast<GeistTextEdit *>(ui->tabWidget->widget(index));
     newNumBlocks = p->document()->blockCount();
     QObject::connect(p->verticalScrollBar(), SIGNAL(valueChanged(int)), ui->listWidget->verticalScrollBar(), SLOT(setValue(int)));
     QObject::connect(p->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(scrollOverview(int)));
@@ -246,7 +246,7 @@ void MainWindow::on_tabWidget_tabCloseRequested(int index)
 //  Create new tab
 void MainWindow::newTab(){
     if (ui->tabWidget->count() < 50){
-        ui->tabWidget->addTab(new MyTextEdit, "New File");
+        ui->tabWidget->addTab(new GeistTextEdit, "New File");
         ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);
         ui->tabWidget->setTabToolTip(ui->tabWidget->currentIndex(), "");
         filename = "";

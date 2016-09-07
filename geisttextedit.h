@@ -1,14 +1,14 @@
-#ifndef MYTEXTEDIT_H
-#define MYTEXTEDIT_H
+#ifndef GeistTextEdit_H
+#define GeistTextEdit_H
 
 #include <QPlainTextEdit>
 #include "highlighter.h"
 
-class MyTextEdit : public QPlainTextEdit
+class GeistTextEdit : public QPlainTextEdit
 {
     Q_OBJECT
 public:
-    MyTextEdit(QWidget *parent = 0);
+    GeistTextEdit(QWidget *parent = 0);
     QString getFilepath();
     QString getFileType();
     void setFilePath(QString newFilepath);
@@ -37,4 +37,4 @@ private:
 
 };
 
-#endif // MYTEXTEDIT_H
+#endif // GeistTextEdit_H

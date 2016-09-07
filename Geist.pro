@@ -20,7 +20,7 @@ SOURCES += main.cpp\
     snippets.cpp \
     files.cpp \
     runner.cpp \
-    mytextedit.cpp
+    geisttextedit.cpp
 
 HEADERS  += mainwindow.h \
     conversion.h \
@@ -30,7 +30,7 @@ HEADERS  += mainwindow.h \
     snippets.h \
     files.h \
     runner.h \
-    mytextedit.h
+    geisttextedit.h
 
 FORMS    += mainwindow.ui
 

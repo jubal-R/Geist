@@ -1,7 +1,7 @@
-#include "mytextedit.h"
+#include "geisttextedit.h"
 #include <iostream>
 
-MyTextEdit::MyTextEdit(QWidget *parent) :
+GeistTextEdit::GeistTextEdit(QWidget *parent) :
     QPlainTextEdit(parent)
 {
     filepath = "";
@@ -16,7 +16,7 @@ MyTextEdit::MyTextEdit(QWidget *parent) :
 */
 
 // Selects current line where cursor is positioned
-void MyTextEdit::selectLine(){
+void GeistTextEdit::selectLine(){
     QTextCursor cur = this->textCursor();
     cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
     cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
@@ -24,7 +24,7 @@ void MyTextEdit::selectLine(){
 }
 
 // Selects current word where cursor is positioned
-void MyTextEdit::selectWord(){
+void GeistTextEdit::selectWord(){
     QTextCursor cur = this->textCursor();
     cur.movePosition(QTextCursor::StartOfWord, QTextCursor::MoveAnchor);
     cur.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
@@ -32,7 +32,7 @@ void MyTextEdit::selectWord(){
 }
 
 // Returns word under cursor
-QString MyTextEdit::lineUnderCursor(){
+QString GeistTextEdit::lineUnderCursor(){
     selectLine();
     QTextCursor cur = this->textCursor();
     QString line = cur.selectedText();
@@ -42,7 +42,7 @@ QString MyTextEdit::lineUnderCursor(){
 }
 
 // Returns word under cursor
-QString MyTextEdit::wordUnderCursor(){
+QString GeistTextEdit::wordUnderCursor(){
     selectWord();
     QTextCursor cur = this->textCursor();
     QString word = cur.selectedText();
@@ -52,7 +52,7 @@ QString MyTextEdit::wordUnderCursor(){
 }
 
 // Deletes current line where cursor is positioned
-void MyTextEdit::deleteLine(){
+void GeistTextEdit::deleteLine(){
     selectLine();
     QTextCursor cur = this->textCursor();
     if(cur.selectedText() != ""){
@@ -62,7 +62,7 @@ void MyTextEdit::deleteLine(){
 }
 
 // Deletes current word where cursor is positioned
-void MyTextEdit::deleteWord(){
+void GeistTextEdit::deleteWord(){
     selectWord();
     QTextCursor cur = this->textCursor();
 
@@ -74,7 +74,7 @@ void MyTextEdit::deleteWord(){
 }
 
 // Joins line where cursor is currently positioned with the line below it
-void MyTextEdit::joinLines(){
+void GeistTextEdit::joinLines(){
     QTextCursor cur = this->textCursor();
 
     cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
@@ -84,7 +84,7 @@ void MyTextEdit::joinLines(){
 }
 
 // Swaps line where cursor is currently positioned with the line above it
-void MyTextEdit::swapLineUp(){
+void GeistTextEdit::swapLineUp(){
     QTextCursor cur = this->textCursor();
     //  Select current line and store value
     cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
@@ -109,7 +109,7 @@ void MyTextEdit::swapLineUp(){
 }
 
 // Swaps line where cursor is currently positioned with the line below it
-void MyTextEdit::swapLineDown(){
+void GeistTextEdit::swapLineDown(){
     QTextCursor cur = this->textCursor();
     //  Select current line and store value
     cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
@@ -139,7 +139,7 @@ void MyTextEdit::swapLineDown(){
 *   comments based on language of file type
 *   If no text is selected then it selects the current line
 */
-void MyTextEdit::toggleComment(){
+void GeistTextEdit::toggleComment(){
     QTextCursor cur = this->textCursor();
     if (!cur.hasSelection()){
         selectLine();
@@ -257,22 +257,22 @@ void MyTextEdit::toggleComment(){
  *         File Info         *
  *****************************
 */
-QString MyTextEdit::getFilepath(){
+QString GeistTextEdit::getFilepath(){
     return filepath;
 }
 
-QString MyTextEdit::getFileType(){
+QString GeistTextEdit::getFileType(){
     return fileType;
 }
 
-void MyTextEdit::setFilePath(QString newFilepath){
+void GeistTextEdit::setFilePath(QString newFilepath){
     filepath = newFilepath;
 }
-void MyTextEdit::setFileType(QString newFileType){
+void GeistTextEdit::setFileType(QString newFileType){
     fileType = newFileType;
 }
 
-void MyTextEdit::setHighlighter(Highlighter * h){
+void GeistTextEdit::setHighlighter(Highlighter * h){
     if(highlighter != NULL){
         delete highlighter;
     }
@@ -286,7 +286,7 @@ void MyTextEdit::setHighlighter(Highlighter * h){
  *****************************
 */
 
-void MyTextEdit::keyPressEvent ( QKeyEvent * e ){
+void GeistTextEdit::keyPressEvent ( QKeyEvent * e ){
     // Indent selection on tab
     if(e->key() == 16777217){
         QTextCursor cur = this->textCursor();
