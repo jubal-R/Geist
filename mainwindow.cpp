@@ -42,7 +42,7 @@
 using namespace std;
 
 
-GeistTextEdit *p;
+GeistTextEdit *p = NULL;
 
 Conversion conversion;
 Files files;
@@ -120,14 +120,34 @@ MainWindow::MainWindow(QWidget *parent) :
         tabWidth = settings.at(4).toInt();  // After first tab
     }
 
+    // Set default theme
+    on_actionSolarized_Dark_triggered();
+
+    // Set theme if not default
+    if(settings.at(3) != theme){
+
+        if(settings.at(3) == "monokai"){
+            on_actionDark_triggered();
+
+        }else if(settings.at(3) == "solarized"){
+            on_actionSolarized_triggered();
+
+        }else if(settings.at(3) == "solarizedDark"){
+            on_actionSolarized_Dark_triggered();
+
+        }else if(settings.at(3) == "tomorrow"){
+            on_actionTommorrow_triggered();
+
+        }else if(settings.at(3) == "tomorrowNight"){
+            on_actionTommorrow_Night_triggered();
+        }
+    }
+
     // Create and setup initial tab
     newTab();
     connect(p, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
     p->setFocus();
     highlightCurrentLine();
-
-    // Set default theme
-    on_actionSolarized_Dark_triggered();
 
     ui->listWidget->addItem("1");
     QListWidgetItem *item = ui->listWidget->item(numBlocks-1);
@@ -137,26 +157,6 @@ MainWindow::MainWindow(QWidget *parent) :
     if (settings.size() > 4){
         MainWindow::resize(settings.at(0).toInt(), settings.at(1).toInt());
         ui->fileOverview->setMaximumWidth(settings.at(2).toInt());
-
-        // Set theme if not default
-        if(settings.at(3) != theme){
-
-            if(settings.at(3) == "monokai"){
-                on_actionDark_triggered();
-
-            }else if(settings.at(3) == "solarized"){
-                on_actionSolarized_triggered();
-
-            }else if(settings.at(3) == "solarizedDark"){
-                on_actionSolarized_Dark_triggered();
-
-            }else if(settings.at(3) == "tomorrow"){
-                on_actionTommorrow_triggered();
-
-            }else if(settings.at(3) == "tomorrowNight"){
-                on_actionTommorrow_Night_triggered();
-            }
-        }
 
         // Open files from list saved in settings
         for(int i = 5; i < settings.size(); i++){
@@ -957,17 +957,19 @@ void MainWindow::on_actionTommorrow_Night_triggered()
 
 //  Highlight Current Line
 void MainWindow::highlightCurrentLine(){
-   QList<QTextEdit::ExtraSelection> extraSelections;
+   if(p != NULL){
+       QList<QTextEdit::ExtraSelection> extraSelections;
 
-   QTextEdit::ExtraSelection selections;
-   selections.format.setBackground(lineColor);
-   selections.format.setProperty(QTextFormat::FullWidthSelection, true);
-   selections.cursor = p->textCursor();
-   selections.cursor.clearSelection();
-   extraSelections.append(selections);
+       QTextEdit::ExtraSelection selections;
+       selections.format.setBackground(lineColor);
+       selections.format.setProperty(QTextFormat::FullWidthSelection, true);
+       selections.cursor = p->textCursor();
+       selections.cursor.clearSelection();
+       extraSelections.append(selections);
 
-   p->setExtraSelections(extraSelections);
-   ui->listWidget->verticalScrollBar()->setValue(p->verticalScrollBar()->value());
+       p->setExtraSelections(extraSelections);
+       ui->listWidget->verticalScrollBar()->setValue(p->verticalScrollBar()->value());
+   }
 }
 
 //  Line nums Block count
