@@ -156,7 +156,9 @@ MainWindow::MainWindow(QWidget *parent) :
     //  Setup window based on user's settings
     if (settings.size() > 4){
         MainWindow::resize(settings.at(0).toInt(), settings.at(1).toInt());
-        ui->fileOverview->setMaximumWidth(settings.at(2).toInt());
+        if(settings.at(2).toInt() == 1){
+            ui->fileOverview->hide();
+        }
 
         // Open files from list saved in settings
         for(int i = 5; i < settings.size(); i++){
@@ -172,7 +174,10 @@ MainWindow::~MainWindow()
     *   Window size, overview toggle values
     */
     ostringstream oss;
-    oss << MainWindow::width() << "\n" << MainWindow::height() << "\n" << ui->fileOverview->width() << "\n" << theme.toStdString() << "\n";
+    QRect windowRect = MainWindow::normalGeometry();
+    oss << windowRect.width() << "\n" << windowRect.height() << "\n";
+    oss << ui->fileOverview->isHidden() << "\n";
+    oss << theme.toStdString() << "\n";
     oss << tabWidth << "\n";
 
     int numOpenFiles = ui->tabWidget->count();
@@ -780,10 +785,10 @@ void MainWindow::on_actionFullScreen_triggered()
 //  Toggle file overview
 void MainWindow::on_actionOverview_triggered()
 {
-    if(ui->fileOverview->width() == 0){
-        ui->fileOverview->setMaximumWidth(110);
+    if(ui->fileOverview->isHidden()){
+        ui->fileOverview->show();
     }else{
-        ui->fileOverview->setMaximumWidth(0);
+        ui->fileOverview->hide();
     }
 }
 
