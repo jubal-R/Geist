@@ -18,6 +18,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "files.h"
+#include "search.h"
 #include "conversion.h"
 #include "snippets.h"
 #include "geisttextedit.h"
@@ -46,6 +47,7 @@ GeistTextEdit *p = NULL;
 
 Conversion conversion;
 Files files;
+Search searcher;
 Snippets snippets;
 Runner runner;
 Templates templates;
@@ -392,57 +394,6 @@ void MainWindow::on_actionFind_triggered()
     }
 }
 
-/*  Returns all positions of first char in search term where matches are found
- *  as a string with positions seperated by spaces */
-string MainWindow::find(string searchTerm, string content){
-    ostringstream oss;
-    string line = "";
-    string *l = &line;
-    bool found = false;
-    bool *f = &found;
-    int qLen = searchTerm.length();
-    char altFirst[1];   // Alternate case(uppercase/lowercase) version of first character
-
-    //  Set altFirst
-    if(searchTerm[0] > 90){
-        altFirst[0] = searchTerm[0] - 32;
-    }else{
-        altFirst[0] = searchTerm[0] + 32;
-    }
-
-    for(unsigned int i = 0; i < content.length(); i++){
-        *l += content[i];
-
-        if(content[i] == searchTerm[0] || content[i] == altFirst[0] ){
-            int lineNum = 1;
-            char altCase[1];
-
-            while(lineNum < qLen){
-
-                if(searchTerm[lineNum] > 90){
-                    altCase[0] = searchTerm[lineNum]-32;
-                }else{
-                    altCase[0] = searchTerm[lineNum]+32;
-                }
-
-                if(content[i+lineNum] == searchTerm[lineNum] || content[i+lineNum] == altCase[0]){
-                    if(lineNum == qLen-1){
-                        *f = true;
-                        oss << i << " ";
-                    }
-
-                }else{
-                    break;
-                }
-
-                lineNum++;
-            }
-
-        }
-    }
-    return oss.str();
-}
-
 // Find all instances of search term and cycles through them
 void MainWindow::on_findLineEdit_returnPressed()
 {
@@ -455,7 +406,7 @@ void MainWindow::on_findLineEdit_returnPressed()
         searchTermLen = searchTerm.length();
 
         if (searchTermLen > 0){
-            QString found = QString::fromStdString(find(searchTerm.toStdString(), p->toPlainText().toStdString()));
+            QString found = QString::fromStdString(searcher.findAll(searchTerm.toStdString(), p->toPlainText().toStdString()));
             foundPositions = found.split(" ");
             foundPosElement = 0;
             selectText(foundPositions[foundPosElement].toInt(), searchTermLen);
@@ -579,7 +530,7 @@ void MainWindow::on_replaceButton_clicked()
     searchTermLen = searchTerm.length();
 
     if (searchTermLen > 0){
-        QString found = QString::fromStdString(find(searchTerm.toStdString(), p->toPlainText().toStdString()));
+        QString found = QString::fromStdString(searcher.findAll(searchTerm.toStdString(), p->toPlainText().toStdString()));
         foundPositions = found.split(" ");
         foundPosElement = 0;
         selectText(foundPositions[foundPosElement].toInt(), searchTermLen);
@@ -599,7 +550,7 @@ void MainWindow::on_replaceAllButton_clicked()
         searchTermLen = searchTerm.length();
 
         if (searchTermLen > 0){
-            QString found = QString::fromStdString(find(searchTerm.toStdString(), p->toPlainText().toStdString()));
+            QString found = QString::fromStdString(searcher.findAll(searchTerm.toStdString(), p->toPlainText().toStdString()));
             foundPositions = found.split(" ");
             foundPosElement = 0;
             selectText(foundPositions[foundPosElement].toInt(), searchTermLen);

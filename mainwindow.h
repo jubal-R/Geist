@@ -92,8 +92,6 @@ private slots:
 
     void on_actionFind_Next_triggered();
 
-    std::string find(std::string q, std::string content);
-
     void findNext();
 
     void findPrev();
