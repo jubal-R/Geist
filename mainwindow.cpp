@@ -959,24 +959,37 @@ void MainWindow::updateLineNums(int newBlockCount){
 }
 void MainWindow::onBlockCountChanged(int newBlockCount)
 {
+
+    /*  Auto-Indent New Lines   */
+
+    //  If Block Count Only Increased By One
+    if(newBlockCount == numBlocks + 1){
+
+        QString data = p->toPlainText();
+        int cursorPosition = p->textCursor().position();
+
+        // If Beginning Cursor At Beginning Of New Line
+        if (data.mid(cursorPosition-1, 1) == "\n"){
+            int pos;
+
+            // Get Position Of Start Of New Line
+            for (pos=cursorPosition-2; pos>=0; pos--){
+
+                if (data.mid(pos, 1) == "\n") {
+                    break;
+                    }
+                }
+
+                //  For Each Tab Char At Beggining Of Previous Line: Add Tab To New Line
+                while (data.mid(pos + 1, 1) == "\t"){
+                    p->textCursor().insertText("\t");
+                    pos++;
+                }
+         }
+    }
+
+    // Update Line Numbers
     MainWindow::updateLineNums(newBlockCount);
-
-    //  auto-indent
-    QString data = p->toPlainText();
-    int cursorPosition = p->textCursor().position();
-    int i;
-
-    for (i=cursorPosition-2; i>=0; i--){
-
-        if (data.mid(i,1) == "\n") {
-            break;
-            }
-        }
-
-        while (data.mid(i+1,1) == "\t"){
-            p->textCursor().insertText("\t");
-            i++;
-        }
 }
 
 //  Text Changed
