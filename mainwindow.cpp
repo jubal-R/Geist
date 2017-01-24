@@ -43,6 +43,7 @@
 using namespace std;
 
 
+// Pointer To GeistTextEdit Widget
 GeistTextEdit *p = NULL;
 
 Conversion conversion;
@@ -52,10 +53,10 @@ Snippets snippets;
 Runner runner;
 Templates templates;
 
-QString currentSearchTerm;
-QStringList foundPositions;
-QStringList settings;
-QString currentDirectory = QString::fromStdString(files.getHomeDir());    //  Directory of last opened file. Users home folder by default.
+QString currentSearchTerm;  // Current Value Of Search Term
+QStringList foundPositions; // Positions Of Substrings Matching Search Term
+QStringList settings;       // List Of User Settings
+QString currentDirectory = QString::fromStdString(files.getHomeDir());  //  Directory of last opened file. Users home folder by default.
 
 QString licence = "Project Page: https://github.com/jubal-R/Geist\n\n"
         "Geist - All purpose text/code editor\n"
@@ -81,7 +82,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    // Init vars
+    /* Initialize Variables */
     numBlocks = 1;
     newNumBlocks = 0;
     outputMode = 0;
@@ -89,44 +90,42 @@ MainWindow::MainWindow(QWidget *parent) :
     searchTermLen = 0;
     tabWidth = 4;
 
-    outputModeP = &outputMode; //  0 = ascii, 1 = hex, 2 = strings
+    outputModeP = &outputMode;  //  0 = ascii, 1 = hex, 2 = strings
 
-    filename = "";  // Name of file in current tab
-    theme = "solarizedDark"; // Default theme
+    filename = "";              // Name Of File In Current Tab
+    theme = "solarizedDark";    // Name Of Current Theme. Initialized To Default
     lineColor = QColor(7, 54, 66);
 
     // UI Setup
     ui->setupUi(this);
 
-    //  Style Sheet
+    // Style Sheet
     this->setWindowTitle("Geist");
     ui->menuBar->setStyleSheet("color:white; background-color:#262626; QMenuBar::item {background:black;}");
     ui->centralWidget->layout()->setContentsMargins(0,0,0,0);
 
-    //  Disbale manual scrolling for line numbers
+    // Disbale manual scrolling for line numbers
     ui->listWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->listWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    // Hide find/replace bar by default
+    // Hide Search Bar By Default
     ui->findReplaceBar->hide();
     ui->replaceLineEdit->hide();
     ui->replaceButton->hide();
     ui->replaceAllButton->hide();
     ui->label_3->hide();
 
-    // Read settings file
+    // Read Settings File
     string set = files.read("settings.txt");
     settings = QString::fromStdString(set).split("\n");
 
-    if(settings.size() > 4){
+    // Set Tab Width
+    if(settings.size() >= 5){
         tabWidth = settings.at(4).toInt();  // After first tab
     }
 
-    // Set default theme
-    on_actionSolarized_Dark_triggered();
-
-    // Set theme if not default
-    if(settings.at(3) != theme){
+    // Set Theme From Settings
+    if(settings.size() >= 4){
 
         if(settings.at(3) == "monokai"){
             on_actionDark_triggered();
@@ -142,10 +141,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
         }else if(settings.at(3) == "tomorrowNight"){
             on_actionTommorrow_Night_triggered();
+        }else{
+            // Set default theme
+            on_actionSolarized_Dark_triggered();
         }
+    }else{
+        // Set default theme
+        on_actionSolarized_Dark_triggered();
     }
 
-    // Create and setup initial tab
+    // Create And Setup Initial Tab
     newTab();
     connect(p, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
     p->setFocus();
@@ -155,14 +160,17 @@ MainWindow::MainWindow(QWidget *parent) :
     QListWidgetItem *item = ui->listWidget->item(numBlocks-1);
     item->setSizeHint(QSize(item->sizeHint().height(), 14));
 
-    //  Setup window based on user's settings
+    // Setup Window Based On User's Settings
     if (settings.size() > 4){
+        // Set Window Size
         MainWindow::resize(settings.at(0).toInt(), settings.at(1).toInt());
+
+        // Show/Hide Overview
         if(settings.at(2).toInt() == 1){
             ui->fileOverview->hide();
         }
 
-        // Open files from list saved in settings
+        // Open Files From Fist Saved In Settings
         for(int i = 5; i < settings.size(); i++){
             open(settings.at(i));
         }
@@ -172,21 +180,23 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    /*  Save settings
-    *   Window size, overview toggle values
+    /*
+     *  Save Settings
     */
     ostringstream oss;
     QRect windowRect = MainWindow::normalGeometry();
-    oss << windowRect.width() << "\n" << windowRect.height() << "\n";
-    oss << ui->fileOverview->isHidden() << "\n";
-    oss << theme.toStdString() << "\n";
-    oss << tabWidth << "\n";
+    oss << windowRect.width() << "\n" << windowRect.height() << "\n";   // Window Size
+    oss << ui->fileOverview->isHidden() << "\n";    // File Overview Shown/Hidden
+    oss << theme.toStdString() << "\n";             // Theme
+    oss << tabWidth << "\n";                        // Tab Width
 
+    // List Of Files Open In Editor
     int numOpenFiles = ui->tabWidget->count();
     for(int i = 0; i < numOpenFiles; i++){
         oss << ui->tabWidget->tabToolTip(i).toStdString() << "\n";
     }
 
+    // Write Settings To File
     files.write("settings.txt", oss.str());
 
     delete ui;
@@ -198,7 +208,7 @@ MainWindow::~MainWindow()
  *****************************
 */
 
-// Switch tab
+// Switch Tab
 void MainWindow::on_tabWidget_currentChanged(int index)
 {
     if (p != 0){
@@ -223,7 +233,7 @@ void MainWindow::on_tabWidget_currentChanged(int index)
 
 }
 
-//  Close tab
+// Close Tab
 void MainWindow::on_tabWidget_tabCloseRequested(int index)
 {
     if (ui->tabWidget->count() < 2){
@@ -250,7 +260,7 @@ void MainWindow::on_tabWidget_tabCloseRequested(int index)
 
 }
 
-//  Create new tab
+// Create New Tab
 void MainWindow::newTab(){
     if (ui->tabWidget->count() < 50){
         ui->tabWidget->addTab(new GeistTextEdit, "New File");
@@ -281,9 +291,10 @@ QString MainWindow::getFileType(QString file){
         return "";
 }
 
-/*  Open directory of currently active file in default file manager
-*   If current tab has no file open then open directory of last active file
-*   Else open users home directory
+/*
+ *  Open directory of currently active file in default file manager
+ *  If current tab has no file open then open directory of last active file
+ *  Else open users home directory
 */
 void MainWindow::on_actionOpen_containg_folder_triggered()
 {
@@ -293,9 +304,10 @@ void MainWindow::on_actionOpen_containg_folder_triggered()
     p->setFocus();
 }
 
-/*  Open file
-*   Opens in new tab unless current tab is empty
-*   If file does not exist it will be created on save
+/*
+ *  Open file
+ *  Opens in new tab unless current tab is empty
+ *  If file does not exist it will be created on save
 */
 void MainWindow::open(QString file){
 
@@ -333,7 +345,7 @@ void MainWindow::on_actionOpen_triggered()
     open(file);
 }
 
-//  Save file
+// Save File
 void MainWindow::save(){
     if (filename == "" || *outputModeP != 0){
         on_actionSave_as_triggered();
@@ -350,7 +362,7 @@ void MainWindow::on_actionSave_triggered()
 }
 void MainWindow::on_actionSave_as_triggered()
 {
-    filename = QFileDialog::getSaveFileName(this, tr("Open File"), currentDirectory, tr("All (*)"));
+    filename = QFileDialog::getSaveFileName(this, tr("Save As"), currentDirectory, tr("All (*)"));
     QString filetype = getFileType(filename);
 
     if (filename != ""){
@@ -374,7 +386,7 @@ void MainWindow::on_actionSave_as_triggered()
  *****************************
 */
 
-// Toggle find bar
+// Toggle Find Bar
 void MainWindow::on_actionFind_triggered()
 {
     if(ui->findReplaceBar->isHidden()){
@@ -394,7 +406,7 @@ void MainWindow::on_actionFind_triggered()
     }
 }
 
-// Find all instances of search term and cycles through them
+// Find All Instances Of Search Term And Cycles Through Them
 void MainWindow::on_findLineEdit_returnPressed()
 {
     if (ui->findLineEdit->text() == currentSearchTerm){
@@ -418,7 +430,7 @@ void MainWindow::on_findLineEdit_textChanged(const QString &arg1)
     on_findLineEdit_returnPressed();
 }
 
-// Selects text given the position of the first char and it's length
+// Selects Text Given the Position Of the First Char And It's Length
 void MainWindow::selectText(int pos, int len){
     if (foundPositions.length() > 1){
         QTextCursor cur = p->textCursor();
@@ -429,7 +441,7 @@ void MainWindow::selectText(int pos, int len){
     }
 }
 
-//  Find next instance of search term
+//  Find Next Instance Of Search Term
 void MainWindow::findNext(){
     if (ui->findLineEdit->text() == currentSearchTerm){
 
@@ -449,7 +461,7 @@ void MainWindow::findNext(){
     }
 }
 
-// Find previous instance of search term
+// Find Previous Instance Of Search Term
 void MainWindow::findPrev(){
 
     if (foundPositions.length() > 1){
@@ -483,7 +495,7 @@ void MainWindow::on_actionFind_Previous_triggered()
     findPrev();
 }
 
-//  Toggle replace bar
+//  Toggle Replace Bar
 void MainWindow::on_actionReplace_triggered()
 {
     if(ui->findReplaceBar->isHidden()){
@@ -514,7 +526,7 @@ void MainWindow::on_actionReplace_triggered()
     }
 }
 
-// Replace currently selected found instance of text to be replaced
+// Replace Currently Selected Found Instance Of Text To Be Replaced
 void MainWindow::on_replaceButton_clicked()
 {
     QTextCursor cur = p->textCursor();
@@ -541,7 +553,7 @@ void MainWindow::on_replaceLineEdit_returnPressed()
     MainWindow::on_replaceButton_clicked();
 }
 
-//  Replace all found instances of text to be replaced
+//  Replace All Found Instances Of Text To Be Replaced
 void MainWindow::on_replaceAllButton_clicked()
 {
     QString searchTerm = ui->findLineEdit->text();
@@ -568,7 +580,7 @@ void MainWindow::on_replaceAllButton_clicked()
     }while(foundPositions.length() > 1);
 }
 
-// Go To (Line number)
+// Go To Line Number
 void MainWindow::on_actionGoTo_triggered()
 {
     bool ok = 0;
@@ -588,7 +600,7 @@ void MainWindow::on_actionGoTo_triggered()
  *****************************
 */
 
-//  undo/redo
+//  Undo/Redo
 void MainWindow::on_actionUndo_triggered()
 {
     p->undo();
@@ -598,39 +610,40 @@ void MainWindow::on_actionRedo_triggered()
     p->redo();
 }
 
-//  Delete line where cusor currently resides
+//  Delete Line Where Cusor Currently Resides
 void MainWindow::on_actionDelete_line_triggered()
 {
     p->deleteLine();
 }
 
-//  Delete word where cusor currently resides
+//  Delete Word Where Cusor Currently Resides
 void MainWindow::on_actionRemove_word_triggered()
 {
     p->deleteWord();
 }
 
-/*  Toggles currently selected line(s) between commented out and uncommented
-*   If no text is selected then it selects the current line
+/*
+ *  Toggles currently selected line(s) between commented out and uncommented
+ *  If no text is selected then it selects the current line
 */
 void MainWindow::on_actionToggle_comment_triggered()
 {
     p->toggleComment();
 }
 
-// Join lines
+// Join Lines
 void MainWindow::on_actionJoin_Lines_triggered()
 {
     p->joinLines();
 }
 
-// Swap line up
+// Swap Line Up
 void MainWindow::on_actionMove_Line_Up_triggered()
 {
     p->swapLineUp();
 }
 
-// Swap line down
+// Swap Line Down
 void MainWindow::on_actionSwap_line_down_triggered()
 {
     p->swapLineDown();
@@ -642,9 +655,7 @@ void MainWindow::on_actionSwap_line_down_triggered()
  *****************************
 */
 
-/*  Strings
-*   Strips all nonprintable ascii characters from contents of current tab
-*/
+// Strips All Nonprintable ascii Characters From Contents Of Current Tab
 void MainWindow::on_actionStrings_triggered()
 {
     if (*outputModeP != 1){
@@ -652,7 +663,7 @@ void MainWindow::on_actionStrings_triggered()
         p->setPlainText( QString::fromStdString(conversion.getStrings(p->toPlainText().toStdString())) );
     }
 }
-//  Converts ascii values of content of current tab into hexidecimal
+//  Converts ascii Values Of Content Of Current Tab Into Hexidecimal
 void MainWindow::on_actionHex_triggered()
 {
     if (*outputModeP == 0 || *outputModeP == 2){
@@ -660,7 +671,7 @@ void MainWindow::on_actionHex_triggered()
         p->setPlainText( QString::fromStdString( conversion.hex(p->toPlainText().toStdString() ) ) );
     }
 }
-//  Converts hexidecimal values of content of current tab into ascii
+//  Converts Hexidecimal Values Of Content Of Current Tab Into ascii
 void MainWindow::on_actionAscii_triggered()
 {
     if (*outputModeP == 1){
@@ -675,10 +686,11 @@ void MainWindow::on_actionAscii_triggered()
  *****************************
 */
 
-// If current tab is empty fill it with the selected code template
+// Apply Code Template Given Template Id
 void MainWindow::getTemp(int num){
 
-    if(p->toPlainText() == ""){
+    // Check If Tab Contents Empty
+    if (p->toPlainText() == ""){
         p->setPlainText(QString::fromStdString(templates.getTemplate(num)));
     }else{
         QMessageBox::StandardButton reply;
@@ -697,7 +709,7 @@ void MainWindow::on_actionHtml_triggered(){ MainWindow::getTemp(3);}
 void MainWindow::on_actionJava_triggered(){ MainWindow::getTemp(4);}
 void MainWindow::on_actionCss_triggered(){ MainWindow::getTemp(5);}
 
-//  Get directory of current file
+// Get Directory Of File Open In Current Tab
 string MainWindow::getDirectory(){
    ostringstream oss;
 
@@ -722,7 +734,7 @@ string MainWindow::getDirectory(){
  *****************************
 */
 
-//  Toggle fullScreen
+// Toggle FullScreen
 void MainWindow::on_actionFullScreen_triggered()
 {
     if(MainWindow::isFullScreen())
@@ -733,7 +745,7 @@ void MainWindow::on_actionFullScreen_triggered()
     }
 }
 
-//  Toggle file overview
+// Toggle File Overview
 void MainWindow::on_actionOverview_triggered()
 {
     if(ui->fileOverview->isHidden()){
@@ -743,7 +755,7 @@ void MainWindow::on_actionOverview_triggered()
     }
 }
 
-//  Toggle Menubar
+// Toggle Menubar
 void MainWindow::on_actionMenubar_triggered()
 {
     if(ui->menuBar->height() > 0){
@@ -928,12 +940,11 @@ void MainWindow::highlightCurrentLine(){
    }
 }
 
-//  Line nums Block count
+//  Update Line Numbers
 void MainWindow::updateLineNums(int newBlockCount){
 
-    //  add remove line numbers
     if(newBlockCount > numBlocks){
-
+        //  Add Line Numbers
         while(numBlocks < newBlockCount){
             numBlocks++;
             ostringstream oss;
@@ -944,7 +955,7 @@ void MainWindow::updateLineNums(int newBlockCount){
         }
 
     }else{
-
+        //  Remove Line Numbers
         while(numBlocks > newBlockCount){
             ostringstream oss;
             oss << numBlocks;
@@ -1000,12 +1011,12 @@ void MainWindow::onTextChanged(){
     currentSearchTerm = "";
 }
 
-// Sync overview scrolling with editor scrolling
+// Sync Overview Scrolling With Editor Scrolling
 void MainWindow::scrollOverview(int scrollValue){
     ui->fileOverview->verticalScrollBar()->setValue(scrollValue * 2.5);
 }
 
-//  Close program
+//  Close Program
 void MainWindow::on_actionExit_triggered()
 {
     QMessageBox::StandardButton reply;
@@ -1018,7 +1029,7 @@ void MainWindow::on_actionExit_triggered()
     }
 }
 
-// Close all tabs
+// Close All Tabs
 void MainWindow::on_actionClose_All_triggered()
 {
     while(ui->tabWidget->count() > 1){
@@ -1027,13 +1038,13 @@ void MainWindow::on_actionClose_All_triggered()
     on_tabWidget_tabCloseRequested(0);
 }
 
-//  Display about info
+//  Display About Info
 void MainWindow::on_actionAbout_triggered()
 {
     QMessageBox::information(this, tr("About Geist"), *licencePointer,QMessageBox::Close);
 }
 
-// Set tab stop width
+// Set Tab Stop Width
 void MainWindow::setTabWidth(int width){
     QFont font;
     font.setFamily("Anonymous Pro");

@@ -12,7 +12,7 @@ Files::Files()
 {
 }
 
-//  Read file and return it's content
+//  Read File And Return It's Contents
 string Files::read(string file){
     string line = "";
     string content = "";
@@ -37,7 +37,7 @@ string Files::read(string file){
     return content;
 }
 
-//  Write string content to file
+//  Write String Content To File
 bool Files::write(string fileName, string content){
     try{
         ofstream file;
@@ -50,7 +50,7 @@ bool Files::write(string fileName, string content){
     }
 }
 
-//  Return users home directory
+//  Return Users Home Directory
 string Files::getHomeDir(){
     ostringstream oss;
     FILE *in;

@@ -11,7 +11,7 @@ Conversion::Conversion()
 {
 }
 
-//  Convert acsii string into hex representation
+//  Convert acsii String Into Hex Representation
 string Conversion::hex(string s){
     ostringstream oss (ostringstream::out);
     char byte;
@@ -36,7 +36,7 @@ string Conversion::hex(string s){
     return oss.str();
 }
 
-//  Convert from hex representation back into ascii
+//  Convert From Hex Representation Back Into ascii
 string Conversion::ascii(string s){
     ostringstream oss (ostringstream::out);
     char c;
@@ -55,7 +55,7 @@ string Conversion::ascii(string s){
     return oss.str();
 }
 
-// Convert hexidecimal string into integer
+// Convert Hexidecimal String Into Integer
 int Conversion::hexToInt(string s){
     ostringstream c1 (ostringstream::out);
     ostringstream c2 (ostringstream::out);
@@ -92,7 +92,7 @@ int Conversion::hexToInt(string s){
     return result;
 }
 
-//  Strips all nonprintable ascii characters from string
+//  Strips All Nonprintable ascii Characters From String
 string Conversion::getStrings(string s){
     ostringstream oss;
     int len = s.length();

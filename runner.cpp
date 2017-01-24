@@ -13,7 +13,7 @@ Runner::Runner()
 {
 }
 
-//  Run program given filepath
+//  Run Program Given Filepath
 string Runner::run(string path){
     ostringstream oss;
     ostringstream oss2;

@@ -15,7 +15,7 @@ GeistTextEdit::GeistTextEdit(QWidget *parent) :
  *****************************
 */
 
-// Selects current line where cursor is positioned
+// Selects Current Line Where Cursor Is Positioned
 void GeistTextEdit::selectLine(){
     QTextCursor cur = this->textCursor();
     cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
@@ -23,7 +23,7 @@ void GeistTextEdit::selectLine(){
     this->setTextCursor(cur);
 }
 
-// Selects current word where cursor is positioned
+// Selects Current Word Where Cursor Is Positioned
 void GeistTextEdit::selectWord(){
     QTextCursor cur = this->textCursor();
     cur.movePosition(QTextCursor::StartOfWord, QTextCursor::MoveAnchor);
@@ -31,7 +31,7 @@ void GeistTextEdit::selectWord(){
     this->setTextCursor(cur);
 }
 
-// Returns word under cursor
+// Returns Word Under Cursor
 QString GeistTextEdit::lineUnderCursor(){
     selectLine();
     QTextCursor cur = this->textCursor();
@@ -41,7 +41,7 @@ QString GeistTextEdit::lineUnderCursor(){
     return line;
 }
 
-// Returns word under cursor
+// Returns Word Under Cursor
 QString GeistTextEdit::wordUnderCursor(){
     selectWord();
     QTextCursor cur = this->textCursor();
@@ -51,7 +51,7 @@ QString GeistTextEdit::wordUnderCursor(){
     return word;
 }
 
-// Deletes current line where cursor is positioned
+// Deletes Current Line Where Cursor Is Positioned
 void GeistTextEdit::deleteLine(){
     selectLine();
     QTextCursor cur = this->textCursor();
@@ -61,7 +61,7 @@ void GeistTextEdit::deleteLine(){
     this->setTextCursor(cur);
 }
 
-// Deletes current word where cursor is positioned
+// Deletes Current Word Where Cursor Is Positioned
 void GeistTextEdit::deleteWord(){
     selectWord();
     QTextCursor cur = this->textCursor();
@@ -73,7 +73,7 @@ void GeistTextEdit::deleteWord(){
     this->setTextCursor(cur);
 }
 
-// Joins line where cursor is currently positioned with the line below it
+// Joins Line Where Cursor Is Currently Positioned With The Line Below It
 void GeistTextEdit::joinLines(){
     QTextCursor cur = this->textCursor();
 
@@ -83,50 +83,50 @@ void GeistTextEdit::joinLines(){
     this->setTextCursor(cur);
 }
 
-// Swaps line where cursor is currently positioned with the line above it
+// Swaps Line Where Cursor Is Currently Positioned With The Line Above It
 void GeistTextEdit::swapLineUp(){
     QTextCursor cur = this->textCursor();
-    //  Select current line and store value
+    //  Select Current Line And Store Value
     cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
     cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
     QString newTop = cur.selectedText();
     cur.removeSelectedText();
-    // Select line above and store value
+    // Select Line Above And Store Value
     cur.movePosition(QTextCursor::Up, QTextCursor::MoveAnchor);
     cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
     cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
     QString newBottom = cur.selectedText();
     cur.removeSelectedText();
-    // Insert new values
+    // Insert New Values
     cur.insertText(newTop);
     cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
     cur.insertText(newBottom);
-    // Position cursor
+    // Position Cursor
     cur.movePosition(QTextCursor::Up, QTextCursor::MoveAnchor);
     cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
 
     this->setTextCursor(cur);
 }
 
-// Swaps line where cursor is currently positioned with the line below it
+// Swaps Line Where Cursor Is Currently Positioned With The Line Below It
 void GeistTextEdit::swapLineDown(){
     QTextCursor cur = this->textCursor();
-    //  Select current line and store value
+    //  Select Current Line And Store Value
     cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
     cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
     QString newBottom = cur.selectedText();
     cur.removeSelectedText();
-    // Select line below and store value
+    // Select Line Below And Store Value
     cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
     cur.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
     cur.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
     QString newTop = cur.selectedText();
     cur.removeSelectedText();
-    // Insert new values
+    // Insert New Values
     cur.insertText(newBottom);
     cur.movePosition(QTextCursor::Up, QTextCursor::MoveAnchor);
     cur.insertText(newTop);
-    // Position cursor
+    // Position Cursor
     cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
     cur.movePosition(QTextCursor::EndOfLine, QTextCursor::MoveAnchor);
 
@@ -135,9 +135,10 @@ void GeistTextEdit::swapLineDown(){
 
 
 
-/*  Toggles currently selected line(s) between commented out and uncommented
-*   comments based on language of file type
-*   If no text is selected then it selects the current line
+/*
+ *  Toggles currently selected line(s) between commented out and uncommented
+ *  Comments based on language of file type
+ *  If no text is selected then it selects the current line
 */
 void GeistTextEdit::toggleComment(){
     QTextCursor cur = this->textCursor();
@@ -287,7 +288,7 @@ void GeistTextEdit::setHighlighter(Highlighter * h){
 */
 
 void GeistTextEdit::keyPressEvent ( QKeyEvent * e ){
-    // Indent selection on tab
+    // Indent Selection On Tab
     if(e->key() == 16777217){
         QTextCursor cur = this->textCursor();
         if (cur.hasSelection()){
@@ -312,7 +313,7 @@ void GeistTextEdit::keyPressEvent ( QKeyEvent * e ){
         }
 
     }else if(e->key() == 16777218){
-        // Unindent Selection on backtab
+        // Unindent Selection On Backtab
         QTextCursor cur = this->textCursor();
         if (!cur.hasSelection()){
             selectLine();

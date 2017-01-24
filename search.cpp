@@ -8,9 +8,10 @@ Search::Search()
 
 }
 
-/* Returns positions within content where matches to searchTerm are found.
-*  searchTerm must not contain non ascii characters
-*  Searchs using boyer-moore alg
+/*
+ *  Returns positions within content where matches to searchTerm are found.
+ *  Search Term must not contain non ascii characters
+ *  Searchs using boyer-moore alg
 */
 std::string Search::findAll(std::string searchTerm, std::string content){
     std::ostringstream positions;
@@ -33,7 +34,7 @@ std::string Search::findAll(std::string searchTerm, std::string content){
        //Setup shiftTable
        int lastPrefixIndex = strLen - 1;
 
-       // Set default shift value and shift value for prefix
+       // Set Default Shift Value And Shift Value For Prefix
        for(int i = strLen-1; i >= 0; i--){
            if(isPrefix(searchTerm, strLen, i+1)){
                lastPrefixIndex = i+1;
@@ -41,7 +42,7 @@ std::string Search::findAll(std::string searchTerm, std::string content){
            shiftTable[i] = lastPrefixIndex + (strLen-1 - i);
        }
 
-       // Set shift value to next instance of suffix
+       // Set Shift Value To Next Instance Of Suffix
        for(int i=0; i < strLen-1; i++){
            int suffLen = suffixLen(searchTerm, strLen, i);
            // If not a prefix
@@ -51,7 +52,7 @@ std::string Search::findAll(std::string searchTerm, std::string content){
 
        }
 
-       // Search for matches
+       // Search For Matches
        unsigned int i = strLen-1;
 
        while(i < content.length()){
@@ -63,13 +64,13 @@ std::string Search::findAll(std::string searchTerm, std::string content){
                j--;
            }
 
-           // If found match add to list of found positions
+           // If Found Match Add To List Of Found Positions
            if(j < 0){
                positions << i+1 << " ";
                i += strLen * 2;
 
            }else{
-               // Shift to next possible match
+               // Shift To Next Possible Match
                if(charTable[(unsigned char)content[i]] < 256)
                    i += std::max(charTable[(unsigned char)content[i]], shiftTable[j]);
                else
@@ -85,7 +86,7 @@ std::string Search::findAll(std::string searchTerm, std::string content){
    return positions.str();
 }
 
-// True if the end of the word starting at pos is a prefix of the word
+// True If The End Of The Word Starting At pos Is A Prefix Of The Word
 bool Search::isPrefix(std::string word, int len, int pos){
     int endLen = len - pos;
 
@@ -96,7 +97,7 @@ bool Search::isPrefix(std::string word, int len, int pos){
     return false;
 }
 
-// returns length of the longest suffix of the word from pos
+// Returns Length Of The Longest Suffix Of The Word From pos
 int Search::suffixLen(std::string word, int len, int pos){
     int i = 0;
     while(word[pos-i] == word[len-1-i] && i < pos){
