@@ -1,4 +1,5 @@
-# Geist
+![GeistLogo](https://github.com/jubal-R/Geist/blob/master/icons/geistlogo.png)
+
 Geist is an all purpose text/code editor written in c++ and using the qt framework. Geist is currently in development but should be ready for
 a release soon. Once it is ready I will publish both windows and linux versions on my website.
 
