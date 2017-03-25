@@ -47,7 +47,7 @@ Highlighter::Highlighter(QString filetype, QString theme, QTextDocument *parent)
 {
     HighlightingRule rule;
 
-    compiledLanguages = QString::fromStdString("adb abs asm c cpp cs dart go h java m rs rlib swift").split(" ");
+    compiledLanguages = QString::fromStdString("adb abs c cpp cs dart go h java m rs rlib swift").split(" ");
     scriptingLanguages = QString::fromStdString("coffee hs js php pl ps1 py rb sh").split(" ");
     markupLanguages = QString::fromStdString("html ui xml").split(" ");
 
@@ -333,6 +333,68 @@ Highlighter::Highlighter(QString filetype, QString theme, QTextDocument *parent)
 
         commentStartExpression = QRegExp("<!--");
         commentEndExpression = QRegExp("-->");
+
+    }else if(filetype == "asm"){
+        //Functions
+        functionFormat.setForeground(functionsColor);
+        rule.pattern = QRegExp("\\b[A-Za-z0-9_<>-@]+:");
+        rule.format = functionFormat;
+        highlightingRules.append(rule);
+
+        //Nums :D
+        classFormat.setForeground(numColor);
+        rule.pattern = QRegExp("\\b[0-9a-fx\\.]+\\b");
+        rule.format = classFormat;
+        highlightingRules.append(rule);
+
+        keywordFormat.setForeground(keyword2Color);
+        keywordFormat.setFontWeight(QFont::Bold);
+        QStringList keywordPatterns;
+        keywordPatterns << "\\bcall\\b" << "\\bpush\\b" << "\\bpop\\b" << "\\blea\\b"
+                        << "\\bret\\b" << "\\bcmp\\b" << "\\bmov\\b" << "\\bint\\b"
+                        << "\\bjmp\\b" << "\\bje\\b" << "\\bjne\\b" << "\\bjl\\b"
+                        << "\\bjg\\b" << "\\bjge\\b" << "\\bjle\\b" << "\\bjz\\b"
+                        << "\\bjnz\\b" << "\\bjb\\b" << "\\bja\\b" << "\\bjae\\b"
+                        << "\\bjbe\\b" << "\\bjs\\b" << "\\bjns\\b" << "\\bleave\\b"
+                        << "\\bxor\\b" << "\\bnot\\b" << "\\band\\b" << "\\bor\\b"
+                        << "\\bsal\\b" << "\\bsar\\b" << "\\bshl\\b" << "\\bshr\\b"
+                        << "\\bnop\\b" << "\\btest\\b" << "\\bxchg\\b"
+                        << "\\badd\\b" << "\\bsub\\b" << "\\bmul\\b" << "\\bdiv\\b";
+
+        foreach (const QString &pattern, keywordPatterns) {
+            rule.pattern = QRegExp(pattern);
+            rule.format = keywordFormat;
+            highlightingRules.append(rule);
+        }
+
+        //Quotes
+        quotationFormat.setForeground(valueColor);
+        rule.pattern = QRegExp("\".*\"");
+        rule.format = quotationFormat;
+        highlightingRules.append(rule);
+
+        quotationFormat.setForeground(valueColor);
+        rule.pattern = QRegExp("'.*'");
+        rule.format = quotationFormat;
+        highlightingRules.append(rule);
+
+        //Comments
+        singleLineCommentFormat.setFontItalic(true);
+        singleLineCommentFormat.setForeground(commentColor);
+        rule.pattern = QRegExp("//[^\n]*");
+        rule.format = singleLineCommentFormat;
+        highlightingRules.append(rule);
+
+        singleLineCommentFormat.setForeground(commentColor);
+        rule.pattern = QRegExp(";[^\n]*");
+        rule.format = singleLineCommentFormat;
+        highlightingRules.append(rule);
+
+        multiLineCommentFormat.setFontItalic(true);
+        multiLineCommentFormat.setForeground(commentColor);
+
+        commentStartExpression = QRegExp("/\\*");
+        commentEndExpression = QRegExp("\\*/");
 
     }else if(filetype == "css"){
 
