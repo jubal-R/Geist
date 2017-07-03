@@ -1,12 +1,14 @@
 ![GeistLogo](https://github.com/jubal-R/Geist/blob/master/icons/geistlogo.png)
 
-Geist is an all purpose text/code editor written in c++ and using the qt framework. Geist is currently in development but should be ready for
-a release soon. Once it is ready I will publish both windows and linux versions on my website.
+Geist is an all purpose text/code editor written in c++ and using the qt framework.
 
-##Screenshots:
 ![Geist](https://github.com/jubal-R/Geist/blob/master/Screenshots/geist.png)
 
-##License
+## Fonts Used:
+- Noto Sans - https://www.google.com/get/noto/
+- Anonymous Pro - http://www.marksimonson.com/fonts/view/anonymous-pro
+
+## License
 Geist - All purpose text/code editor
 Copyright (C) 2016  Jubal Rosenbarker
 
@@ -23,11 +25,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-##Fonts Used:
-- Noto Sans - https://www.google.com/get/noto/
-- Anonymous Pro - http://www.marksimonson.com/fonts/view/anonymous-pro
-
-##Shortcuts
+## Shortcuts
 
 	Files
 - Ctrl+O            Open file.
