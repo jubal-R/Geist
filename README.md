@@ -6,14 +6,14 @@ Geist is an all purpose text/code editor written in c++ and using the qt framewo
 
 ## Required Fonts:
 - Noto Sans - https://www.google.com/get/noto/
-- Anonymous Pro - http://www.marksimonson.com/fonts/view/anonymous-pro
+- Anonymous Pro - http://www.marksimonson.com/fonts/view/anonymous-pro  
 Note: Font settings to be added in the future
 
 ## Building Geist
-`git clone https://github.com/jubal-R/Geist.git`
-`mkdir build`
-`cd build`
-`qmake ../Geist/Geist.pro`
+`git clone https://github.com/jubal-R/Geist.git`  
+`mkdir build`  
+`cd build`  
+`qmake ../Geist/Geist.pro`  
 `make`
 
 ## Features
