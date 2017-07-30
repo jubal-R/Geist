@@ -17,9 +17,7 @@ SOURCES += main.cpp\
     conversion.cpp \
     highlighter.cpp \
     templates.cpp \
-    snippets.cpp \
     files.cpp \
-    runner.cpp \
     geisttextedit.cpp \
     search.cpp
 
@@ -28,9 +26,7 @@ HEADERS  += mainwindow.h \
     highlighter.h \
     search.h \
     templates.h \
-    snippets.h \
     files.h \
-    runner.h \
     geisttextedit.h \
     search.h
 

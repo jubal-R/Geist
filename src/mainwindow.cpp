@@ -20,9 +20,7 @@
 #include "files.h"
 #include "search.h"
 #include "conversion.h"
-#include "snippets.h"
 #include "geisttextedit.h"
-#include "runner.h"
 #include "templates.h"
 #include <QFile>
 #include <QFileDialog>
@@ -49,8 +47,6 @@ GeistTextEdit *p = NULL;
 Conversion conversion;
 Files files;
 Search searcher;
-Snippets snippets;
-Runner runner;
 Templates templates;
 
 QString currentSearchTerm;  // Current Value Of Search Term
@@ -60,6 +56,7 @@ QString currentDirectory = QString::fromStdString(files.getHomeDir());  //  Dire
 
 QString licence = "Project Page: https://github.com/jubal-R/Geist\n\n"
         "Geist - All purpose text/code editor\n"
+        "Version: 1.0\n"
         "Copyright (C) 2016  Jubal Rosenbarker\n\n"
 
         "This program is free software: you can redistribute it and/or modify "
@@ -93,7 +90,7 @@ MainWindow::MainWindow(QWidget *parent) :
     outputModeP = &outputMode;  //  0 = ascii, 1 = hex, 2 = strings
 
     filename = "";              // Name Of File In Current Tab
-    theme = "solarizedDark";    // Name Of Current Theme. Initialized To Default
+    theme = "solarized";    // Name Of Current Theme. Initialized To Default
     lineColor = QColor(7, 54, 66);
 
     // UI Setup
@@ -143,11 +140,11 @@ MainWindow::MainWindow(QWidget *parent) :
             on_actionTommorrow_Night_triggered();
         }else{
             // Set default theme
-            on_actionSolarized_Dark_triggered();
+            on_actionSolarized_triggered();
         }
     }else{
         // Set default theme
-        on_actionSolarized_Dark_triggered();
+        on_actionSolarized_triggered();
     }
 
     // Create And Setup Initial Tab
@@ -298,9 +295,7 @@ QString MainWindow::getFileType(QString file){
 */
 void MainWindow::on_actionOpen_containg_folder_triggered()
 {
-    ostringstream oss;
-    oss << "xdg-open " << getDirectory();
-    ui->textBrowser->setPlainText(QString::fromStdString(runner.run(oss.str())));
+    files.openFileManager(QString::fromStdString(getDirectory()));
     p->setFocus();
 }
 
