@@ -171,10 +171,8 @@ private:
     int foundPosElement;
     int searchTermLen;
     int *outputModeP;
-    int tabWidth;
 
     QString filename;
-    QString theme;
     QColor lineColor;
 
 };
