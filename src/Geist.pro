@@ -19,8 +19,7 @@ SOURCES += main.cpp\
     templates.cpp \
     files.cpp \
     geisttextedit.cpp \
-    search.cpp \
-    settings.cpp
+    search.cpp
 
 HEADERS  += mainwindow.h \
     conversion.h \
@@ -29,8 +28,7 @@ HEADERS  += mainwindow.h \
     templates.h \
     files.h \
     geisttextedit.h \
-    search.h \
-    settings.h
+    search.h
 
 FORMS    += mainwindow.ui
 

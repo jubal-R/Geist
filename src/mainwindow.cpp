@@ -21,7 +21,6 @@
 #include "search.h"
 #include "conversion.h"
 #include "geisttextedit.h"
-#include "settings.h"
 #include "templates.h"
 #include <QFile>
 #include <QFileDialog>
@@ -48,12 +47,11 @@ GeistTextEdit *p = NULL;
 Conversion conversion;
 Files files;
 Search searcher;
-Settings settings;
 Templates templates;
 
 QString currentSearchTerm;  // Current Value Of Search Term
 QStringList foundPositions; // Positions Of Substrings Matching Search Term
-QString currentDirectory = QString::fromStdString(files.getHomeDir());  //  Directory of last opened file. Users home folder by default.
+QString currentDirectory = files.getHomeDir();  //  Directory of last opened file. Users home folder by default.
 
 QString licence = "Project Page: https://github.com/jubal-R/Geist\n\n"
         "Geist - All purpose text/code editor\n"
@@ -112,7 +110,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->label_3->hide();
 
     // Set Theme From Settings
-    QString theme = settings.getTheme();
+    theme = settings.value("theme", "monokai").toString();
     if (theme == "monokai"){
         on_actionDark_triggered();
     }else if (theme == "solarized"){
@@ -123,9 +121,6 @@ MainWindow::MainWindow(QWidget *parent) :
         on_actionTommorrow_triggered();
     }else if (theme == "tomorrowNight"){
         on_actionTommorrow_Night_triggered();
-    }else{
-        // Set default theme
-        on_actionSolarized_triggered();
     }
 
     // Create And Setup Initial Tab
@@ -141,31 +136,33 @@ MainWindow::MainWindow(QWidget *parent) :
     // Setup Window Based On User's Settings
 
     // Set Window Size
-    MainWindow::resize(settings.getWindowWidth(), settings.getWindowHeight());
+    int windowWidth = settings.value("windowWidth", 1000).toInt();
+    int windowHeight = settings.value("windowHeight", 600).toInt();
+    MainWindow::resize(windowWidth, windowHeight);
 
     // Show/Hide Overview
-    if(!settings.getShowOverview()){
+    if(!settings.value("showOverview", true).toBool()){
         ui->fileOverview->hide();
     }
 
     // Open Files From List Saved In Settings
-    QStringList openFiles = settings.getOpenFiles();
-    for(int i = 0; i < openFiles.length(); i++){
-        open(openFiles.at(i));
+    QStringList openFiles;
+    openFiles = settings.value("openFilesList").toStringList();
+
+    if (!openFiles.isEmpty()){
+        for (int i = 0; i < openFiles.length(); i++){
+            open(openFiles.at(i));
+        }
     }
 
 }
 
 MainWindow::~MainWindow()
 {
-    /*
-     *  Save Settings
-    */
-
     // Get Window Size
     QRect windowRect = MainWindow::normalGeometry();
-    settings.setWindowWidth(windowRect.width());
-    settings.setWindowHeight(windowRect.height());
+    settings.setValue("windowWidth", windowRect.width());
+    settings.setValue("windowHeight", windowRect.height());
 
 
     // Get List Of Files Open In Editor
@@ -174,10 +171,7 @@ MainWindow::~MainWindow()
     for (int i = 0; i < numOpenFiles; i++){
         fileList.append(ui->tabWidget->tabToolTip(i));
     }
-    settings.setOpenFiles(fileList);
-
-    // Write Settings To File
-    settings.saveSettings();
+    settings.setValue("openFilesList", fileList);
 
     delete ui;
 }
@@ -248,7 +242,7 @@ void MainWindow::newTab(){
         ui->tabWidget->setTabToolTip(ui->tabWidget->currentIndex(), "");
         filename = "";
 
-        setTabWidth(settings.getTabWidth());
+        setTabWidth(settings.value("tabWidth", 4).toInt());
         p->setWordWrapMode(QTextOption::NoWrap);
     }
 }
@@ -272,17 +266,6 @@ QString MainWindow::getFileType(QString file){
 }
 
 /*
- *  Open directory of currently active file in default file manager
- *  If current tab has no file open then open directory of last active file
- *  Else open users home directory
-*/
-void MainWindow::on_actionOpen_containg_folder_triggered()
-{
-    files.openFileManager(QString::fromStdString(getDirectory()));
-    p->setFocus();
-}
-
-/*
  *  Open file
  *  Opens in new tab unless current tab is empty
  *  If file does not exist it will be created on save
@@ -297,11 +280,11 @@ void MainWindow::open(QString file){
 
         filename = file;
         QString filetype = getFileType(file);
-        p->setPlainText(QString::fromStdString(files.read(filename.toStdString())));
+        p->setPlainText(files.read(filename));
 
         p->setFilePath(filename);
         p->setFileType(filetype);
-        p->setHighlighter(new Highlighter(filetype, settings.getTheme(), p->document() ));
+        p->setHighlighter(new Highlighter(filetype, theme, p->document() ));
 
         if (filename.length() >= 21){
             ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename.right(21));
@@ -314,7 +297,7 @@ void MainWindow::open(QString file){
 
         ui->textBrowser->setText("");
         *outputModeP = 0;
-        currentDirectory = QString::fromStdString(getDirectory());
+        currentDirectory = getDirectory();
     }
 }
 void MainWindow::on_actionOpen_triggered()
@@ -328,10 +311,8 @@ void MainWindow::save(){
     if (filename == "" || *outputModeP != 0){
         on_actionSave_as_triggered();
     }else{
-        if(files.write(filename.toStdString(), p->toPlainText().toStdString())){
-            ui->textBrowser->setText("Saved");
-        }
-
+        files.write(filename, p->toPlainText());
+        ui->textBrowser->setText("Saved");
     }
 }
 void MainWindow::on_actionSave_triggered()
@@ -344,11 +325,11 @@ void MainWindow::on_actionSave_as_triggered()
     QString filetype = getFileType(filename);
 
     if (filename != ""){
-        files.write(filename.toStdString(), p->toPlainText().toStdString());
+        files.write(filename, p->toPlainText());
 
         p->setFilePath(filename);
         p->setFileType(filetype);
-        p->setHighlighter(new Highlighter(filetype, settings.getTheme(), p->document() ));
+        p->setHighlighter(new Highlighter(filetype, theme, p->document() ));
 
         ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename.right(21));
         ui->tabWidget->setTabToolTip(ui->tabWidget->currentIndex(), filename);
@@ -688,22 +669,12 @@ void MainWindow::on_actionJava_triggered(){ MainWindow::getTemp(4);}
 void MainWindow::on_actionCss_triggered(){ MainWindow::getTemp(5);}
 
 // Get Directory Of File Open In Current Tab
-string MainWindow::getDirectory(){
-   ostringstream oss;
+QString MainWindow::getDirectory(){
+    QString filepath = filename;
+    int lastIndex = filepath.lastIndexOf("/");
+    filepath.chop(filepath.length() - lastIndex);
 
-    if (filename != ""){
-        QStringList path = filename.split("/");
-        int len = path.length();
-
-        for(int i = 0; i < len - 1; i++){
-            oss << path[i].toStdString() << "/";
-        }
-
-    }else{
-        oss << currentDirectory.toStdString();
-    }
-
-    return oss.str();
+    return filepath;
 }
 
 /*
@@ -728,10 +699,10 @@ void MainWindow::on_actionOverview_triggered()
 {
     if(ui->fileOverview->isHidden()){
         ui->fileOverview->show();
-        settings.setShowOverview(true);
+        settings.setValue("showOverview", true);
     }else{
         ui->fileOverview->hide();
-        settings.setShowOverview(false);
+        settings.setValue("showOverview", false);
     }
 }
 
@@ -801,14 +772,14 @@ void MainWindow::updateHighlighterTheme(){
     int numOpenTabs = ui->tabWidget->count();
     for(int i = 0; i < numOpenTabs; i++){
         ui->tabWidget->setCurrentIndex(i);
-        p->setHighlighter(new Highlighter(p->getFileType(), settings.getTheme(), p->document() ));
+        p->setHighlighter(new Highlighter(p->getFileType(), theme, p->document() ));
     }
     ui->tabWidget->setCurrentIndex(current);
 }
 
 void MainWindow::on_actionDark_triggered()
 {
-    settings.setTheme("monokai");
+    settings.setValue("theme", "monokai");
     QString fgc = "#e0e0e0";
     QString bgc = "#272822";
     QString lc = "#32332c";
@@ -827,7 +798,7 @@ void MainWindow::on_actionDark_triggered()
 
 void MainWindow::on_actionSolarized_triggered()
 {
-    settings.setTheme("solarized");
+    settings.setValue("theme", "solarized");
     QString fgc = "#839496";
     QString bgc = "#fdf6e3";
     QString lc = "#eee7d5";
@@ -845,7 +816,7 @@ void MainWindow::on_actionSolarized_triggered()
 
 void MainWindow::on_actionSolarized_Dark_triggered()
 {
-    settings.setTheme("solarizedDark");
+    settings.setValue("theme", "solarizedDark");
     QString fgc = "#839496";
     QString bgc = "#002b36";
     QString lc = "#073642";
@@ -863,7 +834,7 @@ void MainWindow::on_actionSolarized_Dark_triggered()
 
 void MainWindow::on_actionTommorrow_triggered()
 {
-    settings.setTheme("tomorrow");
+    settings.setValue("theme", "tomorrow");
     QString fgc = "#4d4d4c";
     QString bgc = "#ffffff";
     QString lc = "#efefef";
@@ -881,7 +852,7 @@ void MainWindow::on_actionTommorrow_triggered()
 
 void MainWindow::on_actionTommorrow_Night_triggered()
 {
-    settings.setTheme("tomorrowNight");
+    settings.setValue("theme", "tomorrowNight");
     QString fgc = "#c5c8c6";
     QString bgc = "#1d1f21";
     QString lc = "#282a2e";
@@ -1046,19 +1017,19 @@ void MainWindow::setTabWidth(int width){
 
 void MainWindow::on_action8_triggered()
 {
-    settings.setTabWidth(8);
+    settings.setValue("tabWidth", 8);
     setTabWidth(8);
 }
 
 void MainWindow::on_action4_triggered()
 {
-    settings.setTabWidth(4);
+    settings.setValue("tabWidth", 4);
     setTabWidth(4);
 }
 
 void MainWindow::on_action2_triggered()
 {
-    settings.setTabWidth(2);
+    settings.setValue("tabWidth", 2);
     setTabWidth(2);
 }
 

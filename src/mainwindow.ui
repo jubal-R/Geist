@@ -648,7 +648,6 @@ background-color: rgba(255, 255, 255, 0);</string>
     <addaction name="actionNew"/>
     <addaction name="separator"/>
     <addaction name="actionOpen"/>
-    <addaction name="actionOpen_containg_folder"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_as"/>
     <addaction name="separator"/>
@@ -876,11 +875,6 @@ background-color: rgba(255, 255, 255, 0);</string>
   <action name="actionOverview">
    <property name="text">
     <string>Overview</string>
-   </property>
-  </action>
-  <action name="actionOpen_containg_folder">
-   <property name="text">
-    <string>Open containg folder</string>
    </property>
   </action>
   <action name="actionDark">

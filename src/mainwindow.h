@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <highlighter.h>
 #include <QShortcut>
+#include "QSettings"
 #include <QPlainTextEdit>
 
 namespace Ui {
@@ -82,7 +83,7 @@ private slots:
 
     void on_actionCss_triggered();
 
-    std::string getDirectory();
+    QString getDirectory();
 
     void selectText(int pos,int len);
 
@@ -117,8 +118,6 @@ private slots:
     void on_actionOverview_triggered();
 
     void highlightCurrentLine();
-
-    void on_actionOpen_containg_folder_triggered();
 
     QString getFileType(QString file);
 
@@ -164,6 +163,7 @@ private:
     Ui::MainWindow *ui;
     Highlighter *highlighter;
     QShortcut *shortcut;
+    QSettings settings;
 
     int numBlocks;
     int newNumBlocks;
@@ -173,6 +173,7 @@ private:
     int *outputModeP;
 
     QString filename;
+    QString theme;
     QColor lineColor;
 
 };
