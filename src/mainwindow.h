@@ -79,7 +79,7 @@ private slots:
 
     void on_actionJava_triggered();
 
-    void getTemp(int num);
+    bool confirmApplyTemplate();
 
     void on_actionCss_triggered();
 

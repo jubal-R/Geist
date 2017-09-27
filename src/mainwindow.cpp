@@ -1,47 +1,18 @@
-/*
-    Geist - All purpose text/code editor
-    Copyright (C) 2016  Jubal Rosenbarker
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QInputDialog>
+#include <QScrollBar>
+#include <QTabWidget>
+
 #include "files.h"
 #include "search.h"
 #include "conversion.h"
 #include "geisttextedit.h"
 #include "templates.h"
-#include <QFile>
-#include <QFileDialog>
-#include <QFont>
-#include <QStringListModel>
-#include <QMessageBox>
-#include <QInputDialog>
-#include <QScrollBar>
-#include <QShortcut>
-#include <QSyntaxHighlighter>
-#include <QTabWidget>
-#include <QTextCursor>
-#include <QPlainTextEdit>
-#include <string>
-#include <iostream>
-#include <sstream>
 
-using namespace std;
-
-
-// Pointer To GeistTextEdit Widget
 GeistTextEdit *p = NULL;
 
 Conversion conversion;
@@ -645,28 +616,78 @@ void MainWindow::on_actionAscii_triggered()
  *****************************
 */
 
-// Apply Code Template Given Template Id
-void MainWindow::getTemp(int num){
+bool MainWindow::confirmApplyTemplate(){
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Template", "Are you sure you want to apply a template?\nAll unsaved work will be lost.", QMessageBox::Yes|QMessageBox::No);
 
-    // Check If Tab Contents Empty
-    if (p->toPlainText() == ""){
-        p->setPlainText(QString::fromStdString(templates.getTemplate(num)));
-    }else{
-        QMessageBox::StandardButton reply;
-        reply = QMessageBox::question(this, "Test", "Are you sure you want to apply a template?\nAll unsaved work will be lost.", QMessageBox::Yes|QMessageBox::No);
-
-        if (reply == QMessageBox::Yes) {
-            p->setPlainText(QString::fromStdString(templates.getTemplate(num)));
-        }
-
+    if (reply == QMessageBox::Yes){
+        return true;
+    } else {
+        return false;
     }
 }
-void MainWindow::on_actionAsm_triggered(){ MainWindow::getTemp(0);}
-void MainWindow::on_actionC_triggered(){ MainWindow::getTemp(1);}
-void MainWindow::on_actionCpluspluss_triggered(){ MainWindow::getTemp(2);}
-void MainWindow::on_actionHtml_triggered(){ MainWindow::getTemp(3);}
-void MainWindow::on_actionJava_triggered(){ MainWindow::getTemp(4);}
-void MainWindow::on_actionCss_triggered(){ MainWindow::getTemp(5);}
+
+// If current tab contents are not empty, prompt user for confirmation to apply template
+
+void MainWindow::on_actionAsm_triggered(){
+    if (p->toPlainText() == ""){
+        p->setPlainText(templates.getAsmTemplate());
+    } else {
+        if (confirmApplyTemplate()){
+            p->setPlainText(templates.getAsmTemplate());
+        }
+    }
+}
+
+void MainWindow::on_actionC_triggered(){
+    if (p->toPlainText() == ""){
+        p->setPlainText(templates.getCTemplate());
+    } else {
+        if (confirmApplyTemplate()){
+            p->setPlainText(templates.getCTemplate());
+        }
+    }
+}
+
+void MainWindow::on_actionCpluspluss_triggered(){
+    if (p->toPlainText() == ""){
+        p->setPlainText(templates.getCPPTemplate());
+    } else {
+        if (confirmApplyTemplate()){
+            p->setPlainText(templates.getCPPTemplate());
+        }
+    }
+}
+
+void MainWindow::on_actionHtml_triggered(){
+    if (p->toPlainText() == ""){
+        p->setPlainText(templates.getHtmlTemplate());
+    } else {
+        if (confirmApplyTemplate()){
+            p->setPlainText(templates.getHtmlTemplate());
+        }
+    }
+}
+
+void MainWindow::on_actionJava_triggered(){
+    if (p->toPlainText() == ""){
+        p->setPlainText(templates.getJavaTemplate());
+    } else {
+        if (confirmApplyTemplate()){
+            p->setPlainText(templates.getJavaTemplate());
+        }
+    }
+}
+
+void MainWindow::on_actionCss_triggered(){
+    if (p->toPlainText() == ""){
+        p->setPlainText(templates.getCSSTemplate());
+    } else {
+        if (confirmApplyTemplate()){
+            p->setPlainText(templates.getCSSTemplate());
+        }
+    }
+}
 
 // Get Directory Of File Open In Current Tab
 QString MainWindow::getDirectory(){
@@ -723,48 +744,36 @@ void MainWindow::on_actionMenubar_triggered()
 */
 
 void MainWindow::setMainWindowStyle(QString backgroundColor, QString lineColor){
-    string bgc = backgroundColor.toStdString();
-    string lc = lineColor.toStdString();
-    ostringstream style;
-    style << "QMenu {background-color: rgb(48, 47, 54); color:white; selection-background-color: #404f4f;border: 1px solid #404f4f; border-radius: 3px 3px 3px 3px;}"
-             << "QMenuBar::item {background:#262626;} QMenuBar::item:selected {background: #232629;}"
-             << "QMessageBox {color:white;}"
-             << "QLineEdit {border: 1px solid #676767; border-radius: 5px 5px 5px 5px;}"
-             << "QScrollBar::sub-page:vertical {background: "<< bgc <<";} QScrollBar::add-page:vertical {background: "<< bgc <<";}"
-             << "QScrollBar::sub-page:horizonal {background: "<< bgc <<";} QScrollBar::add-page:horizontal {background: "<< bgc <<";}"
-             << "QScrollBar:vertical{background: white;width:12px;margin: 0px 0px 0px 0px;} QScrollBar::handle:vertical {background:"<< lc <<";border: 2px solid "<< bgc <<";border-radius: 5px 5px 5px 5px; min-height: 30px;}"
-             << "QScrollBar:horizontal{background: white;height:12px;margin: 0px 0px 0px 0px;} QScrollBar::handle:horizontal {background:"<< lc <<";border: 2px solid "<< bgc <<";border-radius: 5px 5px 5px 5px; min-height: 30px;}";
+    QString stylesheet = "QMenu {background-color: rgb(48, 47, 54); color:white; selection-background-color: #404f4f;border: 1px solid #404f4f; border-radius: 3px 3px 3px 3px;}"
+             "QMenuBar::item {background:#262626;} QMenuBar::item:selected {background: #232629;}"
+             "QMessageBox {color:white;}"
+             "QLineEdit {border: 1px solid #676767; border-radius: 5px 5px 5px 5px;}"
+             "QScrollBar::sub-page:vertical {background: " +  backgroundColor + ";} QScrollBar::add-page:vertical {background: " +  backgroundColor + ";}"
+             "QScrollBar::sub-page:horizonal {background: " +  backgroundColor +";} QScrollBar::add-page:horizontal {background: " +  backgroundColor +";}"
+             "QScrollBar:vertical{background: white;width:12px;margin: 0px 0px 0px 0px;} QScrollBar::handle:vertical {background:" + lineColor  +";border: 2px solid " +  backgroundColor  +";border-radius: 5px 5px 5px 5px; min-height: 30px;}"
+             "QScrollBar:horizontal{background: white;height:12px;margin: 0px 0px 0px 0px;} QScrollBar::handle:horizontal {background:" + lineColor  +";border: 2px solid " +  backgroundColor  +";border-radius: 5px 5px 5px 5px; min-height: 30px;}";
 
-    MainWindow::setStyleSheet(QString::fromStdString(style.str()));
+    MainWindow::setStyleSheet(stylesheet);
 
 }
 
 void MainWindow::setTabWidgetStyle(QString foregroundColor, QString backgroundColor){
-    string fgc = foregroundColor.toStdString();
-    string bgc = backgroundColor.toStdString();
-    ostringstream style;
-    style << "QPlainTextEdit { background-color: "<< bgc <<"; color:"<< fgc <<"; border: 0px; selection-background-color: #404f4f; font-family: \"Anonymous Pro\"; font-size:11pt;} "
-             << "QScrollBar:vertical{background: "<< bgc <<";} QScrollBar:horizontal{background: "<< bgc <<";}"
-             << "QTabBar::tab:selected{color: white; border-bottom: 3px solid #2F4F4F;}"
-             << "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; margin: 0 -2px;padding: 1px 5px; background-color: #262626; border-bottom: 3px solid #212121;}";
-   ui->tabWidget->setStyleSheet(QString::fromStdString(style.str()));
+    QString stylesheet = "QPlainTextEdit { background-color: " +  backgroundColor  +"; color:" + foregroundColor  +"; border: 0px; selection-background-color: #404f4f; font-family: \"Anonymous Pro\"; font-size:11pt;} "
+             "QScrollBar:vertical{background: " +  backgroundColor  +";} QScrollBar:horizontal{background: " +  backgroundColor  +";}"
+             "QTabBar::tab:selected{color: white; border-bottom: 3px solid #2F4F4F;}"
+             "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; margin: 0 -2px;padding: 1px 5px; background-color: #262626; border-bottom: 3px solid #212121;}";
+   ui->tabWidget->setStyleSheet(stylesheet);
 
 }
 
 void MainWindow::setLineNumStyle(QString lineColor, QString foregroundColor){
-    string lc = lineColor.toStdString();
-    string fgc = foregroundColor.toStdString();
-    ostringstream style;
-    style << "background-color: "<< lc <<"; margin-top: 28px; padding-left: 5px; color: "<< fgc <<"; border: none; font: 11pt \"Anonymous Pro\"; ";
-    ui->listWidget->setStyleSheet(QString::fromStdString(style.str()));
+    QString stylesheet = "background-color: " + lineColor  +"; margin-top: 28px; padding-left: 5px; color: " + foregroundColor  +"; border: none; font: 11pt \"Anonymous Pro\"; ";
+    ui->listWidget->setStyleSheet(stylesheet);
 }
 
 void MainWindow::setOverViewStyle(QString lineColor, QString foregroundColor){
-    string lc = lineColor.toStdString();
-    string fgc = foregroundColor.toStdString();
-    ostringstream style;
-    style << "font-family: \"Anonymous Pro\"; font-size: 1pt; color:"<< fgc <<"; margin-top: 28px; background-color:"<< lc <<"; border: 0px;";
-    ui->fileOverview->setStyleSheet(QString::fromStdString(style.str()));
+    QString stylesheet = "font-family: \"Anonymous Pro\"; font-size: 1pt; color:" + foregroundColor  +"; margin-top: 28px; background-color:" + lineColor  +"; border: 0px;";
+    ui->fileOverview->setStyleSheet(stylesheet);
 }
 
 void MainWindow::updateHighlighterTheme(){
@@ -894,30 +903,26 @@ void MainWindow::highlightCurrentLine(){
 //  Update Line Numbers
 void MainWindow::updateLineNums(int newBlockCount){
 
-    if(newBlockCount > numBlocks){
+    if (newBlockCount > numBlocks){
         //  Add Line Numbers
-        while(numBlocks < newBlockCount){
+        while (numBlocks < newBlockCount){
             numBlocks++;
-            ostringstream oss;
-            oss << numBlocks;
-            ui->listWidget->addItem( QString::fromStdString(oss.str()) );
+            QString lineNum = QString::number(numBlocks);
+            ui->listWidget->addItem(lineNum);
             QListWidgetItem *item = ui->listWidget->item(numBlocks-1);
             item->setSizeHint(QSize(item->sizeHint().height(), 14));
         }
 
     }else{
         //  Remove Line Numbers
-        while(numBlocks > newBlockCount){
-            ostringstream oss;
-            oss << numBlocks;
+        while (numBlocks > newBlockCount){
             ui->listWidget->takeItem(numBlocks - 1);
             numBlocks--;
         }
     }
 
-    ostringstream oss;
-    oss << newBlockCount << " Lines";
-    ui->label->setText(QString::fromStdString(oss.str()));
+    QString numLinesText = QString::number(newBlockCount) + " Lines";
+    ui->label->setText(numLinesText);
 }
 void MainWindow::onBlockCountChanged(int newBlockCount)
 {

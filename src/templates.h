@@ -1,19 +1,20 @@
 #ifndef TEMPLATES_H
 #define TEMPLATES_H
-#include <string>
+
+#include "QString"
 
 class Templates
 {
 public:
     Templates();
-    std::string getTemplate(int e);
+    QString getAsmTemplate();
+    QString getCTemplate();
+    QString getCPPTemplate();
+    QString getHtmlTemplate();
+    QString getJavaTemplate();
+    QString getCSSTemplate();
 private:
-    std::string asmb;
-    std::string c;
-    std::string cplusplus;
-    std::string html;
-    std::string java;
-    std::string css;
+
 
 };
 
