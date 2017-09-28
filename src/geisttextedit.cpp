@@ -252,6 +252,17 @@ void GeistTextEdit::toggleComment(){
     this->setTextCursor(cur);
 }
 
+void GeistTextEdit::setHighlighterTheme(QString theme){
+    highlighter->setTheme(fileType, theme);
+}
+
+void GeistTextEdit::setHighlighter(Highlighter * h){
+    if(highlighter != NULL){
+        delete highlighter;
+    }
+
+    highlighter = h;
+}
 
 /*
  *****************************
@@ -271,14 +282,6 @@ void GeistTextEdit::setFilePath(QString newFilepath){
 }
 void GeistTextEdit::setFileType(QString newFileType){
     fileType = newFileType;
-}
-
-void GeistTextEdit::setHighlighter(Highlighter * h){
-    if(highlighter != NULL){
-        delete highlighter;
-    }
-
-    highlighter = h;
 }
 
 /*

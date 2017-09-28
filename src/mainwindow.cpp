@@ -7,49 +7,14 @@
 #include <QScrollBar>
 #include <QTabWidget>
 
-#include "files.h"
-#include "search.h"
-#include "conversion.h"
 #include "geisttextedit.h"
-#include "templates.h"
 
-GeistTextEdit *p = NULL;
-
-Conversion conversion;
-Files files;
-Search searcher;
-Templates templates;
-
-QString currentSearchTerm;  // Current Value Of Search Term
-QStringList foundPositions; // Positions Of Substrings Matching Search Term
-QString currentDirectory = files.getHomeDir();  //  Directory of last opened file. Users home folder by default.
-
-QString licence = "Project Page: https://github.com/jubal-R/Geist\n\n"
-        "Geist - All purpose text/code editor\n"
-        "Version: 1.0\n"
-        "Copyright (C) 2016  Jubal Rosenbarker\n\n"
-
-        "This program is free software: you can redistribute it and/or modify "
-        "it under the terms of the GNU General Public License as published by "
-        "the Free Software Foundation, either version 3 of the License, or "
-        "(at your option) any later version.\n\n"
-
-        "This program is distributed in the hope that it will be useful,"
-        "but WITHOUT ANY WARRANTY; without even the implied warranty of "
-        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the "
-        "GNU General Public License for more details.\n\n"
-
-        "You should have received a copy of the GNU General Public License "
-        "along with this program.  If not, see <http://www.gnu.org/licenses/>.\n";
-
-QString *licencePointer = &licence;
-
+GeistTextEdit *currentEditorWidget = NULL;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    /* Initialize Variables */
     numBlocks = 1;
     newNumBlocks = 0;
     outputMode = 0;
@@ -78,26 +43,26 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->replaceLineEdit->hide();
     ui->replaceButton->hide();
     ui->replaceAllButton->hide();
-    ui->label_3->hide();
+    ui->replaceLabel->hide();
 
     // Set Theme From Settings
     theme = settings.value("theme", "monokai").toString();
     if (theme == "monokai"){
         on_actionDark_triggered();
-    }else if (theme == "solarized"){
+    } else if (theme == "solarized"){
         on_actionSolarized_triggered();
-    }else if (theme == "solarizedDark"){
+    } else if (theme == "solarizedDark"){
         on_actionSolarized_Dark_triggered();
-    }else if (theme == "tomorrow"){
+    } else if (theme == "tomorrow"){
         on_actionTommorrow_triggered();
-    }else if (theme == "tomorrowNight"){
+    } else if (theme == "tomorrowNight"){
         on_actionTommorrow_Night_triggered();
     }
 
     // Create And Setup Initial Tab
     newTab();
-    connect(p, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
-    p->setFocus();
+    connect(currentEditorWidget, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
+    currentEditorWidget->setFocus();
     highlightCurrentLine();
 
     ui->listWidget->addItem("1");
@@ -112,9 +77,11 @@ MainWindow::MainWindow(QWidget *parent) :
     MainWindow::resize(windowWidth, windowHeight);
 
     // Show/Hide Overview
-    if(!settings.value("showOverview", true).toBool()){
+    if (!settings.value("showOverview", true).toBool()){
         ui->fileOverview->hide();
     }
+
+    currentDirectory = files.getHomeDir();
 
     // Open Files From List Saved In Settings
     QStringList openFiles;
@@ -130,17 +97,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    // Get Window Size
     QRect windowRect = MainWindow::normalGeometry();
     settings.setValue("windowWidth", windowRect.width());
     settings.setValue("windowHeight", windowRect.height());
 
 
-    // Get List Of Files Open In Editor
+    // Save List Of Files Open In Editor
     QStringList fileList;
     int numOpenFiles = ui->tabWidget->count();
+
     for (int i = 0; i < numOpenFiles; i++){
-        fileList.append(ui->tabWidget->tabToolTip(i));
+        ui->tabWidget->setCurrentIndex(i);
+        fileList.append(currentEditorWidget->getFilepath());
     }
     settings.setValue("openFilesList", fileList);
 
@@ -156,24 +124,29 @@ MainWindow::~MainWindow()
 // Switch Tab
 void MainWindow::on_tabWidget_currentChanged(int index)
 {
-    if (p != 0){
-        disconnect(p, SIGNAL(blockCountChanged(int)), this, SLOT(onBlockCountChanged(int)));
-        disconnect(p, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+    if (currentEditorWidget != 0){
+        disconnect(currentEditorWidget, SIGNAL(blockCountChanged(int)), this, SLOT(onBlockCountChanged(int)));
+        disconnect(currentEditorWidget, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
     }
 
-    p = qobject_cast<GeistTextEdit *>(ui->tabWidget->widget(index));
-    newNumBlocks = p->document()->blockCount();
-    QObject::connect(p->verticalScrollBar(), SIGNAL(valueChanged(int)), ui->listWidget->verticalScrollBar(), SLOT(setValue(int)));
-    QObject::connect(p->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(scrollOverview(int)));
-    connect(p, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
-    MainWindow::updateLineNums(newNumBlocks);
-    connect(p, SIGNAL(blockCountChanged(int)), this, SLOT(onBlockCountChanged(int)));
-    connect(p, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
-    ui->fileOverview->setPlainText(p->toPlainText());
-    filename = p->getFilepath();
-    ui->labelFileType->setText(p->getFileType().toUpper());
+    currentEditorWidget = qobject_cast<GeistTextEdit *>(ui->tabWidget->widget(index));
+    newNumBlocks = currentEditorWidget->document()->blockCount();
+
+    QObject::connect(currentEditorWidget->verticalScrollBar(), SIGNAL(valueChanged(int)), ui->listWidget->verticalScrollBar(), SLOT(setValue(int)));
+    QObject::connect(currentEditorWidget->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(scrollOverview(int)));
+    connect(currentEditorWidget, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
+    updateLineNums(newNumBlocks);
+    connect(currentEditorWidget, SIGNAL(blockCountChanged(int)), this, SLOT(onBlockCountChanged(int)));
+    connect(currentEditorWidget, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+    ui->fileOverview->setPlainText(currentEditorWidget->toPlainText());
+
+    filename = currentEditorWidget->getFilepath();
+
+    ui->labelFileType->setText(currentEditorWidget->getFileType().toUpper());
     foundPositions.clear();
+
     foundPosElement = 0;
+
     highlightCurrentLine();
 
 }
@@ -187,12 +160,12 @@ void MainWindow::on_tabWidget_tabCloseRequested(int index)
 
     // delete highlighter
     ui->tabWidget->setCurrentIndex(index);
-    p->setHighlighter(NULL);
+    currentEditorWidget->setHighlighter(NULL);
 
         // Set the new current tab
         if (index > 0){
             ui->tabWidget->setCurrentWidget(ui->tabWidget->widget(index - 1));
-        }else{
+        } else {
             ui->tabWidget->setCurrentWidget(ui->tabWidget->widget(index + 1));
         }
 
@@ -201,7 +174,7 @@ void MainWindow::on_tabWidget_tabCloseRequested(int index)
         delete ui->tabWidget->widget(index);
 
         // Update filename to correspond to new current tab
-        filename = ui->tabWidget->tabToolTip(ui->tabWidget->currentIndex());
+        filename = currentEditorWidget->getFilepath();
 
 }
 
@@ -214,7 +187,7 @@ void MainWindow::newTab(){
         filename = "";
 
         setTabWidth(settings.value("tabWidth", 4).toInt());
-        p->setWordWrapMode(QTextOption::NoWrap);
+        currentEditorWidget->setWordWrapMode(QTextOption::NoWrap);
     }
 }
 void MainWindow::on_actionNew_triggered()
@@ -229,9 +202,9 @@ void MainWindow::on_actionNew_triggered()
 */
 
 QString MainWindow::getFileType(QString file){
-    QStringList sl = file.split(".");
-    if(sl.length() > 1)
-        return sl.last();
+    QStringList dotSplit = file.split(".");
+    if (dotSplit.length() > 1)
+        return dotSplit.last();
     else
         return "";
 }
@@ -245,30 +218,30 @@ void MainWindow::open(QString file){
 
     if (file != ""){
 
-        if(filename != "" || p->toPlainText() != ""){
+        if (filename != "" || currentEditorWidget->toPlainText() != ""){
             newTab();
         }
 
         filename = file;
         QString filetype = getFileType(file);
-        p->setPlainText(files.read(filename));
+        currentEditorWidget->setPlainText(files.read(filename));
 
-        p->setFilePath(filename);
-        p->setFileType(filetype);
-        p->setHighlighter(new Highlighter(filetype, theme, p->document() ));
+        currentEditorWidget->setFilePath(filename);
+        currentEditorWidget->setFileType(filetype);
+        currentEditorWidget->setHighlighter(new Highlighter(filetype, theme, currentEditorWidget->document() ));
 
         if (filename.length() >= 21){
             ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename.right(21));
-        }else{
+        } else {
             ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename);
         }
-        // Store file path in tool tip
+
         ui->tabWidget->setTabToolTip(ui->tabWidget->currentIndex(), filename);
         ui->labelFileType->setText(filetype.toUpper());
 
         ui->textBrowser->setText("");
         *outputModeP = 0;
-        currentDirectory = getDirectory();
+        currentDirectory = files.getDirectory(filename);
     }
 }
 void MainWindow::on_actionOpen_triggered()
@@ -281,8 +254,8 @@ void MainWindow::on_actionOpen_triggered()
 void MainWindow::save(){
     if (filename == "" || *outputModeP != 0){
         on_actionSave_as_triggered();
-    }else{
-        files.write(filename, p->toPlainText());
+    } else {
+        files.write(filename, currentEditorWidget->toPlainText());
         ui->textBrowser->setText("Saved");
     }
 }
@@ -296,11 +269,11 @@ void MainWindow::on_actionSave_as_triggered()
     QString filetype = getFileType(filename);
 
     if (filename != ""){
-        files.write(filename, p->toPlainText());
+        files.write(filename, currentEditorWidget->toPlainText());
 
-        p->setFilePath(filename);
-        p->setFileType(filetype);
-        p->setHighlighter(new Highlighter(filetype, theme, p->document() ));
+        currentEditorWidget->setFilePath(filename);
+        currentEditorWidget->setFileType(filetype);
+        currentEditorWidget->setHighlighter(new Highlighter(filetype, theme, currentEditorWidget->document() ));
 
         ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), filename.right(21));
         ui->tabWidget->setTabToolTip(ui->tabWidget->currentIndex(), filename);
@@ -319,18 +292,18 @@ void MainWindow::on_actionSave_as_triggered()
 // Toggle Find Bar
 void MainWindow::on_actionFind_triggered()
 {
-    if(ui->findReplaceBar->isHidden()){
+    if (ui->findReplaceBar->isHidden()){
         ui->findReplaceBar->show();
         ui->findLineEdit->setFocus();
-    }else{
-        if(ui->replaceLineEdit->isHidden()){
+    } else {
+        if (ui->replaceLineEdit->isHidden()){
             ui->findReplaceBar->hide();
-            p->setFocus();
-        }else{
+            currentEditorWidget->setFocus();
+        } else {
             ui->replaceLineEdit->hide();
             ui->replaceButton->hide();
             ui->replaceAllButton->hide();
-            ui->label_3->hide();
+            ui->replaceLabel->hide();
         }
 
     }
@@ -342,13 +315,13 @@ void MainWindow::on_findLineEdit_returnPressed()
     if (ui->findLineEdit->text() == currentSearchTerm){
             findNext();
 
-    }else{
+    } else {
         QString searchTerm = ui->findLineEdit->text();
         currentSearchTerm = searchTerm;
         searchTermLen = searchTerm.length();
 
         if (searchTermLen > 0){
-            QString found = QString::fromStdString(searcher.findAll(searchTerm.toStdString(), p->toPlainText().toStdString()));
+            QString found = QString::fromStdString(searcher.findAll(searchTerm.toStdString(), currentEditorWidget->toPlainText().toStdString()));
             foundPositions = found.split(" ");
             foundPosElement = 0;
             selectText(foundPositions[foundPosElement].toInt(), searchTermLen);
@@ -363,11 +336,11 @@ void MainWindow::on_findLineEdit_textChanged(const QString &arg1)
 // Selects Text Given the Position Of the First Char And It's Length
 void MainWindow::selectText(int pos, int len){
     if (foundPositions.length() > 1){
-        QTextCursor cur = p->textCursor();
+        QTextCursor cur = currentEditorWidget->textCursor();
         cur.setPosition(pos , QTextCursor::MoveAnchor);
         cur.setPosition(pos + len, QTextCursor::KeepAnchor);
-        p->setTextCursor(cur);
-        ui->listWidget->verticalScrollBar()->setValue(p->verticalScrollBar()->value());
+        currentEditorWidget->setTextCursor(cur);
+        ui->listWidget->verticalScrollBar()->setValue(currentEditorWidget->verticalScrollBar()->value());
     }
 }
 
@@ -379,14 +352,14 @@ void MainWindow::findNext(){
 
             if (foundPosElement < foundPositions.length() - 2){
                 foundPosElement++;
-            }else{
+            } else {
                 foundPosElement = 0;
             }
 
             selectText(foundPositions[foundPosElement].toInt(), searchTermLen);
         }
 
-    }else{
+    } else {
         on_findLineEdit_returnPressed();
     }
 }
@@ -398,7 +371,7 @@ void MainWindow::findPrev(){
 
         if (foundPosElement > 0){
             foundPosElement--;
-        }else{
+        } else {
             foundPosElement = foundPositions.length() - 2;
         }
 
@@ -409,7 +382,7 @@ void MainWindow::findPrev(){
 void MainWindow::on_findButton_clicked()
 {
     findNext();
-    p->setFocus();
+    currentEditorWidget->setFocus();
 }
 void MainWindow::on_actionFind_Next_triggered()
 {
@@ -418,7 +391,7 @@ void MainWindow::on_actionFind_Next_triggered()
 void MainWindow::on_findPrevButton_clicked()
 {
     findPrev();
-    p->setFocus();
+    currentEditorWidget->setFocus();
 }
 void MainWindow::on_actionFind_Previous_triggered()
 {
@@ -428,29 +401,29 @@ void MainWindow::on_actionFind_Previous_triggered()
 //  Toggle Replace Bar
 void MainWindow::on_actionReplace_triggered()
 {
-    if(ui->findReplaceBar->isHidden()){
+    if (ui->findReplaceBar->isHidden()){
         ui->findReplaceBar->show();
         ui->findLineEdit->setFocus();
-        if(ui->replaceLineEdit->isHidden()){
+        if (ui->replaceLineEdit->isHidden()){
             ui->replaceLineEdit->show();
             ui->replaceButton->show();
             ui->replaceAllButton->show();
-            ui->label_3->show();
+            ui->replaceLabel->show();
         }
-    }else{
+    } else {
 
-        if(ui->replaceLineEdit->isHidden()){
+        if (ui->replaceLineEdit->isHidden()){
             ui->replaceLineEdit->show();
             ui->replaceButton->show();
             ui->replaceAllButton->show();
-            ui->label_3->show();
-        }else{
+            ui->replaceLabel->show();
+        } else {
             ui->replaceLineEdit->hide();
             ui->replaceButton->hide();
             ui->replaceAllButton->hide();
             ui->findReplaceBar->hide();
-            ui->label_3->hide();
-            p->setFocus();
+            ui->replaceLabel->hide();
+            currentEditorWidget->setFocus();
         }
 
     }
@@ -459,20 +432,20 @@ void MainWindow::on_actionReplace_triggered()
 // Replace Currently Selected Found Instance Of Text To Be Replaced
 void MainWindow::on_replaceButton_clicked()
 {
-    QTextCursor cur = p->textCursor();
+    QTextCursor cur = currentEditorWidget->textCursor();
 
     if (cur.selectedText() != ""){
         cur.removeSelectedText();
         cur.insertText(ui->replaceLineEdit->text());
     }
 
-    p->setTextCursor(cur);
+    currentEditorWidget->setTextCursor(cur);
     QString searchTerm = ui->findLineEdit->text();
     currentSearchTerm = searchTerm;
     searchTermLen = searchTerm.length();
 
     if (searchTermLen > 0){
-        QString found = QString::fromStdString(searcher.findAll(searchTerm.toStdString(), p->toPlainText().toStdString()));
+        QString found = QString::fromStdString(searcher.findAll(searchTerm.toStdString(), currentEditorWidget->toPlainText().toStdString()));
         foundPositions = found.split(" ");
         foundPosElement = 0;
         selectText(foundPositions[foundPosElement].toInt(), searchTermLen);
@@ -488,26 +461,26 @@ void MainWindow::on_replaceAllButton_clicked()
 {
     QString searchTerm = ui->findLineEdit->text();
     currentSearchTerm = searchTerm;
-    do{
+    do {
         searchTermLen = searchTerm.length();
 
         if (searchTermLen > 0){
-            QString found = QString::fromStdString(searcher.findAll(searchTerm.toStdString(), p->toPlainText().toStdString()));
+            QString found = QString::fromStdString(searcher.findAll(searchTerm.toStdString(), currentEditorWidget->toPlainText().toStdString()));
             foundPositions = found.split(" ");
             foundPosElement = 0;
             selectText(foundPositions[foundPosElement].toInt(), searchTermLen);
         }
 
-        QTextCursor cur = p->textCursor();
+        QTextCursor cur = currentEditorWidget->textCursor();
 
         if (cur.selectedText() != ""){
             cur.removeSelectedText();
             cur.insertText(ui->replaceLineEdit->text());
         }
 
-        p->setTextCursor(cur);
+        currentEditorWidget->setTextCursor(cur);
 
-    }while(foundPositions.length() > 1);
+    } while (foundPositions.length() > 1);
 }
 
 // Go To Line Number
@@ -516,11 +489,11 @@ void MainWindow::on_actionGoTo_triggered()
     bool ok = 0;
 
     if (int line = QInputDialog::getText(this, tr("Enter"),tr("Go to:"), QLineEdit::Normal,"", &ok).toInt()){
-        QTextCursor cur = p->textCursor();
+        QTextCursor cur = currentEditorWidget->textCursor();
         cur.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
         cur.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, line-1);
-        p->setTextCursor(cur);
-        ui->listWidget->verticalScrollBar()->setValue(p->verticalScrollBar()->value());
+        currentEditorWidget->setTextCursor(cur);
+        ui->listWidget->verticalScrollBar()->setValue(currentEditorWidget->verticalScrollBar()->value());
     }
 }
 
@@ -533,23 +506,23 @@ void MainWindow::on_actionGoTo_triggered()
 //  Undo/Redo
 void MainWindow::on_actionUndo_triggered()
 {
-    p->undo();
+    currentEditorWidget->undo();
 }
 void MainWindow::on_actionRedo_triggered()
 {
-    p->redo();
+    currentEditorWidget->redo();
 }
 
 //  Delete Line Where Cusor Currently Resides
 void MainWindow::on_actionDelete_line_triggered()
 {
-    p->deleteLine();
+    currentEditorWidget->deleteLine();
 }
 
 //  Delete Word Where Cusor Currently Resides
 void MainWindow::on_actionRemove_word_triggered()
 {
-    p->deleteWord();
+    currentEditorWidget->deleteWord();
 }
 
 /*
@@ -558,25 +531,25 @@ void MainWindow::on_actionRemove_word_triggered()
 */
 void MainWindow::on_actionToggle_comment_triggered()
 {
-    p->toggleComment();
+    currentEditorWidget->toggleComment();
 }
 
 // Join Lines
 void MainWindow::on_actionJoin_Lines_triggered()
 {
-    p->joinLines();
+    currentEditorWidget->joinLines();
 }
 
 // Swap Line Up
 void MainWindow::on_actionMove_Line_Up_triggered()
 {
-    p->swapLineUp();
+    currentEditorWidget->swapLineUp();
 }
 
 // Swap Line Down
 void MainWindow::on_actionSwap_line_down_triggered()
 {
-    p->swapLineDown();
+    currentEditorWidget->swapLineDown();
 }
 
 /*
@@ -590,7 +563,7 @@ void MainWindow::on_actionStrings_triggered()
 {
     if (*outputModeP != 1){
         *outputModeP = 2;
-        p->setPlainText( QString::fromStdString(conversion.getStrings(p->toPlainText().toStdString())) );
+        currentEditorWidget->setPlainText( QString::fromStdString(conversion.getStrings(currentEditorWidget->toPlainText().toStdString())) );
     }
 }
 //  Converts ascii Values Of Content Of Current Tab Into Hexidecimal
@@ -598,7 +571,7 @@ void MainWindow::on_actionHex_triggered()
 {
     if (*outputModeP == 0 || *outputModeP == 2){
         *outputModeP = 1;
-        p->setPlainText( QString::fromStdString( conversion.hex(p->toPlainText().toStdString() ) ) );
+        currentEditorWidget->setPlainText( QString::fromStdString( conversion.hex(currentEditorWidget->toPlainText().toStdString() ) ) );
     }
 }
 //  Converts Hexidecimal Values Of Content Of Current Tab Into ascii
@@ -606,7 +579,7 @@ void MainWindow::on_actionAscii_triggered()
 {
     if (*outputModeP == 1){
         *outputModeP = 0;
-        p->setPlainText( QString::fromStdString( conversion.ascii(p->toPlainText().toStdString() ) ) );
+        currentEditorWidget->setPlainText( QString::fromStdString( conversion.ascii(currentEditorWidget->toPlainText().toStdString() ) ) );
     }
 }
 
@@ -630,72 +603,63 @@ bool MainWindow::confirmApplyTemplate(){
 // If current tab contents are not empty, prompt user for confirmation to apply template
 
 void MainWindow::on_actionAsm_triggered(){
-    if (p->toPlainText() == ""){
-        p->setPlainText(templates.getAsmTemplate());
+    if (currentEditorWidget->toPlainText() == ""){
+        currentEditorWidget->setPlainText(templates.getAsmTemplate());
     } else {
         if (confirmApplyTemplate()){
-            p->setPlainText(templates.getAsmTemplate());
+            currentEditorWidget->setPlainText(templates.getAsmTemplate());
         }
     }
 }
 
 void MainWindow::on_actionC_triggered(){
-    if (p->toPlainText() == ""){
-        p->setPlainText(templates.getCTemplate());
+    if (currentEditorWidget->toPlainText() == ""){
+        currentEditorWidget->setPlainText(templates.getCTemplate());
     } else {
         if (confirmApplyTemplate()){
-            p->setPlainText(templates.getCTemplate());
+            currentEditorWidget->setPlainText(templates.getCTemplate());
         }
     }
 }
 
 void MainWindow::on_actionCpluspluss_triggered(){
-    if (p->toPlainText() == ""){
-        p->setPlainText(templates.getCPPTemplate());
+    if (currentEditorWidget->toPlainText() == ""){
+        currentEditorWidget->setPlainText(templates.getCPPTemplate());
     } else {
         if (confirmApplyTemplate()){
-            p->setPlainText(templates.getCPPTemplate());
+            currentEditorWidget->setPlainText(templates.getCPPTemplate());
         }
     }
 }
 
 void MainWindow::on_actionHtml_triggered(){
-    if (p->toPlainText() == ""){
-        p->setPlainText(templates.getHtmlTemplate());
+    if (currentEditorWidget->toPlainText() == ""){
+        currentEditorWidget->setPlainText(templates.getHtmlTemplate());
     } else {
         if (confirmApplyTemplate()){
-            p->setPlainText(templates.getHtmlTemplate());
+            currentEditorWidget->setPlainText(templates.getHtmlTemplate());
         }
     }
 }
 
 void MainWindow::on_actionJava_triggered(){
-    if (p->toPlainText() == ""){
-        p->setPlainText(templates.getJavaTemplate());
+    if (currentEditorWidget->toPlainText() == ""){
+        currentEditorWidget->setPlainText(templates.getJavaTemplate());
     } else {
         if (confirmApplyTemplate()){
-            p->setPlainText(templates.getJavaTemplate());
+            currentEditorWidget->setPlainText(templates.getJavaTemplate());
         }
     }
 }
 
 void MainWindow::on_actionCss_triggered(){
-    if (p->toPlainText() == ""){
-        p->setPlainText(templates.getCSSTemplate());
+    if (currentEditorWidget->toPlainText() == ""){
+        currentEditorWidget->setPlainText(templates.getCSSTemplate());
     } else {
         if (confirmApplyTemplate()){
-            p->setPlainText(templates.getCSSTemplate());
+            currentEditorWidget->setPlainText(templates.getCSSTemplate());
         }
     }
-}
-
-// Get Directory Of File Open In Current Tab
-QString MainWindow::getDirectory(){
-    QString filepath = filename;
-    int lastIndex = filepath.lastIndexOf("/");
-    filepath.chop(filepath.length() - lastIndex);
-
-    return filepath;
 }
 
 /*
@@ -707,10 +671,10 @@ QString MainWindow::getDirectory(){
 // Toggle FullScreen
 void MainWindow::on_actionFullScreen_triggered()
 {
-    if(MainWindow::isFullScreen())
+    if (MainWindow::isFullScreen())
     {
         MainWindow::showNormal();
-    }else{
+    } else {
         MainWindow::showFullScreen();
     }
 }
@@ -718,10 +682,10 @@ void MainWindow::on_actionFullScreen_triggered()
 // Toggle File Overview
 void MainWindow::on_actionOverview_triggered()
 {
-    if(ui->fileOverview->isHidden()){
+    if (ui->fileOverview->isHidden()){
         ui->fileOverview->show();
         settings.setValue("showOverview", true);
-    }else{
+    } else {
         ui->fileOverview->hide();
         settings.setValue("showOverview", false);
     }
@@ -730,9 +694,9 @@ void MainWindow::on_actionOverview_triggered()
 // Toggle Menubar
 void MainWindow::on_actionMenubar_triggered()
 {
-    if(ui->menuBar->height() > 0){
+    if (ui->menuBar->height() > 0){
         ui->menuBar->setMaximumHeight(0);
-    }else{
+    } else {
         ui->menuBar->setMaximumHeight(100);
     }
 }
@@ -781,13 +745,14 @@ void MainWindow::updateHighlighterTheme(){
     int numOpenTabs = ui->tabWidget->count();
     for(int i = 0; i < numOpenTabs; i++){
         ui->tabWidget->setCurrentIndex(i);
-        p->setHighlighter(new Highlighter(p->getFileType(), theme, p->document() ));
+        currentEditorWidget->setHighlighterTheme(theme);
     }
     ui->tabWidget->setCurrentIndex(current);
 }
 
 void MainWindow::on_actionDark_triggered()
 {
+    theme = "monokai";
     settings.setValue("theme", "monokai");
     QString fgc = "#e0e0e0";
     QString bgc = "#272822";
@@ -807,6 +772,7 @@ void MainWindow::on_actionDark_triggered()
 
 void MainWindow::on_actionSolarized_triggered()
 {
+    theme = "solarized";
     settings.setValue("theme", "solarized");
     QString fgc = "#839496";
     QString bgc = "#fdf6e3";
@@ -825,6 +791,7 @@ void MainWindow::on_actionSolarized_triggered()
 
 void MainWindow::on_actionSolarized_Dark_triggered()
 {
+    theme = "solarizedDark";
     settings.setValue("theme", "solarizedDark");
     QString fgc = "#839496";
     QString bgc = "#002b36";
@@ -843,6 +810,7 @@ void MainWindow::on_actionSolarized_Dark_triggered()
 
 void MainWindow::on_actionTommorrow_triggered()
 {
+    theme = "tomorrow";
     settings.setValue("theme", "tomorrow");
     QString fgc = "#4d4d4c";
     QString bgc = "#ffffff";
@@ -861,6 +829,7 @@ void MainWindow::on_actionTommorrow_triggered()
 
 void MainWindow::on_actionTommorrow_Night_triggered()
 {
+    theme = "tomorrowNight";
     settings.setValue("theme", "tomorrowNight");
     QString fgc = "#c5c8c6";
     QString bgc = "#1d1f21";
@@ -885,18 +854,18 @@ void MainWindow::on_actionTommorrow_Night_triggered()
 
 //  Highlight Current Line
 void MainWindow::highlightCurrentLine(){
-   if(p != NULL){
+   if (currentEditorWidget != NULL){
        QList<QTextEdit::ExtraSelection> extraSelections;
 
        QTextEdit::ExtraSelection selections;
        selections.format.setBackground(lineColor);
        selections.format.setProperty(QTextFormat::FullWidthSelection, true);
-       selections.cursor = p->textCursor();
+       selections.cursor = currentEditorWidget->textCursor();
        selections.cursor.clearSelection();
        extraSelections.append(selections);
 
-       p->setExtraSelections(extraSelections);
-       ui->listWidget->verticalScrollBar()->setValue(p->verticalScrollBar()->value());
+       currentEditorWidget->setExtraSelections(extraSelections);
+       ui->listWidget->verticalScrollBar()->setValue(currentEditorWidget->verticalScrollBar()->value());
    }
 }
 
@@ -913,7 +882,7 @@ void MainWindow::updateLineNums(int newBlockCount){
             item->setSizeHint(QSize(item->sizeHint().height(), 14));
         }
 
-    }else{
+    } else {
         //  Remove Line Numbers
         while (numBlocks > newBlockCount){
             ui->listWidget->takeItem(numBlocks - 1);
@@ -922,18 +891,17 @@ void MainWindow::updateLineNums(int newBlockCount){
     }
 
     QString numLinesText = QString::number(newBlockCount) + " Lines";
-    ui->label->setText(numLinesText);
+    ui->statusMsgLabel->setText(numLinesText);
 }
 void MainWindow::onBlockCountChanged(int newBlockCount)
 {
-
     /*  Auto-Indent New Lines   */
 
     //  If Block Count Only Increased By One
-    if(newBlockCount == numBlocks + 1){
+    if (newBlockCount == numBlocks + 1){
 
-        QString data = p->toPlainText();
-        int cursorPosition = p->textCursor().position();
+        QString data = currentEditorWidget->toPlainText();
+        int cursorPosition = currentEditorWidget->textCursor().position();
 
         // If Beginning Cursor At Beginning Of New Line
         if (data.mid(cursorPosition-1, 1) == "\n"){
@@ -949,7 +917,7 @@ void MainWindow::onBlockCountChanged(int newBlockCount)
 
                 //  For Each Tab Char At Beggining Of Previous Line: Add Tab To New Line
                 while (data.mid(pos + 1, 1) == "\t"){
-                    p->textCursor().insertText("\t");
+                    currentEditorWidget->textCursor().insertText("\t");
                     pos++;
                 }
          }
@@ -963,7 +931,7 @@ void MainWindow::onBlockCountChanged(int newBlockCount)
 void MainWindow::onTextChanged(){
 
     ui->textBrowser->setText("");
-    ui->fileOverview->setPlainText(p->toPlainText());
+    ui->fileOverview->setPlainText(currentEditorWidget->toPlainText());
     currentSearchTerm = "";
 }
 
@@ -988,7 +956,7 @@ void MainWindow::on_actionExit_triggered()
 // Close All Tabs
 void MainWindow::on_actionClose_All_triggered()
 {
-    while(ui->tabWidget->count() > 1){
+    while (ui->tabWidget->count() > 1){
         on_tabWidget_tabCloseRequested(0);
     }
     on_tabWidget_tabCloseRequested(0);
@@ -997,7 +965,24 @@ void MainWindow::on_actionClose_All_triggered()
 //  Display About Info
 void MainWindow::on_actionAbout_triggered()
 {
-    QMessageBox::information(this, tr("About Geist"), *licencePointer,QMessageBox::Close);
+    QString licence = "Project Page: https://github.com/jubal-R/Geist\n\n"
+            "Geist - All purpose text/code editor\n"
+            "Version: 1.0\n"
+            "Copyright (C) 2017\n\n"
+
+            "This program is free software: you can redistribute it and/or modify "
+            "it under the terms of the GNU General Public License as published by "
+            "the Free Software Foundation, either version 3 of the License, or "
+            "(at your option) any later version.\n\n"
+
+            "This program is distributed in the hope that it will be useful,"
+            "but WITHOUT ANY WARRANTY; without even the implied warranty of "
+            "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the "
+            "GNU General Public License for more details.\n\n"
+
+            "You should have received a copy of the GNU General Public License "
+            "along with this program.  If not, see <http://www.gnu.org/licenses/>.\n";
+    QMessageBox::information(this, tr("About Geist"), licence,QMessageBox::Close);
 }
 
 // Set Tab Stop Width
@@ -1013,7 +998,7 @@ void MainWindow::setTabWidth(int width){
 
     for(int i = 0; i < ui->tabWidget->count(); i++){
         ui->tabWidget->setCurrentIndex(i);
-        p->setTabStopWidth(width * metrics.width(' ') );
+        currentEditorWidget->setTabStopWidth(width * metrics.width(' ') );
     }
 
     ui->tabWidget->setCurrentIndex(current);

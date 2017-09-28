@@ -11,6 +11,7 @@ public:
     void write(QString filename, QString content);
     QString getHomeDir();
     void openFileManager(QString dir);
+    QString getDirectory(QString filepath);
 };
 
 #endif // READER_H

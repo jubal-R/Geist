@@ -41,3 +41,9 @@ QString Files::getHomeDir(){
     return homeDir;
 }
 
+QString Files::getDirectory(QString filepath){
+    int lastIndex = filepath.lastIndexOf("/");
+    filepath.chop(filepath.length() - lastIndex);
+
+    return filepath;
+}

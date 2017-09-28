@@ -14,6 +14,7 @@ public:
     void setFilePath(QString newFilepath);
     void setFileType(QString newFileType);
     void setHighlighter(Highlighter * h);
+    void setHighlighterTheme(QString theme);
     void selectLine();
     void selectWord();
     QString lineUnderCursor();

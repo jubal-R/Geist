@@ -7,6 +7,11 @@
 #include "QSettings"
 #include <QPlainTextEdit>
 
+#include "files.h"
+#include "search.h"
+#include "conversion.h"
+#include "templates.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -21,6 +26,34 @@ public:
     void openWith(QString);
 
 private slots:
+    void save();
+
+    void open(QString file);
+
+    void newTab();
+
+    void selectText(int pos,int len);
+
+    void highlightCurrentLine();
+
+    void updateHighlighterTheme();
+
+    void setTabWidth(int width);
+
+    void updateLineNums(int newBlockCount);
+
+    void scrollOverview(int scrollValue);
+
+    void setMainWindowStyle(QString backgroundColor, QString lineColor);
+
+    void setTabWidgetStyle(QString foregroundColor, QString backgroundColor);
+
+    void setLineNumStyle(QString lineColor, QString foregroundColor);
+
+    void setOverViewStyle(QString lineColor, QString foregroundColor);
+
+    QString getFileType(QString file);
+
     void on_actionOpen_triggered();
 
     void on_actionNew_triggered();
@@ -53,21 +86,11 @@ private slots:
 
     void onBlockCountChanged(int newBlockCount);
 
-    void updateLineNums(int newBlockCount);
-
     void onTextChanged();
-
-    void scrollOverview(int scrollValue);
 
     void on_actionFullScreen_triggered();
 
     void on_actionGoTo_triggered();
-
-    void save();
-
-    void open(QString file);
-
-    void newTab();
 
     void on_actionAsm_triggered();
 
@@ -82,10 +105,6 @@ private slots:
     bool confirmApplyTemplate();
 
     void on_actionCss_triggered();
-
-    QString getDirectory();
-
-    void selectText(int pos,int len);
 
     void on_findButton_clicked();
 
@@ -117,10 +136,6 @@ private slots:
 
     void on_actionOverview_triggered();
 
-    void highlightCurrentLine();
-
-    QString getFileType(QString file);
-
     void on_actionDark_triggered();
 
     void on_actionSolarized_Dark_triggered();
@@ -141,29 +156,22 @@ private slots:
 
     void on_action2_triggered();
 
-    void setTabWidth(int width);
-
     void on_actionClose_All_triggered();
-
-    void updateHighlighterTheme();
 
     void on_actionTommorrow_triggered();
 
     void on_actionTommorrow_Night_triggered();
-
-    void setMainWindowStyle(QString backgroundColor, QString lineColor);
-
-    void setTabWidgetStyle(QString foregroundColor, QString backgroundColor);
-
-    void setLineNumStyle(QString lineColor, QString foregroundColor);
-
-    void setOverViewStyle(QString lineColor, QString foregroundColor);
 
 private:
     Ui::MainWindow *ui;
     Highlighter *highlighter;
     QShortcut *shortcut;
     QSettings settings;
+
+    Conversion conversion;
+    Files files;
+    Search searcher;
+    Templates templates;
 
     int numBlocks;
     int newNumBlocks;
@@ -174,6 +182,9 @@ private:
 
     QString filename;
     QString theme;
+    QString currentDirectory;
+    QString currentSearchTerm;  // Current Value Of Search Term
+    QStringList foundPositions; // Positions Of Substrings Matching Search Term
     QColor lineColor;
 
 };

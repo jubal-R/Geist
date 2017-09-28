@@ -53,11 +53,21 @@ class Highlighter : public QSyntaxHighlighter
 
 public:
     Highlighter(QString filetype, QString theme, QTextDocument *parent = 0);
+    void setTheme(QString filetype, QString theme);
 
 protected:
     void highlightBlock(const QString &text);
 
 private:
+    void setupHighlighter(QString fileType, QString theme);
+    void setColorValues(QString theme);
+    void setCompiledLanguageRules();
+    void setScriptingLanguageRules();
+    void setMarkupLanguageRules();
+    void setAsmRules();
+    void setCssRules();
+    void setSqlRules();
+
     struct HighlightingRule
     {
         QRegExp pattern;
@@ -69,11 +79,20 @@ private:
     QRegExp commentEndExpression;
 
     QTextCharFormat keywordFormat;
-    QTextCharFormat classFormat;
+    QTextCharFormat numberFormat;
     QTextCharFormat singleLineCommentFormat;
     QTextCharFormat multiLineCommentFormat;
     QTextCharFormat quotationFormat;
     QTextCharFormat functionFormat;
+    QTextCharFormat formatStringFormat;
+    QTextCharFormat operatorFormat;
+    QTextCharFormat phpVarFormat;
+    QTextCharFormat rubyVarFormat;
+    QTextCharFormat tagFormat;
+    QTextCharFormat valueFormat;
+    QTextCharFormat attributeFormat;
+    QTextCharFormat idFormat;
+    QTextCharFormat classFormat;
 
     QStringList compiledLanguages;
     QStringList scriptingLanguages;
