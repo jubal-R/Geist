@@ -190,6 +190,7 @@ void MainWindow::newTab(){
         currentEditorWidget->setWordWrapMode(QTextOption::NoWrap);
     }
 }
+
 void MainWindow::on_actionNew_triggered()
 {
     MainWindow::newTab();
@@ -244,6 +245,7 @@ void MainWindow::open(QString file){
         currentDirectory = files.getDirectory(filename);
     }
 }
+
 void MainWindow::on_actionOpen_triggered()
 {
     QString file = QFileDialog::getOpenFileName(this, tr("Open File"), currentDirectory, tr("All (*)"));
@@ -259,10 +261,12 @@ void MainWindow::save(){
         ui->textBrowser->setText("Saved");
     }
 }
+
 void MainWindow::on_actionSave_triggered()
 {
     MainWindow::save();
 }
+
 void MainWindow::on_actionSave_as_triggered()
 {
     filename = QFileDialog::getSaveFileName(this, tr("Save As"), currentDirectory, tr("All (*)"));
@@ -384,15 +388,18 @@ void MainWindow::on_findButton_clicked()
     findNext();
     currentEditorWidget->setFocus();
 }
+
 void MainWindow::on_actionFind_Next_triggered()
 {
     findNext();
 }
+
 void MainWindow::on_findPrevButton_clicked()
 {
     findPrev();
     currentEditorWidget->setFocus();
 }
+
 void MainWindow::on_actionFind_Previous_triggered()
 {
     findPrev();
@@ -566,6 +573,7 @@ void MainWindow::on_actionStrings_triggered()
         currentEditorWidget->setPlainText( QString::fromStdString(conversion.getStrings(currentEditorWidget->toPlainText().toStdString())) );
     }
 }
+
 //  Converts ascii Values Of Content Of Current Tab Into Hexidecimal
 void MainWindow::on_actionHex_triggered()
 {
@@ -574,6 +582,7 @@ void MainWindow::on_actionHex_triggered()
         currentEditorWidget->setPlainText( QString::fromStdString( conversion.hex(currentEditorWidget->toPlainText().toStdString() ) ) );
     }
 }
+
 //  Converts Hexidecimal Values Of Content Of Current Tab Into ascii
 void MainWindow::on_actionAscii_triggered()
 {
@@ -708,35 +717,115 @@ void MainWindow::on_actionMenubar_triggered()
 */
 
 void MainWindow::setMainWindowStyle(QString backgroundColor, QString lineColor){
-    QString stylesheet = "QMenu {background-color: rgb(48, 47, 54); color:white; selection-background-color: #404f4f;border: 1px solid #404f4f; border-radius: 3px 3px 3px 3px;}"
-             "QMenuBar::item {background:#262626;} QMenuBar::item:selected {background: #232629;}"
-             "QMessageBox {color:white;}"
-             "QLineEdit {border: 1px solid #676767; border-radius: 5px 5px 5px 5px;}"
-             "QScrollBar::sub-page:vertical {background: " +  backgroundColor + ";} QScrollBar::add-page:vertical {background: " +  backgroundColor + ";}"
-             "QScrollBar::sub-page:horizonal {background: " +  backgroundColor +";} QScrollBar::add-page:horizontal {background: " +  backgroundColor +";}"
-             "QScrollBar:vertical{background: white;width:12px;margin: 0px 0px 0px 0px;} QScrollBar::handle:vertical {background:" + lineColor  +";border: 2px solid " +  backgroundColor  +";border-radius: 5px 5px 5px 5px; min-height: 30px;}"
-             "QScrollBar:horizontal{background: white;height:12px;margin: 0px 0px 0px 0px;} QScrollBar::handle:horizontal {background:" + lineColor  +";border: 2px solid " +  backgroundColor  +";border-radius: 5px 5px 5px 5px; min-height: 30px;}";
+    QString stylesheet = "QMenu {"
+                "background-color: rgb(48, 47, 54);"
+                "color:white;"
+                "selection-background-color: #404f4f;"
+                "border: 1px solid #404f4f;"
+                "border-radius: 3px 3px 3px 3px;"
+             "}"
+             "QMenuBar::item {"
+                "background:#262626;"
+             "}"
+             "QMenuBar::item:selected {"
+                "background: #232629;"
+             "}"
+             "QMessageBox {"
+                "color:white;"
+             "}"
+             "QLineEdit {"
+                "border: 1px solid #676767;"
+                "border-radius: 5px 5px 5px 5px;"
+             "}"
+             "QScrollBar::sub-page:vertical {"
+                "background: " +  backgroundColor + ";"
+             "}"
+             "QScrollBar::add-page:vertical {"
+                "background: " +  backgroundColor + ";"
+             "}"
+             "QScrollBar::sub-page:horizonal {"
+                "background: " +  backgroundColor +";"
+             "}"
+             "QScrollBar::add-page:horizontal {"
+                "background: " +  backgroundColor +";"
+             "}"
+             "QScrollBar:vertical{"
+                "background: white;"
+                "width:12px;margin: 0px 0px 0px 0px;"
+             "}"
+             "QScrollBar::handle:vertical {"
+                "background:" + lineColor  +";"
+                "border: 2px solid " +  backgroundColor  +";"
+                "border-radius: 5px 5px 5px 5px;"
+                "min-height: 30px;"
+             "}"
+             "QScrollBar:horizontal{"
+                "background: white;"
+                "height:12px;"
+                "margin: 0px 0px 0px 0px;"
+             "}"
+             "QScrollBar::handle:horizontal {"
+                "background:" + lineColor  +";"
+             "border: 2px solid " +  backgroundColor  +";"
+             "border-radius: 5px 5px 5px 5px;"
+             "min-height: 30px;"
+             "}";
 
     MainWindow::setStyleSheet(stylesheet);
 
 }
 
 void MainWindow::setTabWidgetStyle(QString foregroundColor, QString backgroundColor){
-    QString stylesheet = "QPlainTextEdit { background-color: " +  backgroundColor  +"; color:" + foregroundColor  +"; border: 0px; selection-background-color: #404f4f; font-family: \"Anonymous Pro\"; font-size:11pt;} "
-             "QScrollBar:vertical{background: " +  backgroundColor  +";} QScrollBar:horizontal{background: " +  backgroundColor  +";}"
-             "QTabBar::tab:selected{color: white; border-bottom: 3px solid #2F4F4F;}"
-             "QTabBar::tab {height: 22px; width: 160px; color: #676767; font-size:9pt; margin: 0 -2px;padding: 1px 5px; background-color: #262626; border-bottom: 3px solid #212121;}";
+    QString stylesheet = "QPlainTextEdit {"
+                "background-color: " +  backgroundColor  +";"
+                "color:" + foregroundColor  +";"
+                "border: 0px;"
+                "padding-left: 1px;"
+                "selection-background-color: #404f4f;"
+                "font-family: \"Anonymous Pro\";"
+                "font-size:11pt;"
+             "}"
+             "QScrollBar:vertical{"
+                "background: " +  backgroundColor  +";"
+             "}"
+             "QScrollBar:horizontal{"
+                "background: " +  backgroundColor  +";"
+             "}"
+             "QTabBar::tab:selected{"
+                "color: white;"
+                "border-bottom: 3px solid #2F4F4F;"
+             "}"
+             "QTabBar::tab {"
+                "height: 22px; width: 160px;"
+                "color: #676767;"
+                "font-size:9pt;"
+                "margin: 0 -2px;"
+                "padding: 1px 5px;"
+                "background-color: #262626;"
+                "border-bottom: 3px solid #212121;"
+             "}";
    ui->tabWidget->setStyleSheet(stylesheet);
 
 }
 
 void MainWindow::setLineNumStyle(QString lineColor, QString foregroundColor){
-    QString stylesheet = "background-color: " + lineColor  +"; margin-top: 28px; padding-left: 5px; color: " + foregroundColor  +"; border: none; font: 11pt \"Anonymous Pro\"; ";
+    QString stylesheet = "background-color: " + lineColor  +";"
+            "margin-top: 30px;"
+            "padding-left: 5px;"
+            "padding-right: 1px;"
+            "color: " + foregroundColor  +";"
+            "border: none;"
+            "font: 11pt \"Anonymous Pro\";";
     ui->listWidget->setStyleSheet(stylesheet);
 }
 
 void MainWindow::setOverViewStyle(QString lineColor, QString foregroundColor){
-    QString stylesheet = "font-family: \"Anonymous Pro\"; font-size: 1pt; color:" + foregroundColor  +"; margin-top: 28px; background-color:" + lineColor  +"; border: 0px;";
+    QString stylesheet = "font-family: \"Anonymous Pro\";"
+            "font-size: 1pt;"
+            "color:" + foregroundColor  +";"
+            "margin-top: 28px;"
+            "background-color:" + lineColor  +";"
+            "border: 0px;";
     ui->fileOverview->setStyleSheet(stylesheet);
 }
 
