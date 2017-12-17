@@ -14,21 +14,21 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    conversion.cpp \
     highlighter.cpp \
-    templates.cpp \
     files.cpp \
-    geisttextedit.cpp \
-    search.cpp
+    search.cpp \
+    widgets/geisttextedit.cpp \
+    utils/conversion.cpp \
+    utils/templates.cpp
 
 HEADERS  += mainwindow.h \
-    conversion.h \
     highlighter.h \
     search.h \
-    templates.h \
     files.h \
-    geisttextedit.h \
-    search.h
+    search.h \
+    widgets/geisttextedit.h \
+    utils/conversion.h \
+    utils/templates.h
 
 FORMS    += mainwindow.ui
 

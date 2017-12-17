@@ -9,7 +9,7 @@
 
 #include "QDebug"
 
-#include "geisttextedit.h"
+#include "widgets/geisttextedit.h"
 
 GeistTextEdit *currentEditorWidget = NULL;
 

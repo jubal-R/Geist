@@ -23,6 +23,9 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setApplicationName("Geist");
+    a.setOrganizationName("Geist");
+
     MainWindow w;
     w.show();
     if(argc > 1){

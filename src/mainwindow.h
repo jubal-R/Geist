@@ -9,8 +9,8 @@
 
 #include "files.h"
 #include "search.h"
-#include "conversion.h"
-#include "templates.h"
+#include "utils/conversion.h"
+#include "utils/templates.h"
 
 namespace Ui {
 class MainWindow;
