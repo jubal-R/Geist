@@ -253,7 +253,9 @@ void GeistTextEdit::toggleComment(){
 }
 
 void GeistTextEdit::setHighlighterTheme(QString theme){
-    highlighter->setTheme(fileType, theme);
+    if (highlighter != NULL){
+        highlighter->setTheme(fileType, theme);
+    }
 }
 
 void GeistTextEdit::setHighlighter(Highlighter * h){

@@ -5,6 +5,8 @@
 Highlighter::Highlighter(QString filetype, QString theme, QTextDocument *parent)
     : QSyntaxHighlighter(parent)
 {
+    commentStartExpression = QRegExp("");
+    commentEndExpression = QRegExp("");
     setupHighlighter(filetype, theme);
 }
 
@@ -510,21 +512,23 @@ void Highlighter::highlightBlock(const QString &text)
     }
     setCurrentBlockState(0);
 
-    int startIndex = 0;
-    if (previousBlockState() != 1)
-        startIndex = commentStartExpression.indexIn(text);
+    if (commentStartExpression != QRegExp("") && commentEndExpression != QRegExp("")) {
+        int startIndex = 0;
+        if (previousBlockState() != 1)
+            startIndex = commentStartExpression.indexIn(text);
 
-    while (startIndex >= 0) {
-        int endIndex = commentEndExpression.indexIn(text, startIndex);
-        int commentLength;
-        if (endIndex == -1) {
-            setCurrentBlockState(1);
-            commentLength = text.length() - startIndex;
-        } else {
-            commentLength = endIndex - startIndex
-                            + commentEndExpression.matchedLength();
+        while (startIndex >= 0) {
+            int endIndex = commentEndExpression.indexIn(text, startIndex);
+            int commentLength;
+            if (endIndex == -1) {
+                setCurrentBlockState(1);
+                commentLength = text.length() - startIndex;
+            } else {
+                commentLength = endIndex - startIndex
+                                + commentEndExpression.matchedLength();
+            }
+            setFormat(startIndex, commentLength, multiLineCommentFormat);
+            startIndex = commentStartExpression.indexIn(text, startIndex + commentLength);
         }
-        setFormat(startIndex, commentLength, multiLineCommentFormat);
-        startIndex = commentStartExpression.indexIn(text, startIndex + commentLength);
     }
 }

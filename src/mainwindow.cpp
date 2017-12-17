@@ -7,6 +7,8 @@
 #include <QScrollBar>
 #include <QTabWidget>
 
+#include "QDebug"
+
 #include "geisttextedit.h"
 
 GeistTextEdit *currentEditorWidget = NULL;
@@ -863,6 +865,7 @@ void MainWindow::on_actionSolarized_triggered()
 {
     theme = "solarized";
     settings.setValue("theme", "solarized");
+
     QString fgc = "#839496";
     QString bgc = "#fdf6e3";
     QString lc = "#eee7d5";
