@@ -573,7 +573,7 @@ background-color: rgba(255, 255, 255, 0);</string>
      <x>0</x>
      <y>0</y>
      <width>961</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="font">
@@ -667,6 +667,7 @@ background-color: rgba(255, 255, 255, 0);</string>
      <addaction name="actionSolarized_Dark"/>
      <addaction name="actionTommorrow"/>
      <addaction name="actionTommorrow_Night"/>
+     <addaction name="actionRandomized"/>
     </widget>
     <widget class="QMenu" name="menuTab_Width">
      <property name="title">
@@ -962,6 +963,34 @@ background-color: rgba(255, 255, 255, 0);</string>
   <action name="actionTommorrow_Night">
    <property name="text">
     <string>Tomorrow Night</string>
+   </property>
+  </action>
+  <action name="actionDefault">
+   <property name="text">
+    <string>Default</string>
+   </property>
+  </action>
+  <action name="actionLight">
+   <property name="text">
+    <string>Light</string>
+   </property>
+  </action>
+  <action name="actionDark_2">
+   <property name="text">
+    <string>Dark</string>
+   </property>
+  </action>
+  <action name="actionFunky">
+   <property name="text">
+    <string>Funky</string>
+   </property>
+  </action>
+  <action name="actionRandomized">
+   <property name="text">
+    <string>Randomized</string>
+   </property>
+   <property name="toolTip">
+    <string>Random Selection</string>
    </property>
   </action>
  </widget>

@@ -162,6 +162,10 @@ private slots:
 
     void on_actionTommorrow_Night_triggered();
 
+    void on_actionRandomized_triggered(bool checked);
+
+    void on_actionRandomized_triggered();
+
 private:
     Ui::MainWindow *ui;
     Highlighter *highlighter;
