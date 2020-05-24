@@ -103,7 +103,10 @@ MainWindow::~MainWindow()
     settings.setValue("windowWidth", windowRect.width());
     settings.setValue("windowHeight", windowRect.height());
 
-
+    if (settings.value("theme")=="Randomized")
+    {
+        settings.setValue("theme","monokai");
+    }
     // Save List Of Files Open In Editor
     QStringList fileList;
     int numOpenFiles = ui->tabWidget->count();
@@ -844,6 +847,12 @@ void MainWindow::updateHighlighterTheme(){
 void MainWindow::on_actionDark_triggered()
 {
     theme = "monokai";
+    ui->actionDark->setText( "*Monokai");
+    ui->actionSolarized->setText("Solarized");
+    ui->actionSolarized_Dark->setText("Solarized Dark");
+    ui->actionTommorrow->setText("Tomorrow");
+    ui->actionTommorrow_Night->setText("Tomorrow Night");
+    ui->actionRandomized->setText("Randomized");
     settings.setValue("theme", "monokai");
     QString fgc = "#e0e0e0";
     QString bgc = "#272822";
@@ -864,6 +873,12 @@ void MainWindow::on_actionDark_triggered()
 void MainWindow::on_actionSolarized_triggered()
 {
     theme = "solarized";
+    ui->actionDark->setText( "Monokai");
+    ui->actionSolarized->setText("*Solarized");
+    ui->actionSolarized_Dark->setText("Solarized Dark");
+    ui->actionTommorrow->setText("Tomorrow");
+    ui->actionTommorrow_Night->setText("Tomorrow Night");
+    ui->actionRandomized->setText("Randomized");
     settings.setValue("theme", "solarized");
 
     QString fgc = "#839496";
@@ -884,6 +899,12 @@ void MainWindow::on_actionSolarized_triggered()
 void MainWindow::on_actionSolarized_Dark_triggered()
 {
     theme = "solarizedDark";
+    ui->actionDark->setText( "Monokai");
+    ui->actionSolarized->setText("Solarized");
+    ui->actionSolarized_Dark->setText("*Solarized Dark");
+    ui->actionTommorrow->setText("Tomorrow");
+    ui->actionTommorrow_Night->setText("Tomorrow Night");
+    ui->actionRandomized->setText("Randomized");
     settings.setValue("theme", "solarizedDark");
     QString fgc = "#839496";
     QString bgc = "#002b36";
@@ -904,6 +925,12 @@ void MainWindow::on_actionTommorrow_triggered()
 {
     theme = "tomorrow";
     settings.setValue("theme", "tomorrow");
+    ui->actionDark->setText( "Monokai");
+    ui->actionSolarized->setText("Solarized");
+    ui->actionSolarized_Dark->setText("Solarized Dark");
+    ui->actionTommorrow->setText("*Tomorrow");
+    ui->actionTommorrow_Night->setText("Tomorrow Night");
+    ui->actionRandomized->setText("Randomized");
     QString fgc = "#4d4d4c";
     QString bgc = "#ffffff";
     QString lc = "#efefef";
@@ -923,6 +950,12 @@ void MainWindow::on_actionTommorrow_Night_triggered()
 {
     theme = "tomorrowNight";
     settings.setValue("theme", "tomorrowNight");
+    ui->actionDark->setText( "Monokai");
+    ui->actionSolarized->setText("Solarized");
+    ui->actionSolarized_Dark->setText("Solarized Dark");
+    ui->actionTommorrow->setText("Tomorrow");
+    ui->actionTommorrow_Night->setText("*Tomorrow Night");
+    ui->actionRandomized->setText("Randomized");
     QString fgc = "#c5c8c6";
     QString bgc = "#1d1f21";
     QString lc = "#282a2e";
@@ -938,6 +971,33 @@ void MainWindow::on_actionTommorrow_Night_triggered()
     highlightCurrentLine();
 }
 
+void MainWindow::on_actionRandomized_triggered()
+{
+    theme = "Randomized";
+    settings.setValue("theme", "Randomized");
+    ui->actionDark->setText( "Monokai");
+    ui->actionSolarized->setText("Solarized");
+    ui->actionSolarized_Dark->setText("Solarized Dark");
+    ui->actionTommorrow->setText("Tomorrow");
+    ui->actionTommorrow_Night->setText("Tomorrow Night");
+    ui->actionRandomized->setText("*Randomized");
+    QString fgc[10] = {"#F42F05","#DED133","#E912CF","#67BC33","0439EE","#02FEE7","#0A4604","#47E155","FDF202","72D62D"};
+    QString bgc [10]= {"#F42F05","#DED133","#E912CF","#67BC33","0439EE","#02FEE7","#0A4604","#388175","#FDF202","#72D62D"};
+    QString lc [10]= {"#F42F05","#DED133","#E912CF","#67BC33","0439EE","#02FEE7","#C073B9","#A30AF5","#47E155","#F5562F"};
+    srand(time(NULL));
+    int a=rand()%10;
+     int b=rand()%10;
+     int c=rand()%10;
+    setMainWindowStyle(bgc[a], lc[b]);
+    setTabWidgetStyle(fgc[b], bgc[a]);
+    setLineNumStyle(lc[c], fgc[b]);
+    setOverViewStyle(lc[c], fgc[b]);
+
+    updateHighlighterTheme();
+
+   lineColor = QColor(250,250,250);
+    highlightCurrentLine();
+}
 /*
  *****************************
  *         Window            *
@@ -1118,3 +1178,9 @@ void MainWindow::on_action2_triggered()
 void MainWindow::openWith(QString file){
     open(file);
 }
+
+
+
+
+
+
