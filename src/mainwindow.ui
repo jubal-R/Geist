@@ -965,26 +965,6 @@ background-color: rgba(255, 255, 255, 0);</string>
     <string>Tomorrow Night</string>
    </property>
   </action>
-  <action name="actionDefault">
-   <property name="text">
-    <string>Default</string>
-   </property>
-  </action>
-  <action name="actionLight">
-   <property name="text">
-    <string>Light</string>
-   </property>
-  </action>
-  <action name="actionDark_2">
-   <property name="text">
-    <string>Dark</string>
-   </property>
-  </action>
-  <action name="actionFunky">
-   <property name="text">
-    <string>Funky</string>
-   </property>
-  </action>
   <action name="actionRandomized">
    <property name="text">
     <string>Randomized</string>
