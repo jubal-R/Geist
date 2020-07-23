@@ -1,6 +1,6 @@
 ![GeistLogo](https://github.com/jubal-R/Geist/blob/master/icons/geistlogo.png)
 
-[![Try it online](https://img.shields.io/badge/Try%20it%20online!-informational)](https://ghost-editor.netlify.app/)
+[![Try it online](https://img.shields.io/badge/Try%20it%20online!-informational)](https://geist-editor.netlify.app/)
 
 Geist is an all purpose text/code editor written in C++ and using the Qt framework.
 
