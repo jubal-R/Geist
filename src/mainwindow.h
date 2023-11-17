@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <highlighter.h>
+#include "highlighter.h"
 #include <QShortcut>
 #include "QSettings"
 #include <QPlainTextEdit>

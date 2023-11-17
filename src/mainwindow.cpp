@@ -1150,7 +1150,7 @@ void MainWindow::setTabWidth(int width){
 
     for(int i = 0; i < ui->tabWidget->count(); i++){
         ui->tabWidget->setCurrentIndex(i);
-        currentEditorWidget->setTabStopWidth(width * metrics.width(' ') );
+        currentEditorWidget->setTabStopDistance(width * metrics.maxWidth() );
     }
 
     ui->tabWidget->setCurrentIndex(current);

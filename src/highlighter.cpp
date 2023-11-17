@@ -1,5 +1,4 @@
 #include <QtGui>
-
 #include "highlighter.h"
 
 Highlighter::Highlighter(QString filetype, QString theme, QTextDocument *parent)
