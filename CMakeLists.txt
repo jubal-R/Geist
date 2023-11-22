@@ -22,10 +22,12 @@ endif()
 include(FeatureSummary)
 
 find_package(
-    Qt6
-    COMPONENTS Core Widgets Core5Compat
+    QT NAMES Qt6 Qt5
+    COMPONENTS Core
     REQUIRED
 )
+
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets)
 
 include_directories(src)
 
@@ -47,8 +49,16 @@ set(PROJECT_SOURCES
     src/widgets/geisttextedit.h
 )
 
-qt_add_executable(${PROJECT_NAME} WIN32 ${PROJECT_SOURCES})
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt::Core Qt::Widgets Qt::Core5Compat)
+if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+    qt_add_executable(${PROJECT_NAME}
+        MANUAL_FINALIZATION
+    )
+else()
+    add_executable(${PROJECT_NAME})
+endif()
+
+target_sources(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCES})
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Widgets)
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
 
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)

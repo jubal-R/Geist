@@ -21,7 +21,7 @@ Note: Font settings to be added in the future
 
 ## Dependencies
 
-- Qt6 {Core, Widgets & Core5Compat (QRegExp)}
+- Qt5.15 or Qt6
 - CMake
 
 ## Building Geist
